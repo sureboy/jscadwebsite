@@ -9,9 +9,15 @@ const {cube,arc,circle,cuboid,cylinder,cylinderElliptic,ellipse,
   ellipsoid,geodesicSphere,line,polygon,polyhedron,rectangle,
   roundedCuboid,roundedCylinder,roundedRectangle,sphere,square,star,torus,triangle
 } = modeling.primitives;
- 
+//type solidHandle = (k:Set<unknown>)=>void;
+
+//type solidHandle = (txt:string) => void;
+type solidStruct  = {name:string, key:Set<string>,val:string[]}
 export const solidListKey="solidList" 
 const regexpGetClass = /const\s+(\w+)\s*=\s*class\s*{/
+const regexpGetMain = /(static\s+)?main(?:\(|\=|\s)/g
+const regexpGetTemplate = /const\s+template_(\w+)\s*=\s*class\s*{/
+
 export const solidNow:{solid:Geometry[]}={
   solid:[]
 }
@@ -238,24 +244,55 @@ export const getSolidCode = (list?:string|null)=>{
     return solidlist.join('\n')
 }
 export const showSolid = (str:string)=>{
-
   updateOptions( eval(str))
 }
-export const getSolidParent = (val:string)=>{
-  let vm = val.match(regexpGetClass) 
-  if (!vm)return "";
-  let funcName  = new Set(); 
-  [...val.matchAll(/(\w+)\./g)].forEach(v=>{funcName.add(v[1])}) 
-  //let list=""
-  funcName.delete("this")
-  console.log(funcName)
-  funcName.forEach(v=>{
-    console.log(v as string)
-    var db = window.localStorage.getItem(v as string)
-    if (db) val+="\n" +db
-  })
-  val+="\n"+vm[1]+".main()" 
-  //console.log(val)
+ 
+const getSolid=(val:string)=>{
+  let vm = val.match(regexpGetClass)    
+  if (!vm)return null; 
+  let info:solidStruct = {name:vm[1], key:new Set(vm[1]),val:[val]}
+  //info.key.add( vm[1]);
+  getSolidFromChild(val,info)
+  return info;
+ 
+}
+const getSolidFromChild=(val:string,childInfo:solidStruct)=>{ 
+  [...val.matchAll(/(\w+)\./g)].forEach(v=>{
+    let vl = v[1]
+    if (childInfo.key.has(vl))return;
+    childInfo.key.add(vl)
+    let val_= window.localStorage.getItem(vl)
+    if (!val_)return 
+    //let vm = val_.match(regexpGetClass)   
+    //if (!vm)return;
+    //childInfo.key.add( vl);
+    childInfo.val.push(val_);
+    getSolidFromChild(val_,childInfo)
+  }) 
+}
+export const getSolidString = (v:string)=>{
+  let m = v.match(regexpGetMain)
+  if (!m)return ""
+  let info = getSolid(v)
+  if (!info)return""
+
+
+  let val = info.val.join("\n")
+    val+="\n"
+   // console.log("main",m.length)
+  if (m[0].startsWith("static")){
+    val+= info.name+".main()" 
+  }else{  
+    val+=`let l=(new ${info.name}());l.main()`
+  }
+  
+
+  console.log(val)
   return val
 
+}
+export const TemplateSolid=(v:string)=>{
+  let m = v.match(regexpGetTemplate)
+  if (!m)return ""
+  return getSolid(v)
 }
