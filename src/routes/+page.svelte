@@ -6,7 +6,7 @@
     solidNow,getSolidString,searchSolid} from "$lib/show3d";
   import {  CodeOutline,TrashBinSolid, CloseOutline, DownloadSolid   } from 'flowbite-svelte-icons';
   import { Fileupload, Navbar, NavBrand, NavLi, NavUl, 
-    NavHamburger,Alert ,Badge,Listgroup,ListgroupItem,Textarea,Popover,AccordionItem, Accordion } from 'flowbite-svelte';  
+    NavHamburger,Alert ,Badge,Listgroup,ListgroupItem,Textarea,Popover,AccordionItem, Accordion,Input } from 'flowbite-svelte';  
   import {serialize,mimeType} from "@jscad/stl-serializer" 
   type Tcolor ="dark" | "form" | "none" | "gray" | "red" | "yellow" | "green" | "indigo" | "purple" | "pink" | "blue" | "light" | "default" | "dropdown" | "navbar" | "navbarUl" | "primary" | "orange" | undefined
  
@@ -147,14 +147,13 @@
 <div class="flex flex-row">
   <div class="basis-1/4 max-h-80 overflow-auto " >
   {#if startSearch}
-  <Listgroup   active >
+  <Listgroup   >
     {#each searchSolid(searchkey) as item,index}
     <ListgroupItem   >
-     <span id="t{index}" class="w-full h-full" > {item[0]}  </span>
+      <div class="w-full h-full"><p>{item[1]}</p></div>
+      
     </ListgroupItem>     
-    <Popover  triggeredBy="#t{index}">  
-    <p    class="w-full h-full"   >{item[1]}</p>
-    </Popover>  
+  
     {/each}
   </Listgroup>
   {/if}
