@@ -197,7 +197,7 @@
   }
 
   //poper.style.top = textareaObj.
-  console.log("input", e)
+  //console.log("input", e)
   // event.value+=e.data 
 
 }}   on:keydown={(e)=>{

@@ -28,10 +28,10 @@ export const searchSolid=(key:string,len:number=10)=>{
   if (!key)return li
   searchObj("this",solidTemplate,key,(k:string,v:any)=>{
     
-    //let v1 = v.toString()
-
-    let d = v.toString().match(/const defaults \= (\{[^\}]+\})/)
-    console.log(d)
+    let v1 = v.toString()
+    
+    let d = v1.match(/const defaults \= (\{[^\}]+\})/)
+    console.log(v1,d)
     if (d)   li.push([k,`${k}(${d![1]})`])
     return li.length<len
   })
