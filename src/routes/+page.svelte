@@ -153,7 +153,7 @@
      <span id="t{index}" class="w-full h-full" > {item[0]}  </span>
     </ListgroupItem>     
     <Popover  triggeredBy="#t{index}">  
-    <textarea  spellcheck=false  rows="10" class="w-full h-full" bind:value={item[1]} ></textarea>
+    <p    class="w-full h-full"   >{item[1]}</p>
     </Popover>  
     {/each}
   </Listgroup>
