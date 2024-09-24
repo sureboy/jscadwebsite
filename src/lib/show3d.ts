@@ -2,22 +2,16 @@
 
 import rend from '@jscad/regl-renderer';
 const {cameras, prepareRender,controls,drawCommands,entitiesFromSolids} = rend;
-import modeling from '@jscad/modeling'; 
+//import modeling from '@jscad/modeling'; 
 import type {Geometry} from '@jscad/modeling/src/geometries/types';
+import {solidBase} from './solidClass'
 
-const {cube,arc,circle,cuboid,cylinder,cylinderElliptic,ellipse,
-  ellipsoid,geodesicSphere,line,polygon,polyhedron,rectangle,
-  roundedCuboid,roundedCylinder,roundedRectangle,sphere,square,star,torus,triangle
-} = modeling.primitives;
-//type solidHandle = (k:Set<unknown>)=>void;
-
-//type solidHandle = (txt:string) => void;
 type solidStruct  = {name:string, key:Set<string>,val:string[]}
 export const solidListKey="solidList" 
-const regexpGetClass = /const\s+(\w+)\s*=\s*class\s*{/
-const regexpGetMain = /(static\s+)?main(?:\(|\=|\s)/g
-const regexpGetTemplate = /const\s+template_(\w+)\s*=\s*class\s*{/
-
+const regexpGetClass = /const\s+(\w+)\s*=\s*class(?:\s+extends\s+(\w+))?\s*\{/ 
+interface SearchDataCallback {
+  (k:string,v:any):boolean
+}
 export const solidNow:{solid:Geometry[]}={
   solid:[]
 }
@@ -27,7 +21,29 @@ const state = {
   controls : orbitControls.defaults,
   camera:Object.assign({}, perspectiveCamera.defaults)
 }
+const solidTemplate = new solidBase()
+export const searchSolid=(key:string,len:number=10)=>{
+ 
+  let li:any[] = []
+  if (!key)return li
+  searchObj("this",solidTemplate,key,(k:string,v:any)=>{
+    
+    //let v1 = v.toString()
 
+    let d = v.toString().match(/const defaults \= (\{[^\}]+\})/)
+    console.log(d)
+    if (d)   li.push([k,`${k}(${d![1]})`])
+    return li.length<len
+  })
+  return li
+}
+//console.log(solidTemplate) 
+/*
+searchObj(solidTemplate,"c",(k:string,v:any)=>{
+  console.log(k,v)
+  return false
+})
+  */
   const gridOptions = {
     visuals: {
       drawCmd: 'drawGrid',
@@ -233,30 +249,48 @@ export const removeSolid=(k:string)=>{
   })
   window.localStorage.setItem(solidListKey, Array.from(funcName).join(","))
 }
-export const getSolidCode = (list?:string|null)=>{
-  if (!list) list = window.localStorage.getItem(solidListKey)
-    if(!list)return ""
-    let solidlist:string[]=[]
-    list.split(",").forEach((v)=>{
-      solidlist.push(window.localStorage.getItem(v)!)
-    })
-    solidlist.push("main()")
-    return solidlist.join('\n')
-}
+
 export const showSolid = (str:string)=>{
   updateOptions( eval(str))
 }
  
 const getSolid=(val:string)=>{
+  if (!val)return null
   let vm = val.match(regexpGetClass)    
   if (!vm)return null; 
-  let info:solidStruct = {name:vm[1], key:new Set(vm[1]),val:[val]}
+  let info:solidStruct = {name:vm[1], key:new Set(vm[1]),val:[]}
   //info.key.add( vm[1]);
   getSolidFromChild(val,info)
-  return info;
- 
+  return info; 
 }
 const getSolidFromChild=(val:string,childInfo:solidStruct)=>{ 
+  let keylist  = new Set<string>();
+  [...val.matchAll(/(\w+)\./g)].forEach(v=>{
+    keylist.add(v[1])
+  });
+  [...val.matchAll(/new\s+(\w+)\s*/g)].forEach(v=>{
+    keylist.add(v[1])
+  });
+  let ext = val.match(/extends\s+(\w+)\s*/);
+  //console.log("ext",ext)
+  if (!ext || !ext[1]){
+    val= val.replace(/\s*class\s*/,"class extends solidBase")
+    //console.log(val)
+  }else{
+    keylist.add(ext[1])
+ 
+  }
+  childInfo.val.push(val)
+
+  keylist.forEach(vl=>{
+    if (childInfo.key.has(vl))return;
+    childInfo.key.add(vl)
+    let val_= window.localStorage.getItem(vl)
+    if (!val_)return  
+    childInfo.val.push(val_);
+    getSolidFromChild(val_,childInfo)
+  });
+  /*
   [...val.matchAll(/(\w+)\./g)].forEach(v=>{
     let vl = v[1]
     if (childInfo.key.has(vl))return;
@@ -269,10 +303,11 @@ const getSolidFromChild=(val:string,childInfo:solidStruct)=>{
     childInfo.val.push(val_);
     getSolidFromChild(val_,childInfo)
   }) 
+    */
 }
 export const getSolidString = (v:string)=>{
-  let m = v.match(regexpGetMain)
-  if (!m)return ""
+  //let m = v.match(regexpGetMain)
+  //if (!m)return ""
   let info = getSolid(v)
   if (!info)return""
 
@@ -280,19 +315,33 @@ export const getSolidString = (v:string)=>{
   let val = info.val.join("\n")
     val+="\n"
    // console.log("main",m.length)
-  if (m[0].startsWith("static")){
-    val+= info.name+".main()" 
-  }else{  
+  //if (m[0].startsWith("static")){
+  //  val+= info.name+".main()" 
+  //}else{  
     val+=`let l=(new ${info.name}());l.main()`
-  }
+  //}
   
 
   console.log(val)
   return val
 
 }
-export const TemplateSolid=(v:string)=>{
-  let m = v.match(regexpGetTemplate)
-  if (!m)return ""
-  return getSolid(v)
+
+ function searchObj(f:string,solid:Object ,k_:string,callback:SearchDataCallback)  {
+  for (const [key, value] of Object.entries(solid)) {
+      //console.log(`${key}: ${value}`);
+      
+      if (key.search(k_)<0) {
+          if (typeof(value) == "object"){
+            
+            if (!searchObj(f+"."+key,value,k_,callback))return
+          } 
+      }else{
+          if (!callback(f+"."+key,value))return false
+      }
+      
+      
+  }
+  return false
+     
 }
