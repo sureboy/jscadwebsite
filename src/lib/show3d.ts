@@ -30,9 +30,10 @@ export const searchSolid=(key:string,len:number=10)=>{
     
     let v1 = v.toString()
     
-    let d = v1.match(/const defaults \= (\{[^\}]+\})/)
+    let d = v1.match(/const (?:defaults|t)\s*\=\s*(\{[^\}]+\})/)
     console.log(v1,d)
     if (d)   li.push([k,`${k}(${d![1]})`])
+     
     return li.length<len
   })
   return li
