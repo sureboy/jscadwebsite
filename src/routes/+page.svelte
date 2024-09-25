@@ -1,16 +1,17 @@
 <script lang="ts"> 
  
 	import { onMount } from "svelte";    
-
+//import type {solidBase} from '$lib/solidClass'
+//import {solidBase} from '$lib/solidClass'
   import {show3d,saveSolid,showSolid,solidListKey,removeSolid,
-    solidNow,getSolidString} from "$lib/show3d";
+    solidNow,getSolidString,solidLogo as solidBase,updateOptions} from "$lib/show3d";
     import type {SearchDataCallback} from "$lib/show3d";
   import {  CodeOutline,TrashBinSolid, CloseOutline, DownloadSolid   } from 'flowbite-svelte-icons';
   import { Fileupload, Navbar, NavBrand, NavLi, NavUl, 
-    NavHamburger,Alert ,Badge,Listgroup,ListgroupItem,Textarea,Popover,AccordionItem, Accordion,Input } from 'flowbite-svelte';  
+    NavHamburger,Alert ,Badge,Listgroup,ListgroupItem,Textarea } from 'flowbite-svelte';  
   import {serialize,mimeType} from "@jscad/stl-serializer" 
   type Tcolor ="dark" | "form" | "none" | "gray" | "red" | "yellow" | "green" | "indigo" | "purple" | "pink" | "blue" | "light" | "default" | "dropdown" | "navbar" | "navbarUl" | "primary" | "orange" | undefined
- 
+  //type base = solidBase
   let files:FileList|undefined ;
   //let solidList:string=""  
   let TextareaVal:string  
@@ -22,8 +23,9 @@
   let searchkey:string = ""
   let start:number;
   let startSearch:boolean =false
-  let tempVal:string=""
+  //let tempVal:string=""
   let regSearchKey = /this\.(\w+)$/
+  //let base:solidBase|null=null
 
 	/** @type {import('./$types').PageData} */
 	export let data:any;
@@ -38,7 +40,11 @@
  })
  return li
 }
-  function searchHelpData(solid:Map<string,any> ,k_:string|RegExp,callback:SearchDataCallback)  {
+ 
+//const base = class extends solidBase{} 
+//console.log(base)
+ 
+function searchHelpData(solid:Map<string,any> ,k_:string|RegExp,callback:SearchDataCallback)  {
   for (const [key, value] of  solid) {
       console.log(`${k_} ${key}: ${typeof(value)}`);
       
@@ -104,8 +110,10 @@
     //textareaObj.addEventListener("beforeinput",eventHand)
     
     init()
+    //const logo = 
+    console.log(solidBase)
     show3d(jscad,[])
-   
+    updateOptions((new solidBase).main())
     window.document.addEventListener(
       "keydown",
       (e) => {    

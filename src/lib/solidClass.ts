@@ -1,5 +1,5 @@
 import modeling from '@jscad/modeling'; 
-  
+import type {Geometry} from '@jscad/modeling/src/geometries/types';
 
 
 export  class solidBase    {
@@ -72,7 +72,8 @@ export  class solidBase    {
     //static  Ttransforms  = modeling.transforms 
 
     main(){
-        return []
+        let l:Geometry[] = []
+        return l
     }
  
 }

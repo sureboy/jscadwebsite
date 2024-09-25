@@ -1,5 +1,4 @@
 // place files you want to import through the `$lib` alias in this folder.
-
 import rend from '@jscad/regl-renderer';
 const {cameras, prepareRender,controls,drawCommands,entitiesFromSolids} = rend;
 //import modeling from '@jscad/modeling'; 
@@ -9,6 +8,13 @@ import {solidBase} from './solidClass'
 type solidStruct  = {name:string, key:Set<string>,val:string[]}
 export const solidListKey="solidList" 
 const regexpGetClass = /const\s+(\w+)\s*=\s*class(?:\s+extends\s+(\w+))?\s*\{/ 
+
+export const solidLogo = class extends solidBase {
+  main=()=>{
+    return [this.cube({size:200,center:[0,0,20]})]
+  }
+}
+
 export interface SearchDataCallback {
   (k:string,v:any):boolean
 }
@@ -21,30 +27,7 @@ const state = {
   controls : orbitControls.defaults,
   camera:Object.assign({}, perspectiveCamera.defaults)
 }
-const solidTemplate = new solidBase()
-export const searchSolid=(key:string|RegExp,len:number=10)=>{
- 
-  let li:any[] = []
-  if (!key)return li
-  searchObj("this",solidTemplate,key,(k:string,v:any)=>{
-    
-    let v1 = v.toString()
-    
-    let d = v1.match(/const (?:defaults|t)\s*\=\s*(\{[^\}]+\})/)
-    console.log(v1,d)
-    if (d)   li.push([k,`${k}(${d![1]})`])
-     
-    return li.length<len
-  })
-  return li
-}
-//console.log(solidTemplate) 
-/*
-searchObj(solidTemplate,"c",(k:string,v:any)=>{
-  console.log(k,v)
-  return false
-})
-  */
+
   const gridOptions = {
     visuals: {
       drawCmd: 'drawGrid',
@@ -319,7 +302,7 @@ export const getSolidString = (v:string)=>{
   //if (m[0].startsWith("static")){
   //  val+= info.name+".main()" 
   //}else{  
-    val+=`let l=(new ${info.name}());l.main()`
+    val+=`let l = (new ${info.name}());l.main()`
   //}
   
 

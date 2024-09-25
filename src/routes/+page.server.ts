@@ -1,5 +1,5 @@
 import {solidBase} from '$lib/solidClass'
-import {searchObj,searchSolid} from '$lib/show3d' 
+//import {searchObj} from '$lib/show3d' 
 const solidTemplate = new solidBase()
 
 /** @type {import('./$types').PageServerLoad} */
