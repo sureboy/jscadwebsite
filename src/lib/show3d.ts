@@ -231,7 +231,7 @@ export const removeSolid=(k:string)=>{
   window.localStorage.getItem(solidListKey)?.split(',').forEach(v=>{    
     if (v&&window.localStorage.getItem(v))funcName.add(v)
   })
-  window.localStorage.setItem(solidListKey, Array.from(funcName).join(","))
+  window.localStorage.setItem(solidListKey,funcName.size>0?Array.from(funcName).join(","):"")
 }
 
 export const showSolid = (str:string)=>{

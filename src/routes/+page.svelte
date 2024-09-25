@@ -80,7 +80,7 @@ function searchHelpData(solid:Map<string,any> ,k_:string|RegExp,callback:SearchD
     //showSolid(solidList) 
     links = []
     window.localStorage.getItem(solidListKey)?.split(",").forEach(v=>{
-      links.push(v)
+      if(v)links.push(v)
     })
     
   }
@@ -201,13 +201,16 @@ function searchHelpData(solid:Map<string,any> ,k_:string|RegExp,callback:SearchD
   {/if}
     
    
-<Listgroup   active items={links} let:item class="basis-1/4" on:click={(e) =>{
-  //console.log(e)
-  TextareaVal =window.localStorage.getItem(e.detail)||"";
-  modalTitle=e.detail;
-  Show3DSolid(TextareaVal);
-  }}>
-  {item}
+<Listgroup   active   class="basis-1/4" >
+  {#each links as item}
+  <ListgroupItem current={modalTitle==item} on:click={(e) =>{
+    //console.log(e)
+    TextareaVal =window.localStorage.getItem(item)||"";
+    modalTitle=item;
+    Show3DSolid(TextareaVal);
+    }} >{item}</ListgroupItem> 
+  {/each}
+  
  
 </Listgroup>
 </div>
