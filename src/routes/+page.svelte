@@ -5,15 +5,16 @@
 //import {solidBase} from '$lib/solidClass'
   import {show3d,saveSolid,showSolid,solidListKey,removeSolid,
     solidNow,getSolidString,solidLogo as solidBase,updateOptions} from "$lib/show3d";
-    import type {SearchDataCallback} from "$lib/show3d";
+  import type {SearchDataCallback} from "$lib/show3d";
   import {  CodeOutline,TrashBinSolid, CloseOutline, DownloadSolid   } from 'flowbite-svelte-icons';
-  import { Fileupload, Navbar, NavBrand, NavLi, NavUl, 
+  import { Fileupload, Navbar, NavBrand, NavLi, NavUl, Modal,
     NavHamburger,Alert ,Badge,Listgroup,ListgroupItem,Textarea } from 'flowbite-svelte';  
-  import {serialize,mimeType} from "@jscad/stl-serializer" 
+  import {serialize,mimeType} from "@jscad/stl-serializer"  
   type Tcolor ="dark" | "form" | "none" | "gray" | "red" | "yellow" | "green" | "indigo" | "purple" | "pink" | "blue" | "light" | "default" | "dropdown" | "navbar" | "navbarUl" | "primary" | "orange" | undefined
   //type base = solidBase
   let files:FileList|undefined ;
   //let solidList:string=""  
+
   let TextareaVal:string  
   let modalTitle = ""
   let jscad:HTMLElement;   
@@ -22,40 +23,47 @@
   let links:any[] = []
   let searchkey:string = ""
   let start:number;
-  let startSearch:boolean =false
+  let helpCode:string = ""
+  let formModal = false;
+  let helpTitle:string=""
+  //let startSearch:boolean =false
   //let tempVal:string=""
-  let regSearchKey = /this\.(\w+)$/
+  let regSearchKey = /this\.(?:\w*\.?)*$/
   //let base:solidBase|null=null
 
 	/** @type {import('./$types').PageData} */
 	export let data:any;
   //console.log(data.data)
-  const searchSolid=(key:string|RegExp,len:number=10)=>{
+const searchSolid=(key:string,len:number=2000)=>{
  console.log(key)
+ //let keylist = key.split(".")
+ //keylist.shift()
  let li:any[] = []
  if (!key)return li
  searchHelpData( data.data,key,(k:string,v:any)=>{
     li.push([k,v])
     return li.length<len
  })
+ if (li.length==0){
+
+ }
  return li
 }
  
 //const base = class extends solidBase{} 
 //console.log(base)
  
-function searchHelpData(solid:Map<string,any> ,k_:string|RegExp,callback:SearchDataCallback)  {
+function searchHelpData(solid:Map<string,any> ,k_:string,callback:SearchDataCallback)  {
   for (const [key, value] of  solid) {
-      console.log(`${k_} ${key}: ${typeof(value)}`);
-      
-      if (key.search(k_)<0) {
-          if (typeof(value) == "object"){            
-            if (!searchHelpData(value,k_,callback))return
-          } 
-      }else{
-          if (!callback(key,value))return false
+      //console.log(`${k_} ${key}: ${typeof(value)}`);
+      if (key.startsWith(k_)){
+        if (!callback(key,value))return 
+      } else{
+        let ks = k_.split(".").pop()
+        if (ks){
+          if (key.search(ks)>0)if (!callback(key,value))return 
+        }
       }
-      
       
   }
   return false
@@ -94,8 +102,7 @@ function searchHelpData(solid:Map<string,any> ,k_:string|RegExp,callback:SearchD
       init()
       AlertMsg.color = "dark" 
       AlertMsg.err=""
-    }catch(e){
-      
+    }catch(e){      
       console.log(e)
       AlertMsg.color = "red"  
       AlertMsg.err = e
@@ -111,7 +118,7 @@ function searchHelpData(solid:Map<string,any> ,k_:string|RegExp,callback:SearchD
     
     init()
     //const logo = 
-    console.log(solidBase)
+    //console.log(solidBase)
     show3d(jscad,[])
     updateOptions((new solidBase).main())
     window.document.addEventListener(
@@ -172,35 +179,31 @@ function searchHelpData(solid:Map<string,any> ,k_:string|RegExp,callback:SearchD
       Show3DSolid(TextareaVal);
       }
       }><CodeOutline/>Edit</NavLi>
-
     {#if TextareaVal}
     <NavLi href="#" on:click={()=>{ saveSolid(TextareaVal);TextareaVal ="";}} ><CloseOutline/>Close</NavLi>  
     {/if}
-
-  
   </NavUl>
   <div class="flex md:order-2">
     <Fileupload tabindex="1" id="multiple_files" multiple bind:files />
   </div> 
-
 </Navbar>
-
 {#if TextareaVal } 
 <div class="flex flex-row">
   <div class="basis-1/4 max-h-80 overflow-auto " >
-  {#if startSearch}
-  <Listgroup   >
+  {#if searchkey}
+  <Listgroup  active >
     {#each searchSolid(searchkey) as item}
-    <ListgroupItem   >
-      <div class="w-full h-full"><p>{item[1]}</p></div>
-      
+    <ListgroupItem  on:click={(e) =>{
+      console.log(item[1])
+      formModal=true;
+      helpCode=item[1]
+      helpTitle=item[0]
+      }} >
+     {item[0]} 
     </ListgroupItem>     
-  
     {/each}
   </Listgroup>
   {/if}
-    
-   
 <Listgroup   active   class="basis-1/4" >
   {#each links as item}
   <ListgroupItem current={modalTitle==item} on:click={(e) =>{
@@ -214,75 +217,39 @@ function searchHelpData(solid:Map<string,any> ,k_:string|RegExp,callback:SearchD
  
 </Listgroup>
 </div>
-<Textarea    placeholder="input Ctrl+Enter View Solid"  on:change={()=>{
- //Show3DSolid(TextareaVal);
-}}   on:input={e=>{  
-  if (e.data==="."){
-    textareaObj = e.target
-    start = textareaObj.selectionStart
-   
-    if (textareaObj.value.substring(start-5,start-1)=="this"){
-      startSearch=true
-      return
-    }
-  }
-  if (startSearch){
+<Textarea    placeholder="input Ctrl+Enter View Solid"     on:input={e=>{
     textareaObj = e.target
     start = textareaObj.selectionStart
     let kl = regSearchKey.exec(textareaObj.value.substring(0,start))
-    if (!kl){
-      startSearch=false
-      return
+    if (!kl)  searchkey=""; 
+    else{
+      //let keylist = kl[0].split(".")
+      //keylist.shift()
+      //console.log(keylist)
+      if (kl[0])  searchkey =kl[0];
+      else  searchkey=".";  
+      //console.log(searchkey)
     }
-    if (kl[1]){
-      searchkey = kl[1]
-     // searchlinks = searchSolid(kl[1])
-    }  } 
-}}   on:keydown={(e)=>{
-  
-   //textareaObj = e.target
-  if(e.code==="Escape"){
-    startSearch=false
-  }
-  
-  //console.log(textareaObj.data)
+  }}   on:keydown={(e)=>{ 
   if (e.ctrlKey &&  e.code=="KeyS") {
     e.preventDefault();   
     Show3DSolid(TextareaVal);
   }
-  if (e.code==="Tab"){   
-    //e.key=" "
-    e.preventDefault();  
-/*
-    //textareaObj = e.target
-    //textareaObj.dispatchEvent(event)
-  
-    if (start>0)return
-  
-    start = textareaObj.selectionStart    
-    textareaObj.value = textareaObj.value.substring(0,start)+"    "+textareaObj.value.substring(start)
-    start+=4 
-    textareaObj.selectionStart = start  ;
-    textareaObj.selectionEnd = start  ;
-    */
+  if (e.code==="Tab"){
+    e.preventDefault();
   }
-  //if (e.shiftKey && e.code=="Enter")Show3DSolid(TextareaVal);
-}} on:keyup={(e)=>{
-  /*
-  if (e.code==="Tab"){    
-    textareaObj = e.target
-    textareaObj.selectionStart = start  ;
-    textareaObj.selectionEnd = start  ;
-    start = 0   
-  }
-    */
-}} spellcheck=false   rows="10" bind:value={TextareaVal} class="basis-3/4  opacity-80 " > </Textarea>
+  }} 
+    spellcheck=false   rows="10" bind:value={TextareaVal} class="basis-3/4  opacity-80 " > </Textarea>
  
 </div>
 
 
 {/if}
 </div>
+<Modal size="xl" title="{helpTitle}" bind:open={formModal}  autoclose outsideclose  class="w-full">
+  <Textarea rows="15" bind:value={helpCode} ></Textarea>
+</Modal>
+
 <div id="jscad" bind:this={jscad} class=" h-full w-full z-0 absolute top-0 left-0" ></div>  
 
 <style lang="postcss">

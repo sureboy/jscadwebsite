@@ -3,13 +3,8 @@ import type {Geometry} from '@jscad/modeling/src/geometries/types';
 
 
 export  class solidBase    {
+    cube  = modeling.primitives.cube
     /*
-      cube,arc,circle,cuboid,cylinder,cylinderElliptic,ellipse,
-        ellipsoid,geodesicSphere,line,polygon,polyhedron,rectangle,
-        roundedCuboid,roundedCylinder,roundedRectangle,sphere,square,star,torus,triangle
-       = modeling.primitives;
-*/
-
     cube  = modeling.primitives.cube
     arc  = modeling.primitives.arc
     circle  = modeling.primitives.circle
@@ -47,7 +42,7 @@ export  class solidBase    {
     rgbToHex  = modeling.colors.rgbToHex
     rgbToHsl  = modeling.colors.rgbToHsl
     rgbToHsv  = modeling.colors.rgbToHsv
-
+*/
 
     primitives  = modeling.primitives
     colors  = modeling.colors

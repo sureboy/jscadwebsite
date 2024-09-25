@@ -1,6 +1,7 @@
 import {solidBase} from '$lib/solidClass'
 //import {searchObj} from '$lib/show3d' 
 const solidTemplate = new solidBase()
+//const regTitle:RegExp[] = [/const defaults \= (\{[^\}]+\})/,/^\(^\)\)/ ]
 
 /** @type {import('./$types').PageServerLoad} */
 
@@ -13,13 +14,21 @@ function solidTemplateToPlainObject(Inobj:Object,f:string="this"){
   const out:Map<string,any> =new Map<string,any> ()
   for (const [key, value] of Object.entries(Inobj)) {
     if (typeof(value) == "object"){    
-      out.set(key, solidTemplateToPlainObject(value,`${f}.${key}`))
+      if (Array.isArray(value)){
+        out.set(`${f}.${key}`,value)
+        continue
+      }
+      for (const [_key, _value] of solidTemplateToPlainObject(value,`${f}.${key}`)) {
+        out.set(_key, _value);
+      }
+      //out.set(key, solidTemplateToPlainObject(value,`${f}.${key}`))  
     }else{
-      let d =value.toString().match(/const (?:defaults|t)\s*\=\s*(\{[^\}]+\})/)
-      if (d) out.set(key,`${f}.${key}(${d![1]})`)
+      //let str = value.toString()
+      //out.set(key,[`${f}.${key}`,str])
+      out.set(`${f}.${key}`,value.toString())
     }
-    
   }
+ 
   return out
 }
 
