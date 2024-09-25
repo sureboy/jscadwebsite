@@ -3,7 +3,8 @@
 	import { onMount } from "svelte";    
 
   import {show3d,saveSolid,showSolid,solidListKey,removeSolid,
-    solidNow,getSolidString,searchSolid} from "$lib/show3d";
+    solidNow,getSolidString} from "$lib/show3d";
+    import type {SearchDataCallback} from "$lib/show3d";
   import {  CodeOutline,TrashBinSolid, CloseOutline, DownloadSolid   } from 'flowbite-svelte-icons';
   import { Fileupload, Navbar, NavBrand, NavLi, NavUl, 
     NavHamburger,Alert ,Badge,Listgroup,ListgroupItem,Textarea,Popover,AccordionItem, Accordion,Input } from 'flowbite-svelte';  
@@ -25,10 +26,35 @@
   let regSearchKey = /this\.(\w+)$/
 
 	/** @type {import('./$types').PageData} */
-	//export let data:any;
-  //console.log(data)
-
-
+	export let data:any;
+  //console.log(data.data)
+  const searchSolid=(key:string|RegExp,len:number=10)=>{
+ console.log(key)
+ let li:any[] = []
+ if (!key)return li
+ searchHelpData( data.data,key,(k:string,v:any)=>{
+    li.push([k,v])
+    return li.length<len
+ })
+ return li
+}
+  function searchHelpData(solid:Map<string,any> ,k_:string|RegExp,callback:SearchDataCallback)  {
+  for (const [key, value] of  solid) {
+      console.log(`${k_} ${key}: ${typeof(value)}`);
+      
+      if (key.search(k_)<0) {
+          if (typeof(value) == "object"){            
+            if (!searchHelpData(value,k_,callback))return
+          } 
+      }else{
+          if (!callback(key,value))return false
+      }
+      
+      
+  }
+  return false
+     
+}
 
   $:if(files ){    
     let stlUrl = window.URL.createObjectURL(files[0])
@@ -59,6 +85,7 @@
     try{
       showSolid(val);
       saveSolid(code); 
+      init()
       AlertMsg.color = "dark" 
       AlertMsg.err=""
     }catch(e){
@@ -69,22 +96,22 @@
     }
   }
   }
-  function eventHand(e:any){
-    console.log(e)
-  }
+ 
   onMount(() => {		 
    // new UIEvent("input",)
    //BeforeInput
     //event = new InputEvent("beforeInput",{inputType:"insertText",data:"----",isComposing:true,});
     //textareaObj.addEventListener("beforeinput",eventHand)
-    show3d(jscad,[])
+    
     init()
-    console.log(solidNow.solid.length,"soldlength")
+    show3d(jscad,[])
+   
     window.document.addEventListener(
       "keydown",
-      (e) => {       
-        if (e.ctrlKey && e.code=="Enter"){
-          e.preventDefault();
+      (e) => {    
+       //console.log(e.code)
+        if (e.ctrlKey && (e.code=="Enter"||e.code=="KeyS")){
+          e.preventDefault();   
           Show3DSolid(TextareaVal);
         }
       }
@@ -129,7 +156,14 @@
     }><DownloadSolid/>STL</NavLi>
     {/if}
   
-    <NavLi href="#" on:click={()=>{ TextareaVal="\/\/Input Ctrl+enter perview this solid\nconst solid1=class{\n main(){\n return [this.cube({size:20,center:[0,0,200]})]\n};\n}";modalTitle=""}}><CodeOutline/>Edit</NavLi>
+    <NavLi href="#" on:click={()=>{ 
+      modalTitle="solid1"
+      TextareaVal=window.localStorage.getItem(modalTitle)||"\/\/Input Ctrl+enter perview this solid\nconst solid1=class{\n main(){\n return [this.cube({size:20,center:[0,0,200]})]\n};\n}";
+      
+      //console.log(solidNow.solid.length,"soldlength")
+      Show3DSolid(TextareaVal);
+      }
+      }><CodeOutline/>Edit</NavLi>
 
     {#if TextareaVal}
     <NavLi href="#" on:click={()=>{ saveSolid(TextareaVal);TextareaVal ="";}} ><CloseOutline/>Close</NavLi>  
@@ -148,7 +182,7 @@
   <div class="basis-1/4 max-h-80 overflow-auto " >
   {#if startSearch}
   <Listgroup   >
-    {#each searchSolid(searchkey) as item,index}
+    {#each searchSolid(searchkey) as item}
     <ListgroupItem   >
       <div class="w-full h-full"><p>{item[1]}</p></div>
       
@@ -160,9 +194,10 @@
     
    
 <Listgroup   active items={links} let:item class="basis-1/4" on:click={(e) =>{
-  console.log(e)
+  //console.log(e)
   TextareaVal =window.localStorage.getItem(e.detail)||"";
   modalTitle=e.detail;
+  Show3DSolid(TextareaVal);
   }}>
   {item}
  
@@ -191,14 +226,7 @@
     if (kl[1]){
       searchkey = kl[1]
      // searchlinks = searchSolid(kl[1])
-    }
-    
-  }
-
-  //poper.style.top = textareaObj.
-  //console.log("input", e)
-  // event.value+=e.data 
-
+    }  } 
 }}   on:keydown={(e)=>{
   
    //textareaObj = e.target
@@ -207,6 +235,10 @@
   }
   
   //console.log(textareaObj.data)
+  if (e.ctrlKey &&  e.code=="KeyS") {
+    e.preventDefault();   
+    Show3DSolid(TextareaVal);
+  }
   if (e.code==="Tab"){   
     //e.key=" "
     e.preventDefault();  

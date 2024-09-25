@@ -9,7 +9,7 @@ import {solidBase} from './solidClass'
 type solidStruct  = {name:string, key:Set<string>,val:string[]}
 export const solidListKey="solidList" 
 const regexpGetClass = /const\s+(\w+)\s*=\s*class(?:\s+extends\s+(\w+))?\s*\{/ 
-interface SearchDataCallback {
+export interface SearchDataCallback {
   (k:string,v:any):boolean
 }
 export const solidNow:{solid:Geometry[]}={
@@ -22,7 +22,7 @@ const state = {
   camera:Object.assign({}, perspectiveCamera.defaults)
 }
 const solidTemplate = new solidBase()
-export const searchSolid=(key:string,len:number=10)=>{
+export const searchSolid=(key:string|RegExp,len:number=10)=>{
  
   let li:any[] = []
   if (!key)return li
@@ -323,18 +323,17 @@ export const getSolidString = (v:string)=>{
   //}
   
 
-  console.log(val)
+  //console.log(val)
   return val
 
 }
 
- function searchObj(f:string,solid:Object ,k_:string,callback:SearchDataCallback)  {
+ export function searchObj(f:string,solid:Object ,k_:string|RegExp,callback:SearchDataCallback)  {
   for (const [key, value] of Object.entries(solid)) {
       //console.log(`${key}: ${value}`);
       
       if (key.search(k_)<0) {
-          if (typeof(value) == "object"){
-            
+          if (typeof(value) == "object"){            
             if (!searchObj(f+"."+key,value,k_,callback))return
           } 
       }else{
