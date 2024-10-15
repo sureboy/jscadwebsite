@@ -73,3 +73,9 @@ export  class solidBase    {
  
 }
 
+export const solidLogo = class extends solidBase {
+    main=()=>{
+      return [this.cube({size:200,center:[0,0,20]})]
+    }
+  }
+

@@ -1,11 +1,8 @@
-import {solidBase} from '$lib/solidClass'
-//import {searchObj} from '$lib/show3d' 
+import {solidBase} from '$lib/function/solidClass'
+import type { PageServerLoad } from './$types'; 
 const solidTemplate = new solidBase()
-//const regTitle:RegExp[] = [/const defaults \= (\{[^\}]+\})/,/^\(^\)\)/ ]
 
-/** @type {import('./$types').PageServerLoad} */
-
-export async function load() {
+export const load: PageServerLoad = async ({ params }) => { 
    return {data:solidTemplateToPlainObject(solidTemplate)}  
    
 }

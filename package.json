@@ -3,14 +3,13 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"dev": "vite dev",
+		"dev": "vite dev --host",
 		"build": "vite build",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
 	},
 	"devDependencies": {
-		"@jscad/cli": "^2.3.2",
 		"@sveltejs/adapter-auto": "^3.0.0",
 		"@sveltejs/adapter-cloudflare": "^4.7.2",
 		"@sveltejs/kit": "^2.0.0",
@@ -28,13 +27,16 @@
 		"vite": "^5.0.3"
 	},
 	"type": "module",
-	"dependencies": {
-		"@jscad/core": "^2.6.9",
-		"@jscad/modeling": "^2.12.2",
-		"@jscad/openjscad": "^1.6.1",
-		"@jscad/regl-renderer": "^2.6.9",
-		"@jscad/scad-deserializer": "^1.0.0-alpha.d0fb3056",
+	"dependencies": {		 
+		"@jscad/modeling": "^2.12.2",		 
 		"@jscad/stl-deserializer": "^2.1.24",
-		"@jscad/stl-serializer": "^2.1.17"
+		"@jscad/stl-serializer": "^2.1.17",
+		"@tiptap/core": "^2.7.4",
+		"@tiptap/extension-code-block-lowlight": "^2.8.0",
+		"@tiptap/starter-kit": "^2.7.4",
+		"lowlight": "^3.1.0",
+		"sveltekit-i18n": "^2.4.2",
+		"@types/three": "^0.167.1",
+		"three": "^0.167.1"
 	}
 }
