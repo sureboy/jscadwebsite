@@ -4,6 +4,7 @@ import {solidLogo} from './solidClass'
 
 
 export const StoreInputCode = writable(""); 
+export const StoreHelpHidden = writable(true); 
 
 export const StoreCode3Dview = writable("");
 export const  StoreAlertMsg = writable<AlertMsgType>( {waitting:false,errMsg:"3D Create" })
@@ -15,15 +16,14 @@ export const StringToClass = (data:string,name:string,msg:AlertMsgType)=>{
   if (!name)return;
   //console.log(data)
   try{  
-  const obj = eval(`(()=>{${data};return ${name}.prototype})()`)  
-  obj.__proto__ = solidB
-  //MySolid[name] = obj
-  //const obje = Object.create(obj)  as solidEditStruct
-  Object.assign(obj,MySolid) 
-  //obj.my=MySolid
-  //console.log(obj,obje,solidB)
-  MySolid[name] = obj
-
+    const obj = eval(`(()=>{${data};return ${name}.prototype})()`)  
+    obj.__proto__ = solidB
+    //MySolid[name] = obj
+    //const obje = Object.create(obj)  as solidEditStruct
+    Object.assign(obj,MySolid) 
+    //obj.my=MySolid
+    //console.log(obj,obje,solidB)
+    MySolid[name] = obj
     return obj as solidEditStruct
   }catch(e:any){
     msg.errMsg = e.toString()  

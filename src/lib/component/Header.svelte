@@ -1,11 +1,10 @@
 <script lang="ts">
   import { t } from '$lib/translations/index';
   import {serialize,mimeType} from "@jscad/stl-serializer"   
-  import {  TrashBinOutline,  DownloadOutline ,PlusOutline,ChevronDownOutline ,  FileCodeOutline ,EditOutline,GridPlusOutline} from 'flowbite-svelte-icons';
+  import {  TrashBinOutline,  DownloadOutline ,PlusOutline,ChevronDownOutline , BookOpenOutline, FileCodeOutline ,EditOutline,GridPlusOutline} from 'flowbite-svelte-icons';
   import {  Navbar,  NavLi, NavUl,  NavHamburger,Alert  ,Button ,Dropdown, DropdownItem,NavBrand,Banner,Spinner} from 'flowbite-svelte';    
-  import {solidNow} from "$lib/function/share"
-  import {StoreInputCode,StoreAlertMsg} from "$lib/function/storage"
-  import {getStoragelist,removeStorage} from "$lib/function/storage"
+  import {solidNow} from "$lib/function/share" 
+  import {getStoragelist,removeStorage,StoreHelpHidden,StoreInputCode,StoreAlertMsg} from "$lib/function/storage"
 
   let modalTitle:string; 
  
@@ -64,6 +63,9 @@
            {/each} 
       
       </Dropdown>
+      <NavLi class="flex  items-center  gap-2" href="#"   color="dark" on:click={()=>{
+        StoreHelpHidden.set(false)
+      }} ><BookOpenOutline class="w-6 h-6 ms-2 " />{$t('header.help',{default:"Help"})}</NavLi>
     </NavUl>
    
   </Navbar>

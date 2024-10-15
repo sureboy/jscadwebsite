@@ -3,6 +3,7 @@
 import Header from '$lib/component/Header.svelte';
 import Tiptap from '$lib/component/Tiptap.svelte' 
 import View3d from '$lib/component/View3d.svelte'  
+import Help from '$lib/component/Help.svelte'  
 import type { PageData } from './$types';
  
 export let data:PageData; 
@@ -21,3 +22,4 @@ export let data:PageData;
 
 </main>
 <View3d  > </View3d> 
+<Help inputList ={data.data} ></Help>

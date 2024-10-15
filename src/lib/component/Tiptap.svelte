@@ -162,7 +162,7 @@
  
 <div  class="container pointer-events-none mx-auto flex flex-row "  >
 	
-	<div bind:this={tipli} class="fixed opacity-90 bg-gray-300 aspect-video overflow-auto     h-2/3 z-50 pointer-events-auto">
+	<div bind:this={tipli} class="fixed opacity-90 bg-gray-300 aspect-video overflow-auto  max-w-1/2   h-1/2 z-50 pointer-events-auto">
 		<Tiplist {inputKey} {inputList} bind:inputOutKey={inputOutKey}></Tiplist>
 	</div>
 	 

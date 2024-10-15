@@ -7,20 +7,20 @@
 	export let inputList:Map<string, any>;
 	export let inputKey:string;
 	export let inputOutKey:string;
-  let helpCode:string = ""
-  let formModal = false;
-  let helpTitle:string=""
-  const searchSolid=(key:string,len:number=30)=>{	
-		let li:any[] = []
-		if (!key)return li
-		searchHelpData(inputList,key,(k:string,v:any)=>{
-			li.push([k,v])
-			return li.length<len
-		})
-		if (li.length==0){
+	let helpCode:string = ""
+	let formModal = false;
+	let helpTitle:string=""
+	const searchSolid=(key:string,len:number=30)=>{	
+	let li:any[] = []
+	if (!key)return li
+	searchHelpData(inputList,key,(k:string,v:any)=>{
+		li.push([k,v])
+		return li.length<len
+	})
+	if (li.length==0){
 
-		}
-		return li
+	}
+	return li
 	}	
 	function searchHelpData(solid:Map<string,any> ,k_:string,callback:SearchDataCallback)  {
 		for (const [key, value] of  solid) {

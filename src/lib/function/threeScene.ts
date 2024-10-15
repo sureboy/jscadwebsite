@@ -2,14 +2,13 @@ import {
 	//BoxGeometry,
 	DirectionalLight,
 	HemisphereLight,
-	Mesh,
-	MeshStandardMaterial,
+ 
 	PerspectiveCamera,
 	Scene,
 	WebGLRenderer,
 	Box3,
 	Vector3,
-	Euler,
+ 
     Object3D
 } from "three"; 
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js'

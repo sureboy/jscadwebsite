@@ -32,7 +32,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 }
  
-  /*
+ 
 export const handleError: HandleServerError = async ({  event }) => {
 	const { locals } = event;
 	const { lang } = event.locals as {lang:string};
@@ -44,7 +44,7 @@ export const handleError: HandleServerError = async ({  event }) => {
 	};
 	//return locals;
 };
-*/
+
 async function resStl(event:any){
 	const url = new URL(event.url);
 	let v = url.searchParams.get("v")

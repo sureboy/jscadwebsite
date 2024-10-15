@@ -1,6 +1,7 @@
 {
     "edit":"Edit {{solid}}",
     "start":"Start",
+    "help":"Help",
     "down":"Download {{solid}}",
     "remove":"Remove {{solid}}"
 }
