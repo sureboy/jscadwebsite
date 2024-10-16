@@ -10,7 +10,7 @@ export const StoreCode3Dview = writable("");
 export const  StoreAlertMsg = writable<AlertMsgType>( {waitting:false,errMsg:"3D Create" })
 
 const solidListKey="solidList"  
-const solidB = new solidLogo()
+export const solidB = new solidLogo()
 export const MySolid:Record<string,solidEditStruct> = {}
 export const StringToClass = (data:string,name:string,msg:AlertMsgType)=>{
   if (!name)return;
