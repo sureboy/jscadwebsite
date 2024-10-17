@@ -56,7 +56,7 @@ const handCode  = (data:{code:string,name?:string,show:boolean})=>{
         return
     }
     if (!data.show)return
-    //try{
+    try{
         const li = obj?.main() || []    
         for (const i in li){
             //console.log(v)
@@ -78,10 +78,10 @@ const handCode  = (data:{code:string,name?:string,show:boolean})=>{
             //self.postMessage({ver:CSG2Vertices(li[i])})
         }
         self.postMessage(data)
-    //}catch(e:any){
-    //    AlertMsg.errMsg = e.toString()
-    //    self.postMessage(AlertMsg)
-    //}
+    }catch(e:any){
+        AlertMsg.errMsg = e.toString()
+        self.postMessage(AlertMsg)
+    }
 }
 
 
