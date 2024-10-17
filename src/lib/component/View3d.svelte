@@ -1,7 +1,7 @@
 <script lang="ts">
  // import {show3d,saveSolid,showSolidFromString,solidLogo as solidBase, } from "./show3d"; 
- import { browser } from '$app/environment';
- import {CSG2Vertices,CSG2Three} from "$lib/function/csg2Three"
+ import { browser } from '$app/environment'; 
+ import {CSG2Vertices,CSG2Three,CSGSides2LineSegmentsVertices,CSG2LineVertices} from "$lib/function/csg2Three"  
  import {regexpGetClass} from "$lib/function/share"  
  import {solidLogo} from '$lib/function/solidClass'
  import {StoreCode3Dview,StringToClass,saveStorage,initMySolid,StoreAlertMsg} from "$lib/function/storage"
@@ -9,7 +9,10 @@
  //import type {solidEditStruct} from '$lib/function/share'
  import { createCanvasElement } from "three";
  import { onMount, onDestroy } from 'svelte'; 
+ import pkg from '@jscad/modeling';
+const {geometries} = pkg;
  import type {AlertMsgType} from '$lib/function/share'
+ import type {Geometry,Geom3,Poly3} from '@jscad/modeling/src/geometries/types';
  //StoreCode3Dview.subscribe(Show3DSolid)
  const AlertMsg:AlertMsgType = {waitting:false,errMsg:""}
  const initAlertMsg = ()=>{
@@ -33,8 +36,21 @@
   console.log(obje?.solid1)
   try{
 
-    obje?.main().forEach((v)=>{
-      mesh.push(CSG2Three(CSG2Vertices(v),{}))
+    obje?.main().forEach((v:Geometry)=>{
+      
+      if (geometries.geom3.isA(v)){
+        mesh.push(CSG2Three(CSG2Vertices(v),{}))
+        return;
+      }
+      if (geometries.geom2.isA(v)){
+        mesh.push(CSG2Three(CSGSides2LineSegmentsVertices(v),{}))
+        return;
+      }
+      if (geometries.path2.isA(v)){
+        mesh.push(CSG2Three(CSG2LineVertices(v),{}))
+        return;
+      }
+      
     })
     console.log(mesh)
     createSceneOBJ(el,mesh)
@@ -102,6 +118,7 @@
           initAlertMsg()
           if (e.data.ver){
             AlertMsg.waitting = true;
+            console.log(e.data.ver)
             mesh.push(CSG2Three(e.data.ver,{}))
           }else{
             if (el && mesh.length>0 ){

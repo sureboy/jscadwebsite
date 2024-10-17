@@ -1,6 +1,8 @@
 import {StringToClass} from '$lib/function/storage'
-import {CSG2Vertices} from "$lib/function/csg2Three"  
-import {regexpGetClass} from "$lib/function/share" 
+import {CSG2Vertices,CSGSides2LineSegmentsVertices,CSG2LineVertices} from "$lib/function/csg2Three"  
+import {regexpGetClass} from "$lib/function/share"  
+import pkg from '@jscad/modeling';
+const {geometries} = pkg;
 import type {AlertMsgType} from '$lib/function/share'
 const AlertMsg:AlertMsgType = {waitting:false,errMsg:""}
 //import type {csgObj} from "$lib/function/csg2Three"  
@@ -54,17 +56,32 @@ const handCode  = (data:{code:string,name?:string,show:boolean})=>{
         return
     }
     if (!data.show)return
-    try{
+    //try{
         const li = obj?.main() || []    
         for (const i in li){
             //console.log(v)
-            self.postMessage({ver:CSG2Vertices(li[i])})
+            const v = li[i]
+            if (geometries.geom3.isA(v)){
+                self.postMessage({ver:CSG2Vertices(v)})
+                continue;
+              }
+              if (geometries.geom2.isA(v)){
+                self.postMessage({ver:CSGSides2LineSegmentsVertices(v)})
+                //self.postMessage(CSG2Three(CSGSides2LineSegmentsVertices(v),{}))
+                continue;
+              }
+              if (geometries.path2.isA(v)){
+                self.postMessage({ver:CSG2LineVertices(v)})
+                //self.postMessage(CSG2Three(CSG2LineVertices(v),{}))
+                continue;
+              }
+            //self.postMessage({ver:CSG2Vertices(li[i])})
         }
         self.postMessage(data)
-    }catch(e:any){
-        AlertMsg.errMsg = e.toString()
-        self.postMessage(AlertMsg)
-    }
+    //}catch(e:any){
+    //    AlertMsg.errMsg = e.toString()
+    //    self.postMessage(AlertMsg)
+    //}
 }
 
 

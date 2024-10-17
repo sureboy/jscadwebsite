@@ -6,7 +6,8 @@
 	//import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
 	//import { all, createLowlight } from 'lowlight' 
 	//import js from 'highlight.js/lib/languages/javascript' 
-	import Tiplist from "./Tiplist.svelte";
+	//import Tiplist from "./Tiplist.svelte";
+
 	import {jsCodeBlockLowlight,insertEnter} from "$lib/function/jsCodeBlockLowlight";
 	//import {StoreCode3Dview} from './store'
 	import {StoreInputCode,StoreCode3Dview} from "$lib/function/storage"
@@ -18,7 +19,7 @@
  
 	let nodeElement:HTMLElement;
 	let element:HTMLElement;
-	let tipli:HTMLElement;
+	//let tipli:HTMLElement;
 	let editor:Editor;
 	let inputKey:string;
 	//let inputKeyBegin:number;
@@ -57,7 +58,7 @@
 	} 
  
 	onMount(() => {
-		tipli.style.visibility = "collapse"
+		//tipli.style.visibility = "collapse"
 		window.document.addEventListener("keydown",(e) => {     
 			if (e.ctrlKey && (e.code=="Enter"||e.code=="KeyS")){
 				e.preventDefault();    
@@ -66,7 +67,7 @@
 			} 
 			if (e.key==="Escape"){
 				inputKey = ""
-				tipli.style.visibility = "collapse"
+				//tipli.style.visibility = "collapse"
 				return
 			} 
 		})
@@ -103,10 +104,13 @@
 			onUpdate:({ editor, transaction })=>{
 				//console.log(editor.can())
 				//console.log(transaction)
+				
 				if (!editor.isActive("codeBlock")){
 					editor.commands.setCodeBlock()
 					return
 				}
+				return
+				/*
 				//let codetext = editor.getText()
 				//StoreCode3Dview.set(codetext)
 				//editor.commands.scrollIntoView();				
@@ -143,6 +147,7 @@
 					console.log(position,el.textContent ,el.parentElement?.getBoundingClientRect())
 				} 
 				return 
+				*/
 			},
 			onFocus({ editor, event }) {
 		 
@@ -160,12 +165,12 @@
 </script>
  
  
-<div  class="container pointer-events-none mx-auto flex flex-row "  >
-	
+<div  class="container pointer-events-none mx-auto flex flex-row  "  >
+	<!--
 	<div bind:this={tipli} class="fixed opacity-90 bg-gray-300 aspect-video overflow-auto  max-w-1/2   h-1/2 z-50 pointer-events-auto">
 		<Tiplist {inputKey} {inputList} bind:inputOutKey={inputOutKey}></Tiplist>
 	</div>
-	 
+	 -->
 	<div bind:this={nodeElement} class=" pointer-events-auto opacity-90 bg-gray-200 max-w-full  " style="visibility:collapse">
 	
 {#if editor}
@@ -198,7 +203,7 @@
 </ButtonGroup>
 {/if}
  
-<div  class="pointer-events-auto" bind:this={element}  spellcheck=false></div>
+<div  class="pointer-events-auto   max-h-[80vh]  overflow-auto" bind:this={element}  spellcheck=false></div>
 </div>
 </div> 
  

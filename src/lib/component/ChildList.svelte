@@ -1,6 +1,6 @@
 <script lang="ts">
        import { Drawer,  CloseButton,Modal,Textarea,AccordionItem, Accordion } from 'flowbite-svelte';
-           import ChildList from "$lib/component/ChildList.svelte"
+       import ChildList from "$lib/component/ChildList.svelte"
        export let inputList:Map<string, any> ;
        export let obj:object;
        export let activateClickOutside:boolean
@@ -24,9 +24,10 @@
   <button class="p-1 flex items-center justify-between w-full font-medium text-left group-first:rounded-t-xl border-b border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-100 hover:dark:bg-gray-800"
    on:click={(e) =>{
     formModal=true;
+    helpTitle=`${parent}.${key}`
     //console.log(`${parent}.${key}`)
-     helpCode=inputList.get(`${parent}.${key}`)
-    helpTitle=key
+     helpCode=inputList.get(helpTitle)
+    
     }}    >
     {key}
  

@@ -10,11 +10,12 @@ import {
     Color,
     Vector3,
 } from "three"; 
-import type {MeshPhongMaterialParameters,LineBasicMaterialParameters,TypedArray,Matrix4,Matrix4Tuple} from "three"
-import type {Geometry,Geom3,Poly3} from '@jscad/modeling/src/geometries/types';
+import type {MeshPhongMaterialParameters,LineBasicMaterialParameters,TypedArray,Matrix4,Matrix4Tuple} from "three" 
+import type {Geometry,Geom3, Poly3 ,Geom2, Path2} from '@jscad/modeling/src/geometries/types';
+import type {Vec3,Vec2} from '@jscad/modeling/src/maths/types'
 export interface csgObj {
-    //polygons:TypedArray
-    list?:[],
+    polygons:TypedArray
+    list:TypedArray,
     vertices:TypedArray;
     indices?:TypedArray; 
     normals?:TypedArray;
@@ -37,8 +38,8 @@ const materials:Record<string,any> = {
   },
   lines: null,
 }
-//materials.lines = materials.line
-//materials.instance = materials.mesh // todo support instances for lines
+materials.lines = materials.line
+materials.instance = materials.mesh // todo support instances for lines
 export function CSG2Three(obj:csgObj , { smooth = false }) {
     //const obj = CSG2Vertices(csg)
     const { vertices, indices, normals, color, colors, isTransparent = false, opacity } = obj
@@ -75,20 +76,23 @@ export function CSG2Three(obj:csgObj , { smooth = false }) {
     if(smooth) geo = toCreasedNormals( geo, Math.PI / 10)
     if (colors) geo.setAttribute('color', new BufferAttribute(colors, isTransparent ? 4 : 3))
 
-    let mesh:Mesh
-    mesh = new Mesh(geo, material)
-    /*
+    let mesh:any
+    //mesh = new Mesh(geo, material)
+   
     switch (objType) {
       case 'mesh':
         mesh = new Mesh(geo, material)
         break
       case 'instance':
         const { list } = obj
+        console.log(list)
+        /*
         mesh = new InstancedMesh(geo, materials.mesh.make({ color: 0x0084d1 }), list.length)
-        list.forEach((item:any, i) => {
-          copyTransformToArray(item.transforms, mesh.m.instanceMatrix.array, i * 16)
+        list.forEach((item, i) => {
+          copyTransformToArray(item.transforms, mesh.instanceMatrix.array, i * 16)
         })
-        transforms = null
+        transforms = undefined
+        */
         break
       case 'line':
         mesh = new Line(geo, material)
@@ -98,11 +102,37 @@ export function CSG2Three(obj:csgObj , { smooth = false }) {
         mesh = new LineSegments(geo, material)
         break
     }
-        */
+        
     if (transforms && !isInstanced) mesh.applyMatrix4({ elements: transforms }as Matrix4)
     return mesh
   }
+// shortcut for setMatrixAt for InstancedMesh
+function copyTransformToArray(te:TypedArray, array:TypedArray , offset = 0) {
+  array[offset] = te[0]
+  array[offset + 1] = te[1]
+  array[offset + 2] = te[2]
+  array[offset + 3] = te[3]
 
+  array[offset + 4] = te[4]
+  array[offset + 5] = te[5]
+  array[offset + 6] = te[6]
+  array[offset + 7] = te[7]
+
+  array[offset + 8] = te[8]
+  array[offset + 9] = te[9]
+  array[offset + 10] = te[10]
+  array[offset + 11] = te[11]
+
+  array[offset + 12] = te[12]
+  array[offset + 13] = te[13]
+  array[offset + 14] = te[14]
+  array[offset + 15] = te[15]
+
+  return array
+}
+
+ 
+ 
   function toCreasedNormals(  geometry:BufferGeometry, creaseAngle = Math.PI / 3 /* 60 degrees */) {
     const creaseDot = Math.cos(creaseAngle)
     const hashMultiplier = (1 + 1e-10) * 1e2
@@ -189,9 +219,37 @@ export function CSG2Three(obj:csgObj , { smooth = false }) {
     resultGeometry.setAttribute('normal', normAttr)
     return resultGeometry
   }
+  export function CSGSides2LineSegmentsVertices (csg:Geom2) {
+    const vLen = csg.sides.length * 6
   
-
+    const vertices = new Float32Array(vLen)
+    csg.sides.forEach((side, idx) => {
+      const i = idx * 6
+      setPoints(vertices, side[0], i)
+      setPoints(vertices, side[1], i + 3)
+    })
+    return { type: 'lines', vertices } as csgObj
+  }
+  export function CSG2LineVertices (csg:Path2) {
+    let vLen = csg.points.length * 3
+    if (csg.isClosed) vLen += 3
+  
+    const vertices = new Float32Array(vLen)
+  
+    csg.points.forEach((p, idx) => setPoints(vertices, p, idx * 3))
+  
+    if (csg.isClosed) {
+      setPoints(vertices, csg.points[0], vertices.length - 3)
+    }
+    return { type: 'line', vertices } as csgObj
+  }
+  const setPoints = (points:TypedArray, p:Vec2|Vec3, i:number) => {
+    points[i++] = p[0]
+    points[i++] = p[1]
+    points[i++] = p[2] || 0
+  }
   export function CSG2Vertices (csg:Geom3) {
+    console.log(csg)
     let vLen = 0; let iLen = 0
     for (const poly of csg.polygons) {
       const len = poly.vertices.length
@@ -252,4 +310,4 @@ export function CSG2Three(obj:csgObj , { smooth = false }) {
     const len = Math.hypot(Nx, Ny, Nz)
     return [Nx / len, Ny / len, Nz / len]
   }
-  
+   

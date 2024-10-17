@@ -8,8 +8,8 @@
     //import {solidBase} from '$lib/function/solidClass'
     //const solidTemplate = new solidBase()
     export let inputList:Map<string, any> ;
-      let activateClickOutside = true;
-  let backdrop = true;
+    let activateClickOutside = true;
+    let backdrop = true;
    // let helpTitle:string
     //let formModal:boolean = false
    // let helpCode:string

@@ -16,5 +16,5 @@ export const solidNow:{solid:Geometry[]}={
 }
 export interface solidEditStruct  { 
   [x: string]: any;
-  main:()=>Geom3[]; 
+  main:()=>Geometry[]; 
 }
