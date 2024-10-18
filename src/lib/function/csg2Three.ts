@@ -221,19 +221,19 @@ function copyTransformToArray(te:TypedArray, array:TypedArray , offset = 0) {
   }
   export function CSGSides2LineSegmentsVertices (csg:Geom2) {
     const vLen = csg.sides.length * 6
-  
+    //const {transforms} = csg
     const vertices = new Float32Array(vLen)
     csg.sides.forEach((side, idx) => {
       const i = idx * 6
       setPoints(vertices, side[0], i)
       setPoints(vertices, side[1], i + 3)
     })
-    return { type: 'lines', vertices } as csgObj
+    return { type: 'lines', vertices, transforms:csg.transforms } as csgObj
   }
   export function CSG2LineVertices (csg:Path2) {
     let vLen = csg.points.length * 3
     if (csg.isClosed) vLen += 3
-  
+     
     const vertices = new Float32Array(vLen)
   
     csg.points.forEach((p, idx) => setPoints(vertices, p, idx * 3))
@@ -241,7 +241,7 @@ function copyTransformToArray(te:TypedArray, array:TypedArray , offset = 0) {
     if (csg.isClosed) {
       setPoints(vertices, csg.points[0], vertices.length - 3)
     }
-    return { type: 'line', vertices } as csgObj
+    return { type: 'line', vertices ,transforms:csg.transforms} as csgObj
   }
   const setPoints = (points:TypedArray, p:Vec2|Vec3, i:number) => {
     points[i++] = p[0]
@@ -287,7 +287,7 @@ function copyTransformToArray(te:TypedArray, array:TypedArray , offset = 0) {
         posOffset += 1
       }
     }
-    return { type: 'mesh', vertices, indices, normals } as csgObj
+    return { type: 'mesh', vertices, indices, normals ,transforms:csg.transforms} as csgObj
   }
   
   const calculateNormal = (vertices:any) => {
