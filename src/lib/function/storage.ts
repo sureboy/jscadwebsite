@@ -10,21 +10,23 @@ export const StoreCode3Dview = writable("");
 export const  StoreAlertMsg = writable<AlertMsgType>( {waitting:false,errMsg:"3D Create" })
 
 const solidListKey="solidList"  
-export const solidB = new solidLogo()
-export const MySolid:Record<string,solidEditStruct> = {}
+export const solidB = new solidLogo() as solidEditStruct
+//export const MySolid:Record<string,solidEditStruct> = {}
 export const StringToClass = (data:string,name:string,msg:AlertMsgType)=>{
   if (!name)return;
   //console.log(data)
   try{  
-    const obj = eval(`(()=>{${data};return ${name}.prototype})()`)  
-    obj.__proto__ = solidB
+    const obj = eval(`(()=>{${data};return ${name}})()`)  
+    obj.prototype.__proto__ = solidB
+    //console.log(obj)
     //MySolid[name] = obj
-    //const obje = Object.create(obj)  as solidEditStruct
-    Object.assign(obj,MySolid) 
+    const obje = new obj as solidEditStruct
+    //Object.assign(obj,MySolid) 
     //obj.my=MySolid
     //console.log(obj,obje,solidB)
-    MySolid[name] = obj
-    return obj as solidEditStruct
+    solidB[name] = obje 
+    //MySolid[name] = obj
+    return obje 
   }catch(e:any){
     msg.errMsg = e.toString()  
     console.log(e)
