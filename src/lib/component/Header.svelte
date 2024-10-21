@@ -1,10 +1,10 @@
 <script lang="ts">
   import { t } from '$lib/translations/index';
   import {serialize,mimeType} from "@jscad/stl-serializer"   
-  import {  TrashBinOutline,  DownloadOutline ,PlusOutline,ChevronDownOutline , BookOpenOutline, FileCodeOutline ,EditOutline,GridPlusOutline} from 'flowbite-svelte-icons';
+  import {  TrashBinOutline,  DownloadOutline ,PlusOutline,ChevronDownOutline , BookOpenOutline, FileCodeOutline ,EditOutline,GridPlusOutline,CloseOutline} from 'flowbite-svelte-icons';
   import {  Navbar,  NavLi, NavUl,  NavHamburger,Alert  ,Button ,Dropdown, DropdownItem,NavBrand,Banner,Spinner} from 'flowbite-svelte';    
   import {solidNow} from "$lib/function/share" 
-  import {getStoragelist,removeStorage,StoreHelpHidden,StoreInputCode,StoreAlertMsg} from "$lib/function/storage"
+  import {getStoragelist,removeStorage,StoreHelpHidden,StoreInputCode,StoreAlertMsg,StoreCode3Dview} from "$lib/function/storage"
 
   let modalTitle:string; 
  
@@ -20,9 +20,16 @@
       <NavUl    > 
     
       {#if modalTitle}
+      {#if $StoreInputCode}
+      <NavLi class="flex  items-center  gap-2" color="light" href="#{modalTitle}" on:click={()=>{
+        StoreCode3Dview.set($StoreInputCode)
+        StoreInputCode.set("");
+      }}><CloseOutline class="w-6 h-6 ms-2 " /> {$t('header.close',{default:"close"})}</NavLi>
+      {:else}
       <NavLi class="flex  items-center  gap-2" color="light" href="#{modalTitle}" on:click={()=>{
         StoreInputCode.set(window.localStorage.getItem(modalTitle)||"");
       }}><EditOutline class="w-6 h-6 ms-2 " /> {$t('header.edit',{default:modalTitle})}</NavLi>
+      {/if}
 
       <NavLi class="flex  items-center  gap-2"  href="#" on:click={()=>{
         if(confirm("Remove "+modalTitle)){

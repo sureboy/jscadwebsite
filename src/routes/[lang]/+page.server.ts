@@ -1,6 +1,7 @@
 import {solidBase} from '$lib/function/solidClass'
 import type { PageServerLoad } from './$types'; 
 const solidTemplate = new solidBase()
+//export const prerender = true;
 
 export const load: PageServerLoad = async ({ params }) => { 
    return {data:solidTemplateToPlainObject(solidTemplate)}  

@@ -6,11 +6,15 @@ import {
 	PerspectiveCamera,
 	Scene,
 	WebGLRenderer,
+	//WebGPURenderer,
 	Box3,
 	Vector3,
  
     Object3D
 } from "three"; 
+//import {	
+//  WebGPURenderer
+//} from "three/webgpu"
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
@@ -39,8 +43,12 @@ const animate = () => {
 export function onWindowResize(el: HTMLCanvasElement) {
 	//let w = el.width>el.height?el.height:el.width
 	if (!renderer){
-		renderer = new WebGLRenderer({ antialias: true,alpha:true, canvas: el,preserveDrawingBuffer:true, });
+		//if (!window.navigator.gpu)
+		renderer = new WebGLRenderer({ antialias: true,alpha:true, canvas: el,preserveDrawingBuffer:false, });
+		//else 
+		//renderer = new WebGPURenderer({ antialias: true,alpha:true, canvas: el,  });
 		//renderer.render(scene, camera)
+		animate();
 	}
 
 	camera.aspect = el.width/el.height
@@ -68,7 +76,7 @@ export const createSceneOBJ = (el: HTMLCanvasElement,m:Object3D[] ) => {
 
 	onWindowResize(el)	 
 
-	animate();
+
 	//directionalLight.position.z=  camera.position.z 
 	//console.log(size,sceneSize)
 			 	 
