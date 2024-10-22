@@ -3,8 +3,7 @@ import {
     LineBasicMaterial,
     BufferGeometry,
     BufferAttribute,
-    Mesh,
-    InstancedMesh,
+    Mesh, 
     Line,
     LineSegments,
     Color,
@@ -12,7 +11,7 @@ import {
 } from "three"; 
 
 import type {MeshPhongMaterialParameters,LineBasicMaterialParameters,TypedArray,Matrix4,Matrix4Tuple} from "three" 
-import type {Geometry,Geom3, Poly3 ,Geom2, Path2} from '@jscad/modeling/src/geometries/types';
+import type {Geom3, Geom2, Path2} from '@jscad/modeling/src/geometries/types';
 import type {Vec3,Vec2} from '@jscad/modeling/src/maths/types'
 export interface csgObj {
     polygons:TypedArray

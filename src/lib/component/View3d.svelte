@@ -12,7 +12,7 @@
  import pkg from '@jscad/modeling';
 const {geometries} = pkg;
  import type {AlertMsgType} from '$lib/function/share'
- import type {Geometry,Geom3,Poly3} from '@jscad/modeling/src/geometries/types';
+ import type {Geometry} from '@jscad/modeling/src/geometries/types';
  //StoreCode3Dview.subscribe(Show3DSolid)
  const AlertMsg:AlertMsgType = {waitting:false,errMsg:""}
  const initAlertMsg = ()=>{
@@ -33,7 +33,7 @@ const {geometries} = pkg;
   if (!vm)return;    
   const obje =  StringToClass(code,vm[1],AlertMsg)
   if (!obje)return;
-  console.log(obje?.solid1)
+  //console.log(obje?.solid1)
   try{
 
     obje?.main().forEach((v:Geometry)=>{
@@ -52,13 +52,13 @@ const {geometries} = pkg;
       }
       
     })
-    console.log(mesh)
+    //console.log(mesh)
     createSceneOBJ(el,mesh)
     mesh = []
     saveStorage(vm[1],code)
   }catch(e:any){
     AlertMsg.errMsg = e.toString()
-    console.log(e)
+    //console.log(e)
   }
   
  }
@@ -118,7 +118,7 @@ const {geometries} = pkg;
           initAlertMsg()
           if (e.data.ver){
             AlertMsg.waitting = true;
-            console.log(e.data.ver)
+            //console.log(e.data.ver)
             mesh.push(CSG2Three(e.data.ver,{}))
           }else{
             if (el && mesh.length>0 ){

@@ -25,7 +25,8 @@ const config = {
 	  platformProxy: {
 		persist: './custom'
 	  }
-		})
+		}),
+ 
 	}
 };
 

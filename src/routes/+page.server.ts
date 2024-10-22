@@ -1,9 +1,9 @@
-import {solidBase} from '$lib/function/solidClass'
-import type { PageServerLoad } from './$types'; 
+import {solidBase} from '$lib/function/solidClass' 
+import type { PageServerLoad } from './$types';
 const solidTemplate = new solidBase()
-//export const prerender = true;
+export const prerender = true;
 
-export const load: PageServerLoad = async ({ params }) => { 
+export const load: PageServerLoad = ({ params }) => { 
    return {data:solidTemplateToPlainObject(solidTemplate)}  
    
 }

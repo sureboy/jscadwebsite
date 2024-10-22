@@ -7,7 +7,7 @@ export const StoreInputCode = writable("");
 export const StoreHelpHidden = writable(true); 
 
 export const StoreCode3Dview = writable("");
-export const  StoreAlertMsg = writable<AlertMsgType>( {waitting:false,errMsg:"3D Create" })
+export const  StoreAlertMsg = writable<AlertMsgType>( {waitting:false,errMsg:"" })
 
 const solidListKey="solidList"  
 export const solidB = new solidLogo() as solidEditStruct
