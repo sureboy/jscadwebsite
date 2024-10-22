@@ -8,7 +8,7 @@
 
 	import {StoreInputCode,StoreCode3Dview} from "$lib/function/storage"
     export let inputList:Map<string, any>; 
-    let element:HTMLElement;
+    //let element:HTMLElement;
     let editor:EditorView|null;
     let nodeElement:HTMLElement;
     const optReg=/(?<=const\s+defaults\s+\=\s+)\{[^\}]+\}/sm
@@ -29,7 +29,7 @@
 		}
 		//console.log(t)
 		//hidden=false
-		StoreCode3Dview.set(t)
+		StoreCode3Dview.set({code:t,show:true})
 		if ( editor) {
 			nodeElement.style.visibility = "visible"
             setValue(t)
@@ -64,7 +64,7 @@
         window.document.addEventListener("keydown",(e) => {     
 			if (e.ctrlKey && (e.code=="Enter"||e.code=="KeyS")){
 				e.preventDefault();    
-				StoreCode3Dview.set(getValue()) 
+				StoreCode3Dview.set({code:getValue(),show:true}) 
 				return
 			} 
  

@@ -1,10 +1,11 @@
 import {StringToClass} from '$lib/function/storage'
+import {serialize} from "@jscad/stl-serializer"   
 import {CSG2Vertices,CSGSides2LineSegmentsVertices,CSG2LineVertices} from "$lib/function/csg2Three"  
 import {regexpGetClass} from "$lib/function/share"  
 import pkg from '@jscad/modeling';
 const {geometries} = pkg;
-import type {AlertMsgType} from '$lib/function/share'
-const AlertMsg:AlertMsgType = {waitting:false,errMsg:""}
+import type {AlertMsgType,CodeToWorker} from '$lib/function/share'
+const AlertMsg:AlertMsgType = {waitting:false,errMsg:"",name:""}
 //import type {csgObj} from "$lib/function/csg2Three"  
 
 //const base  = new solidBase()
@@ -36,9 +37,7 @@ self.onmessage = (e) => {
     handCode(e.data)
 
 }
- 
-
-const handCode  = (data:{code:string,name?:string,show:boolean})=>{
+const handCode  = (data:CodeToWorker)=>{
     if (!data.name){
         let vm = data.code.match(regexpGetClass)    
         if (!vm || !vm[1]){
@@ -53,6 +52,14 @@ const handCode  = (data:{code:string,name?:string,show:boolean})=>{
         if(AlertMsg.errMsg){
             self.postMessage(AlertMsg)
         }
+        return
+    }
+    if (data.stl&&data.name){
+        //const da = serialize({ binary: true }, ...obj?.main()) 
+       
+          self.postMessage({stl:serialize({ binary: true }, 
+            ...obj?.main()),name:data.name})
+
         return
     }
     if (!data.show)return

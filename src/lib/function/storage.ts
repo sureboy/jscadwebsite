@@ -1,13 +1,14 @@
 import { writable } from 'svelte/store';
-import type {solidEditStruct,AlertMsgType} from './share'
+import type {solidEditStruct,AlertMsgType,CodeToWorker} from './share'
 import {solidLogo} from './solidClass'
 
+//export const StoreWorkerCmd = writable("");
 
 export const StoreInputCode = writable(""); 
 export const StoreHelpHidden = writable(true); 
 
-export const StoreCode3Dview = writable("");
-export const  StoreAlertMsg = writable<AlertMsgType>( {waitting:false,errMsg:"" })
+export const StoreCode3Dview = writable<CodeToWorker>({code:""});
+export const  StoreAlertMsg = writable<AlertMsgType>( {waitting:false,errMsg:"",name:"" })
 
 const solidListKey="solidList"  
 export const solidB = new solidLogo() as solidEditStruct
@@ -52,7 +53,10 @@ export const saveStorage = (key:string,value:string)=>{
     return
   }
   keylist.push(key)
-
+  StoreAlertMsg.update( k=>{
+    k.name = key
+    return k
+  })
   window.localStorage.setItem(solidListKey,keylist.join(",") )
  }
 

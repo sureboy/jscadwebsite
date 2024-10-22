@@ -1,10 +1,10 @@
  
-import type {Geometry ,Geom3} from '@jscad/modeling/src/geometries/types';
+import type {Geometry } from '@jscad/modeling/src/geometries/types';
 
 
 //export const solidB = new solidBase()
-
-export type AlertMsgType = {waitting:boolean,errMsg:string }
+export type CodeToWorker = {code:string,name?:string,show?:boolean,stl?:boolean }
+export type AlertMsgType = {waitting:boolean,errMsg:string ,name:string}
 //export let AlertMsg:AlertMsgType={waitting:false,errMsg:"3D Create" }
 export interface SearchDataCallback {
     (k:string,v:any):boolean
@@ -17,4 +17,4 @@ export const solidNow:{solid:Geometry[]}={
 export interface solidEditStruct  { 
   [x: string]: any;
   main:()=>Geometry[]; 
-}
+} 

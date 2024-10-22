@@ -25,6 +25,7 @@ export interface csgObj {
     opacity? :any;
     transforms?:Matrix4Tuple;
     type?:any;
+    //csg:Geometry;
 }  
 const flatShading = false
 const materials:Record<string,any> = {

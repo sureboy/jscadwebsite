@@ -1,6 +1,8 @@
 <script lang="ts">
  // import {show3d,saveSolid,showSolidFromString,solidLogo as solidBase, } from "./show3d"; 
  import { browser } from '$app/environment'; 
+
+ import {mimeType} from "@jscad/stl-serializer"  
  import {CSG2Vertices,CSG2Three,CSGSides2LineSegmentsVertices,CSG2LineVertices} from "$lib/function/csg2Three"  
  import {regexpGetClass} from "$lib/function/share"  
  import {solidLogo} from '$lib/function/solidClass'
@@ -11,13 +13,18 @@
  import { onMount, onDestroy } from 'svelte'; 
  import pkg from '@jscad/modeling';
 const {geometries} = pkg;
- import type {AlertMsgType} from '$lib/function/share'
+ import type {AlertMsgType,CodeToWorker} from '$lib/function/share'
  import type {Geometry} from '@jscad/modeling/src/geometries/types';
  //StoreCode3Dview.subscribe(Show3DSolid)
- const AlertMsg:AlertMsgType = {waitting:false,errMsg:""}
+ //const AlertMsg:AlertMsgType = $StoreAlertMsg
  const initAlertMsg = ()=>{
-  AlertMsg.waitting = false
-  AlertMsg.errMsg=""
+  StoreAlertMsg.update(a=>{
+    a.waitting = false
+    a.errMsg = ""
+    return a
+  })
+  //AlertMsg.waitting = false
+  //AlertMsg.errMsg=""
  }
  //StoreAlertMsg.set(AlertMsg)
  let el: HTMLCanvasElement|null = null;//  = createCanvasElement() ;
@@ -31,7 +38,7 @@ const {geometries} = pkg;
   if (!el)return;
   let vm = code.match(regexpGetClass)   
   if (!vm)return;    
-  const obje =  StringToClass(code,vm[1],AlertMsg)
+  const obje =  StringToClass(code,vm[1],$StoreAlertMsg)
   if (!obje)return;
   //console.log(obje?.solid1)
   try{
@@ -57,7 +64,8 @@ const {geometries} = pkg;
     mesh = []
     saveStorage(vm[1],code)
   }catch(e:any){
-    AlertMsg.errMsg = e.toString()
+    StoreAlertMsg.update(a=>a.errMsg=e.toString())
+    //AlertMsg.errMsg = e.toString()
     //console.log(e)
   }
   
@@ -94,18 +102,21 @@ const {geometries} = pkg;
 */
     })
   
-    StoreCode3Dview.subscribe((t)=>{
+    StoreCode3Dview.subscribe((t:CodeToWorker)=>{
     
       if (worker){
-     
-        worker.postMessage({code:t, show:true})
+        //AlertMsg.waitting = true;
+        $StoreAlertMsg.waitting ==true     
+        worker.postMessage(t)
+        
       }else{
         //StoreAlertMsg.set(AlertMsg)
         initAlertMsg()
-        StoreAlertMsg.set(AlertMsg)
-        NotWorkerShow(t)
-        AlertMsg.waitting=false 
-        StoreAlertMsg.set(AlertMsg)
+        //StoreAlertMsg.set(AlertMsg)
+        NotWorkerShow(t.code)
+        $StoreAlertMsg.waitting = false
+      
+        //StoreAlertMsg.set(AlertMsg)
       }
     })
     const WorkerInit =async()=>{
@@ -116,8 +127,21 @@ const {geometries} = pkg;
         worker.onmessage = function (e:any) {
           //console.log(e.data)
           initAlertMsg()
-          if (e.data.ver){
-            AlertMsg.waitting = true;
+          if(e.data.stl){
+            //AlertMsg.waitting = true;
+            const file = new File(e.data.stl, e.data.name+".stl", {
+              type: mimeType,
+            });
+            //console.log(file)
+            let aTag = document.createElement('a'); 
+            aTag.download = file.name;
+            let href = URL.createObjectURL(file); 
+            aTag.href = href;
+            aTag.click();
+            URL.revokeObjectURL(href); 
+            //AlertMsg.waitting = false;
+          }else if (e.data.ver){
+            $StoreAlertMsg.waitting = true;
             //console.log(e.data.ver)
             mesh.push(CSG2Three(e.data.ver,{}))
           }else{
@@ -129,11 +153,11 @@ const {geometries} = pkg;
               saveStorage(e.data.name,e.data.code)
             }
             if (e.data.errMsg){
-              AlertMsg.errMsg = e.data.errMsg
+              $StoreAlertMsg.errMsg = e.data.errMsg
             }
-            AlertMsg.waitting = false;
+            $StoreAlertMsg.waitting = false;
           }
-          StoreAlertMsg.set(AlertMsg)
+          //StoreAlertMsg.set(AlertMsg)
           //console.log(e.data.ver)
         };
 
@@ -143,7 +167,7 @@ const {geometries} = pkg;
 
       } 
         initMySolid((v,k)=>{
-          StringToClass(v,k,AlertMsg)
+          StringToClass(v,k,$StoreAlertMsg)
           //worker.postMessage({code:v,name:k,show:false})
         })
       

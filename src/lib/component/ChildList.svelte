@@ -1,5 +1,5 @@
 <script lang="ts">
-       import { Drawer,  CloseButton,Modal,Textarea,AccordionItem, Accordion } from 'flowbite-svelte';
+       import { Modal,Textarea,AccordionItem, Accordion } from 'flowbite-svelte';
        import ChildList from "$lib/component/ChildList.svelte"
        export let inputList:Map<string, any> ;
        export let obj:object;
