@@ -11,6 +11,7 @@
     let element:HTMLElement;
     let editor:EditorView|null;
     let nodeElement:HTMLElement;
+    const optReg=/(?<=const\s+defaults\s+\=\s+)\{[^\}]+\}/sm
     const getValue = () => {
         return editor?.state.doc.toString() || ''
     }
@@ -38,12 +39,18 @@
 	})
     
     function myCompletions(context: CompletionContext) {
-      let word = context.matchBefore(/\w*/)
+      let word = context.matchBefore(/[\w.]*/)
       if (word?.from == word?.to && !context.explicit)
         return null
       const options:any[]=[]
       inputList.forEach((v,k)=>{
-        options.push({label:k, type: "text",apply:k,detail:v})
+        const vs = v.toString().match(optReg)
+        if (vs){
+          options.push({label:k, type: "text",apply:k+`(${vs[0]})`,detail:v})
+        }else{
+          options.push({label:k, type: "text",apply:k,detail:v})
+        }
+        
       })
       return {
         from: word?.from,

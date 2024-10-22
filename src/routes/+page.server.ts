@@ -3,6 +3,7 @@ import type { PageServerLoad } from './$types';
 const solidTemplate = new solidBase()
 export const prerender = true;
 
+
 export const load: PageServerLoad = ({ params }) => { 
    return {data:solidTemplateToPlainObject(solidTemplate)}  
    
@@ -22,8 +23,17 @@ function solidTemplateToPlainObject(Inobj:Object,f:string="this"){
       //out.set(key, solidTemplateToPlainObject(value,`${f}.${key}`))  
     }else{
       //let str = value.toString()
-      //out.set(key,[`${f}.${key}`,str])
       out.set(`${f}.${key}`,value.toString())
+      /*
+      const v = str.match(optReg)
+      let k =`${f}.${key}`
+      if (v){
+        out.set(k,k+`(${v[0]})`)
+        //k + `(${v[0]})`
+      }else{
+        out.set(k,str)
+      }
+      */
     }
   }
  
