@@ -250,7 +250,7 @@ function copyTransformToArray(te:TypedArray, array:TypedArray , offset = 0) {
     points[i++] = p[2] || 0
   }
   export function CSG2Vertices (csg:Geom3) {
-    console.log(csg)
+    //console.log(csg)
     let vLen = 0; let iLen = 0
     for (const poly of csg.polygons) {
       const len = poly.vertices.length

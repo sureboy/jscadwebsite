@@ -4,7 +4,7 @@ import {CSG2Vertices,CSGSides2LineSegmentsVertices,CSG2LineVertices} from "$lib/
 import {regexpGetClass} from "$lib/function/share"  
 import pkg from '@jscad/modeling';
 const {geometries} = pkg;
-import type {AlertMsgType,CodeToWorker} from '$lib/function/share'
+import type {AlertMsgType,CodeToWorker,WorkerMsg} from '$lib/function/share'
 const AlertMsg:AlertMsgType = {waitting:false,errMsg:"",name:""}
 //import type {csgObj} from "$lib/function/csg2Three"  
 
@@ -38,26 +38,32 @@ self.onmessage = (e) => {
 
 }
 const handCode  = (data:CodeToWorker)=>{
-    if (!data.name){
+    //console.log(data)
+    if (!data.name ){
+        if (!data.code)   return
         let vm = data.code.match(regexpGetClass)    
         if (!vm || !vm[1]){
-            self.postMessage({errMsg:"class declare err"})
+            self.postMessage(<WorkerMsg>{errMsg:"class declare err"})
             return;
         }
         data.name = vm[1]
     }
     //console.log(data)
     const obj = StringToClass(data.code,data.name,AlertMsg)
+   
     if (!obj){
+       
         if(AlertMsg.errMsg){
-            self.postMessage(AlertMsg)
+            self.postMessage(<WorkerMsg>{errMsg:AlertMsg.errMsg})
         }
         return
     }
+    self.postMessage(<WorkerMsg>{Flist:obj.Flist})
+    //console.log(Object.keys(obj))
+    //console.log(obj)
     if (data.stl&&data.name){
         //const da = serialize({ binary: true }, ...obj?.main()) 
-       
-          self.postMessage({stl:serialize({ binary: true }, 
+        self.postMessage(<WorkerMsg>{stl:serialize({ binary: true }, 
             ...obj?.main()),name:data.name})
 
         return
@@ -69,25 +75,25 @@ const handCode  = (data:CodeToWorker)=>{
             //console.log(v)
             const v = li[i]
             if (geometries.geom3.isA(v)){
-                self.postMessage({ver:CSG2Vertices(v)})
+                self.postMessage(<WorkerMsg>{ver:CSG2Vertices(v)})
                 continue;
               }
               if (geometries.geom2.isA(v)){
-                self.postMessage({ver:CSGSides2LineSegmentsVertices(v)})
+                self.postMessage(<WorkerMsg>{ver:CSGSides2LineSegmentsVertices(v)})
                 //self.postMessage(CSG2Three(CSGSides2LineSegmentsVertices(v),{}))
                 continue;
               }
               if (geometries.path2.isA(v)){
-                self.postMessage({ver:CSG2LineVertices(v)})
+                self.postMessage(<WorkerMsg>{ver:CSG2LineVertices(v)})
                 //self.postMessage(CSG2Three(CSG2LineVertices(v),{}))
                 continue;
               }
             //self.postMessage({ver:CSG2Vertices(li[i])})
         }
-        self.postMessage(data)
+        self.postMessage(<WorkerMsg>data)
     }catch(e:any){
-        AlertMsg.errMsg = e.toString()
-        self.postMessage(AlertMsg)
+        //AlertMsg.errMsg = e.toString()
+        self.postMessage(<WorkerMsg>{errMsg:e.toString()})
     }
 }
 

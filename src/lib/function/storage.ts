@@ -8,7 +8,8 @@ export const StoreInputCode = writable("");
 export const StoreHelpHidden = writable(true); 
 
 export const StoreCode3Dview = writable<CodeToWorker>({code:""});
-export const  StoreAlertMsg = writable<AlertMsgType>( {waitting:false,errMsg:"",name:"" })
+export const StoreAlertMsg = writable<AlertMsgType>( {waitting:false,errMsg:"",name:"" });
+export const StoreMyClass = writable<Map<string, any>>(new Map())
 
 const solidListKey="solidList"  
 export const solidB = new solidLogo() as solidEditStruct
@@ -18,14 +19,27 @@ export const StringToClass = (data:string,name:string,msg:AlertMsgType)=>{
   //console.log(data)
   try{  
     const obj = eval(`(()=>{${data};return ${name}})()`)  
+    
+    //console.log(Object.getOwnPropertyNames(obj.prototype))
     obj.prototype.__proto__ = solidB
-    //console.log(obj)
     //MySolid[name] = obj
     const obje = new obj as solidEditStruct
     //Object.assign(obj,MySolid) 
     //obj.my=MySolid
     //console.log(obj,obje,solidB)
+     
+    //console.log(keys)
+    let Flist = Object.getOwnPropertyNames(obj.prototype).map((v)=>{
+        return [`this.${name}.${v}()`,""]
+    })
+    Object.getOwnPropertyNames(obje).forEach(v=>{
+      Flist.push([`this.${name}.${v}`,obje[v]] )
+    })
+    obje.Flist = Flist
+    //console.log(Object.getOwnPropertyNames(obj.prototype))
+    //console.log(Object.keys(obje))
     solidB[name] = obje 
+    //console.log(JSON.stringify(obje),JSON.stringify(solidB))
     //MySolid[name] = obj
     return obje 
   }catch(e:any){
@@ -35,6 +49,7 @@ export const StringToClass = (data:string,name:string,msg:AlertMsgType)=>{
   }
 }
 export const initMySolid = (f:(v:string,k:string)=>void)=>{
+  
     window.localStorage.getItem(solidListKey)?.split(",").forEach(v=>{
         if (!v)return
         const data = window.localStorage.getItem(v)

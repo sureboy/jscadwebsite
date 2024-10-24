@@ -6,7 +6,7 @@
     import type { CompletionContext } from '@codemirror/autocomplete'     
     import { onMount } from 'svelte'
 
-	import {StoreInputCode,StoreCode3Dview} from "$lib/function/storage"
+	import {StoreInputCode,StoreCode3Dview,StoreMyClass} from "$lib/function/storage"
     export let inputList:Map<string, any>; 
     //let element:HTMLElement;
     let editor:EditorView|null;
