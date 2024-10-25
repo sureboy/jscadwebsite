@@ -16,6 +16,9 @@
     <NavBrand>
       {#if  $StoreAlertMsg.waitting} <Spinner color="gray" />{:else}3D Create{/if} 
       {#if  $StoreAlertMsg.errMsg}<Alert color="red">{$StoreAlertMsg.errMsg}</Alert>{:else if $StoreAlertMsg.name } <Alert color="gray">{$StoreAlertMsg.name}</Alert> {/if}
+   <slot></slot>
+   
+   
     </NavBrand>
   <NavHamburger />
       <NavUl    > 

@@ -233,12 +233,9 @@ function copyTransformToArray(te:TypedArray, array:TypedArray , offset = 0) {
   }
   export function CSG2LineVertices (csg:Path2) {
     let vLen = csg.points.length * 3
-    if (csg.isClosed) vLen += 3
-     
-    const vertices = new Float32Array(vLen)
-  
-    csg.points.forEach((p, idx) => setPoints(vertices, p, idx * 3))
-  
+    if (csg.isClosed) vLen += 3     
+    const vertices = new Float32Array(vLen)  
+    csg.points.forEach((p, idx) => setPoints(vertices, p, idx * 3))  
     if (csg.isClosed) {
       setPoints(vertices, csg.points[0], vertices.length - 3)
     }

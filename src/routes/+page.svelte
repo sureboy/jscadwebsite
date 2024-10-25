@@ -12,14 +12,14 @@ export let data:PageData;
 
 <main>
   <div class="z-10 absolute top-0 left-0  w-full  pointer-events-none">
-    <Header  > </Header>
+    <Header  > 
 
-    <EditorJs   inputList={data.data}  >
 
-    </EditorJs>
+  </Header>
+  <EditorJs   inputList={data.data}  >
+
+  </EditorJs>
   </div>
-
-
 </main>
 <View3d  > </View3d> 
 <Help inputList ={data.data} ></Help>

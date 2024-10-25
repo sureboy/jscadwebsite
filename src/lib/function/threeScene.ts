@@ -25,7 +25,7 @@ const scene = new Scene();
 scene.background = null; 
 const camera = new PerspectiveCamera(50, 1, 0.1, 2000); 
 let renderer:WebGLRenderer;
-let controls:OrbitControls;
+let OrbControls:OrbitControls;
 let _el: HTMLCanvasElement;
 const directionalLight = new DirectionalLight( 0xffffff, 0.5 );
 directionalLight.position.set(0, 1, 0)  
@@ -41,7 +41,7 @@ const animate = (t:number) => {
 	//scene.rotation.x+=0.0025;
 	renderer.render(scene, camera)
 	//renderer.render(scene, camera);
-	controls.update();
+	OrbControls.update();
 };
   
 export function onWindowResize(el: HTMLCanvasElement) {
@@ -54,31 +54,23 @@ export function onWindowResize(el: HTMLCanvasElement) {
 		//renderer.render(scene, camera)
 	//	animate();
 	//}
-
+	if (!renderer)return;
 	camera.aspect = el.width/el.height
 	camera.updateProjectionMatrix()
 	renderer.setSize(el.width,el.height)	
 	renderer.render(scene, camera)
 }
-export const createSceneOBJ = (el: HTMLCanvasElement,m:Object3D[] ) => {
- 
-	//if (!renderer)renderer = new WebGLRenderer({ antialias: true,alpha:true, canvas: el,preserveDrawingBuffer:true, });
- 
-	//controls = new OrbitControls(camera, renderer.domElement);
+export const createSceneOBJ = (el: HTMLCanvasElement,m:Object3D[] ) => { 
 	if (el !== _el){
 		renderer = new WebGLRenderer({ antialias: true,alpha:true, canvas: el,preserveDrawingBuffer:false, });
-		controls = new OrbitControls(camera, el);
+		OrbControls = new OrbitControls(camera, el);
 		stopAnimate = true
 		_el = el
-		controls.enableDamping = true
-	}
-	
-	
+		OrbControls.enableDamping = true
+	}	
 	scene.clear();
 	scene.add(hemisphereLight);
-	scene.add(directionalLight);
-
- 
+	scene.add(directionalLight); 
 	scene.add(...m )
 	const sceneSize = new Box3().setFromObject(scene).getSize(new Vector3())
 	const size = sceneSize.length();

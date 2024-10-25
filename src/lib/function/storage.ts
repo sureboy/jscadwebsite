@@ -30,7 +30,8 @@ export const StringToClass = (data:string,name:string,msg:AlertMsgType)=>{
      
     //console.log(keys)
     let Flist = Object.getOwnPropertyNames(obj.prototype).map((v)=>{
-        return [`this.${name}.${v}()`,""]
+      if (v!=="constructor")
+      return [`this.${name}.${v}()`,""]
     })
     Object.getOwnPropertyNames(obje).forEach(v=>{
       Flist.push([`this.${name}.${v}`,obje[v]] )
@@ -48,17 +49,13 @@ export const StringToClass = (data:string,name:string,msg:AlertMsgType)=>{
     return null
   }
 }
-export const initMySolid = (f:(v:string,k:string)=>void)=>{
-  
-    window.localStorage.getItem(solidListKey)?.split(",").forEach(v=>{
-        if (!v)return
-        const data = window.localStorage.getItem(v)
-        if (!data)return
-        
-        f(data!,v)      
-      
-
-    })
+export const initMySolid = (f:(v:string,k:string)=>void)=>{  
+  window.localStorage.getItem(solidListKey)?.split(",").forEach(v=>{
+    if (!v)return
+    const data = window.localStorage.getItem(v)
+    if (!data)return        
+    f(data!,v)    
+  })
 }
 
 export const saveStorage = (key:string,value:string)=>{
@@ -73,24 +70,24 @@ export const saveStorage = (key:string,value:string)=>{
     return k
   })
   window.localStorage.setItem(solidListKey,keylist.join(",") )
- }
+}
 
 export const getStoragelist = ()=>{
     //solidList =  window.localStorage.getItem(solidListKey)!
     //showSolid(solidList) 
-    let links:any[] = []
-    window.localStorage.getItem(solidListKey)?.split(",").forEach(v=>{
-      if(v)links.push(v)
-    })   
-   return links 
- }
+  let links:any[] = []
+  window.localStorage.getItem(solidListKey)?.split(",").forEach(v=>{
+    if(v)links.push(v)
+  })   
+  return links 
+}
 
- export const removeStorage=(k:string)=>{
-    window.localStorage.removeItem(k)
-    let funcName  = new Set()
-    window.localStorage.getItem(solidListKey)?.split(',').forEach(v=>{    
-      if (v&&window.localStorage.getItem(v))funcName.add(v)
-    })
-    window.localStorage.setItem(solidListKey,funcName.size>0?Array.from(funcName).join(","):"")
-  }
+export const removeStorage=(k:string)=>{
+  window.localStorage.removeItem(k)
+  let funcName  = new Set()
+  window.localStorage.getItem(solidListKey)?.split(',').forEach(v=>{    
+    if (v&&window.localStorage.getItem(v))funcName.add(v)
+  })
+  window.localStorage.setItem(solidListKey,funcName.size>0?Array.from(funcName).join(","):"")
+}
 
