@@ -65,11 +65,20 @@
         }
         if (e.data.ver){
           $StoreAlertMsg.waitting = true; 
-          mesh.push(CSG2Three(e.data.ver,{}))
+          try{
+            mesh.push(CSG2Three(e.data.ver,{}))
+          }catch(e:any){
+            $StoreAlertMsg.errMsg = e.toString()
+          }         
           return
         }            
         if (el && mesh.length>0 ){
-          createSceneOBJ(el!,mesh)
+          try{
+            createSceneOBJ(el!,mesh)
+          }catch(e:any){
+            $StoreAlertMsg.errMsg = e.toString()
+          }
+          
           mesh = []
         } 
         if (e.data.code && e.data.name){
@@ -82,7 +91,7 @@
           //console.log(e.data.Flist)
           StoreMyClass.update((v_:Map<string, any>)=>{      
             e.data.Flist!.forEach(v=>{
-              if (!v)return;
+              //if (!v)return;
               v_.set(v[0],v[1]);
             });
             //v_.delete("constructor")

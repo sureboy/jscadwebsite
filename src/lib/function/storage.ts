@@ -30,7 +30,7 @@ export const StringToClass = (data:string,name:string,msg:AlertMsgType)=>{
      
     //console.log(keys)
     let Flist = Object.getOwnPropertyNames(obj.prototype).map((v)=>{
-      if (v!=="constructor")
+      //if (v!=="constructor")
       return [`this.${name}.${v}()`,""]
     })
     Object.getOwnPropertyNames(obje).forEach(v=>{

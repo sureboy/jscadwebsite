@@ -74,20 +74,24 @@ const handCode  = (data:CodeToWorker)=>{
         for (const i in li){
             //console.log(v)
             const v = li[i]
-            if (geometries.geom3.isA(v)){
-                self.postMessage(<WorkerMsg>{ver:CSG2Vertices(v)})
-                continue;
-              }
-              if (geometries.geom2.isA(v)){
-                self.postMessage(<WorkerMsg>{ver:CSGSides2LineSegmentsVertices(v)})
-                //self.postMessage(CSG2Three(CSGSides2LineSegmentsVertices(v),{}))
-                continue;
-              }
-              if (geometries.path2.isA(v)){
-                self.postMessage(<WorkerMsg>{ver:CSG2LineVertices(v)})
-                //self.postMessage(CSG2Three(CSG2LineVertices(v),{}))
-                continue;
-              }
+            try{
+                if (geometries.geom3.isA(v)){
+                    self.postMessage(<WorkerMsg>{ver:CSG2Vertices(v)})
+                    continue;
+                }
+                if (geometries.geom2.isA(v)){
+                    self.postMessage(<WorkerMsg>{ver:CSGSides2LineSegmentsVertices(v)})
+                  
+                    continue;
+                }
+                if (geometries.path2.isA(v)){
+                    self.postMessage(<WorkerMsg>{ver:CSG2LineVertices(v)})               
+                    continue;
+                }
+            }catch(e:any){
+                self.postMessage(<WorkerMsg>{errMsg:e.toString})
+            }
+
             //self.postMessage({ver:CSG2Vertices(li[i])})
         }
         self.postMessage(<WorkerMsg>data)
