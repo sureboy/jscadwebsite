@@ -5,37 +5,27 @@
   import {indentWithTab} from "@codemirror/commands"
   import type { CompletionContext } from '@codemirror/autocomplete'     
   import { onMount } from 'svelte'
-	import {StoreInputCode,StoreCode3Dview,StoreMyClass} from "$lib/function/storage"
-  import { CloseOutline} from 'flowbite-svelte-icons';
-  import {ButtonGroup,Button} from 'flowbite-svelte';  
+	import {StoreInputCode,StoreCode3Dview,StoreMyClass} from "$lib/function/storage" 
   export let inputList:Map<string, any>; 
   let element:HTMLElement;
   let editor:EditorView|null;
   let nodeElement:HTMLElement;
-  const optReg=/(?<=const\s+defaults\s+\=\s+)\{[^\}]+\}/sm
+  const optReg=/(?<=const\s+defaults\s+\=\s+)\{[^\}]+\}/m
   const getValue = () => {
       return editor?.state.doc.toString() || ''
   }
   const setValue = (val: string) => {
       editor?.dispatch({ changes: { from: 0, to: editor.state.doc.length, insert: val } })
   }
-
-  StoreInputCode.subscribe(t=>{
-		
-		//if ( editor) editor.commands.insertContentAt({from: 0, to: editor.getText().length},t)	
-		if (!t){
-			//hidden=true
+  StoreInputCode.subscribe(t=>{ 
+		if (!t){ 
 			if (element)element.style.visibility = "collapse";
 			return;
-		}
-		//console.log(t)
-		//hidden=false
+		} 
 		StoreCode3Dview.set({code:t,show:true})
 		if ( editor) {
 			element.style.visibility = "visible"
-      setValue(t)
-			//editor.commands.insertContentAt({from: 0, to: editor.getText().length},t)	
-			//console.log("w",outputCode)
+      setValue(t) 
 		}
 	})
   const options:any[]=[]
@@ -59,8 +49,6 @@
     let word = context.matchBefore(/[\w.]*/)
     if (word?.from == word?.to && !context.explicit)
       return null
-    
-
     return {
       from: word?.from,
       options 
@@ -79,7 +67,7 @@
     })
     editor =   new EditorView({
         //  lineWrapping:true,
-      doc: "console.log('hello')\n",
+      //doc: solid1,
       extensions: [
         basicSetup, 
         keymap.of([indentWithTab]),

@@ -12,23 +12,14 @@ export const StoreAlertMsg = writable<AlertMsgType>( {waitting:false,errMsg:"",n
 export const StoreMyClass = writable<Map<string, any>>(new Map())
 
 const solidListKey="solidList"  
-export const solidB = new solidLogo() as solidEditStruct
-//export const MySolid:Record<string,solidEditStruct> = {}
+export const solidB = new solidLogo() as solidEditStruct 
+export const solid1 = "const solid1=class{\n\/\/Input Ctrl+S perview and save this solid\n main(){\n return [this.cube({size:200,center:[0,0,0]})]\n};\n}"
 export const StringToClass = (data:string,name:string,msg:AlertMsgType)=>{
-  if (!name)return;
-  //console.log(data)
+  if (!name)return; 
   try{  
-    const obj = eval(`(()=>{${data};return ${name}})()`)  
-    
-    //console.log(Object.getOwnPropertyNames(obj.prototype))
-    obj.prototype.__proto__ = solidB
-    //MySolid[name] = obj
-    const obje = new obj as solidEditStruct
-    //Object.assign(obj,MySolid) 
-    //obj.my=MySolid
-    //console.log(obj,obje,solidB)
-     
-    //console.log(keys)
+    const obj = eval(`(()=>{${data};return ${name}})()`)   
+    obj.prototype.__proto__ = solidB 
+    const obje = new obj as solidEditStruct 
     let Flist = Object.getOwnPropertyNames(obj.prototype).map((v)=>{
       //if (v!=="constructor")
       return [`this.${name}.${v}()`,""]
@@ -36,12 +27,8 @@ export const StringToClass = (data:string,name:string,msg:AlertMsgType)=>{
     Object.getOwnPropertyNames(obje).forEach(v=>{
       Flist.push([`this.${name}.${v}`,obje[v]] )
     })
-    obje.Flist = Flist
-    //console.log(Object.getOwnPropertyNames(obj.prototype))
-    //console.log(Object.keys(obje))
-    solidB[name] = obje 
-    //console.log(JSON.stringify(obje),JSON.stringify(solidB))
-    //MySolid[name] = obj
+    obje.Flist = Flist 
+    solidB[name] = obje  
     return obje 
   }catch(e:any){
     msg.errMsg = e.toString()  
@@ -72,9 +59,7 @@ export const saveStorage = (key:string,value:string)=>{
   window.localStorage.setItem(solidListKey,keylist.join(",") )
 }
 
-export const getStoragelist = ()=>{
-    //solidList =  window.localStorage.getItem(solidListKey)!
-    //showSolid(solidList) 
+export const getStoragelist = ()=>{ 
   let links:any[] = []
   window.localStorage.getItem(solidListKey)?.split(",").forEach(v=>{
     if(v)links.push(v)
@@ -90,4 +75,3 @@ export const removeStorage=(k:string)=>{
   })
   window.localStorage.setItem(solidListKey,funcName.size>0?Array.from(funcName).join(","):"")
 }
-
