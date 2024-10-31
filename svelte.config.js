@@ -22,9 +22,10 @@ const config = {
 				include: ['/*'],
 				exclude: ['<all>']
 			},
-	  platformProxy: {
-		persist: './custom'
-	  }
+			platformProxy: {
+				persist: './custom',
+				//configPath: 'wrangler.toml',
+			}
 		}),
  
 	}
