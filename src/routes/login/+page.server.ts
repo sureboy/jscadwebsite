@@ -1,3 +1,4 @@
+/*
 import nodemailer from 'nodemailer'; 
 import type { Actions } from './$types';
 const SECRET_KEY = "0x4AAAAAAAylaN-pLQyJmqPMnxe8TsvX9-0";
@@ -56,3 +57,4 @@ export const actions:Actions = {
 		// TODO register the user
 	}
 };
+*/
