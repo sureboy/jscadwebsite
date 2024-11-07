@@ -11,8 +11,7 @@ export default {
   async fetch(request, env, ctx) {
     
     const url = new URL(request.url);
-    const reurl = url.searchParams.get("url")
-    if (!reurl)return
+
 
     const k = url.searchParams.get("k")
     if (k){
@@ -26,6 +25,8 @@ export default {
         });
       }           
     } 
+    const reurl = url.searchParams.get("url")
+    if (!reurl)return
     //const name = url.searchParams.get("keyName")
     //if (!name)return new Response(null,{status:404}) 
 

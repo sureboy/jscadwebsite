@@ -7,10 +7,14 @@ import {createSceneOBJ,onWindowResize} from "$lib/function/threeScene"
 import { createCanvasElement } from "three";
 import { onMount ,onDestroy} from 'svelte';  
 import type {CodeToWorker,WorkerMsg} from '$lib/function/share' 
-import {  Modal  } from 'flowbite-svelte';  
+import {  Modal,Spinner ,Textarea } from 'flowbite-svelte';  
+import   QRCode  from 'qrcode';   
 let container:HTMLElement; 
+let qrcode:HTMLElement;
 let worker:Worker|null
 let formModal=false
+let waitting = false
+let shareUrl = ""
 onDestroy(()=>{
   if (worker) {
     worker.terminate();
@@ -22,16 +26,26 @@ const updataCode = (hash:string)=>{
   const halist = hash.substring(1).split(":")
   if (!halist )return;
   if (halist[0]==="remote"){
-
+    formModal=true 
+    waitting = true
     fetch(`https://stl.miguotuijian.cn?url=${encodeURI($page.url.origin)}&k=${halist[1]}`).then((r)=>{      
       r.arrayBuffer().then((v)=>{ 
         const fl = (new TextDecoder('utf-8')).decode(v).split("\n======\n")
         let codes = fl.slice(1)
         let titles = fl[0].split(",")
         if (halist.length===3 && halist[2]==="QR"){
-          formModal=true
-
+          shareUrl = `${$page.url.origin}#remote:${halist[1]}`
+          var canvas =document.createElement("canvas")  
+          QRCode.toCanvas(canvas, shareUrl, function (error) {
+            waitting=false
+            if (error) console.error(error)
+            else{
+              qrcode.appendChild(canvas!)
+              console.log('success!');
+            }            
+          })
         }else{
+          formModal=false
           titles = titles.map((vn)=>{
             let newName=vn
             for (let n = 1;;n++){            
@@ -157,6 +171,12 @@ const WorkerInit =(el:HTMLCanvasElement)=>{
 }
 </script>
 <div bind:this={container}  class=" h-full w-full z-0 absolute top-0 left-0" > 
-
 </div>
-<Modal bind:open={formModal} size="xs" autoclose={false} class="w-full pointer-events-auto" ></Modal> 
+
+<Modal bind:open={formModal} size="xs" autoclose class="w-full pointer-events-auto" > 
+  <div bind:this={qrcode} class=" text-center " >   
+    {#if waitting}
+    <Spinner  color="green" />
+    {/if}
+  </div> 
+</Modal> 
