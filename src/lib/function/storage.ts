@@ -13,7 +13,7 @@ export const StoreCode3Dview = writable<CodeToWorker>({code:""});
 export const StoreAlertMsg = writable<AlertMsgType>( {waitting:false,errMsg:"",name:"" });
 export const StoreMyClass = writable<Map<string, any>>(new Map())
 export const splitTag = "\n==split==\n"
-const solidListKey="solidList"  
+//const solidListKey="solidList"  
 export const solidB = new solidLogo() as solidEditStruct 
 export const solid1 = "const solid1=class{\n\/\/Input Ctrl+S perview and save this solid\n main(){\n return [this.cube({size:200,center:[0,0,0]})]\n};\n}"
 export const StringToClass = (data:string,name:string,msg:AlertMsgType)=>{
@@ -45,7 +45,8 @@ export const  ClassToString = (c:string,n:string)=>{
 
   const codelist:Map<string,string> = new Map<string,string>()
   codelist.set(n,c)
-  const key = window.localStorage.getItem(solidListKey)?.split(",")
+  const key:string[] =[];
+  getSolidKey(k=> key.push(k) )   
   if (!key)return codelist;
   const item = c.matchAll(/(?<=this\.)[\w\d]+/g)
   const li = new Set<string>()
@@ -59,57 +60,39 @@ export const  ClassToString = (c:string,n:string)=>{
     if (c_) codelist.set(v[0],c_ )
   })
   return codelist
-  //qrcode.toCanvas()
-  //console.log(codelist.join("\n----\n")) 
-  /*
-  zlib.gzip(codelist.join("\n----\n"),(err, buffer)=>{
-    if (err) {
-      console.log(err);
-    }   
    
-    console.log(buffer.toString());
-  })
-*/
+}
+const getSolidKey = (f:(key:string)=>void)=>{
+  const sl = window.localStorage.length
+  for (let i=0;i<sl;i++){ 
+    const k = window.localStorage.key(i)
+    if (k==="solidList")window.localStorage.removeItem(k)
+    if (!k)continue
+    f(k)
+  }
 }
 export const initMySolid = (f:(v:string,k:string)=>void)=>{  
-  window.localStorage.getItem(solidListKey)?.split(",").forEach(v=>{
-    if (!v)return
-    const data = window.localStorage.getItem(v)
-    if (!data)return        
-    f(data!,v)    
+  getSolidKey((k)=>{
+    const d = window.localStorage.getItem(k)
+    if (!d)return
+    f(d,k)
   })
+  
 }
 
 export const saveStorage = (key:string,value:string)=>{
-  window.localStorage.setItem(key, value)
-  let keylist = window.localStorage.getItem(solidListKey)?.split(",") ||[]
-  if (keylist.includes(key)){
-    return
-  }
-  keylist.push(key)
-  StoreAlertMsg.update( k=>{
-    k.name = key
-    return k
-  })
-  window.localStorage.setItem(solidListKey,keylist.join(",") )
+  window.localStorage.setItem(key, value) 
 }
 
 export const getStoragelist = ()=>{ 
   let links:any[] = []
-  window.localStorage.getItem(solidListKey)?.split(",").forEach(v=>{
+  getSolidKey((v)=>{
     if(v)links.push(v)
-  })   
+  })
   return links 
 }
 
 export const removeStorage=(k:string)=>{
   window.localStorage.removeItem(k)
-  let funcName  = new Set(window.localStorage.getItem(solidListKey)?.split(','))
-  funcName.delete(k)
-  /*
-  window.localStorage.getItem(solidListKey)?.split(',').forEach(v=>{    
-    if (v&&window.localStorage.getItem(v))funcName.add(v)
-  })
-    */
-  window.localStorage.setItem(solidListKey,funcName.size>0?Array.from(funcName).join(","):"")
+
 }

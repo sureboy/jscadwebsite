@@ -5,13 +5,17 @@ const u = new URL("https://cdn.jsdelivr.net/gh/sureboy/games@master")
  
 export const handle: Handle = async ({ event, resolve }) => {
 	
-	const { url } = event;
+	const { url,request } = event;
 	const { pathname } = url;
 	if ( pathname.endsWith(".stl")) {
 		return await resStl(event)
 	}
+	//request.body
+	//const db = await request.formData()
+	
 	return await resolve(event)
-	 
+	
+
 
 }
  /*
@@ -50,8 +54,8 @@ async function resStl(event:any){
 		
 		return new Response("err")
 	}
-	const modifiedResponse = new Response(response.body, response);
-   
+	const modifiedResponse = new Response(response.body, response);  
+	//response
     modifiedResponse.headers.set('Access-Control-Allow-Origin', '*');
     modifiedResponse.headers.set('Access-Control-Allow-Headers', '*');
     return modifiedResponse;
@@ -65,4 +69,3 @@ async function digestMessage(message:string) {
 	  .join(""); // 将字节数组转换为十六进制字符串
 	return hashHex;
 } 
- 
