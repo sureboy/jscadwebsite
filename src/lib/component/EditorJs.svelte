@@ -1,19 +1,27 @@
-<script lang="ts">
+<script context="module" lang="ts" >
+  let editor:EditorView|null;
+  export const getValue = () => {
+    return editor?.state.doc.toString() || ''
+  }
+</script>
+
+<script lang="ts" >
   import {  basicSetup } from 'codemirror' 
   import { keymap,EditorView} from "@codemirror/view" 
   import {javascript,javascriptLanguage} from "@codemirror/lang-javascript"
   import {indentWithTab} from "@codemirror/commands"
   import type { CompletionContext } from '@codemirror/autocomplete'     
   import { onMount } from 'svelte'
-	import {StoreInputCode,StoreCode3Dview,StoreMyClass} from "$lib/function/storage" 
+	import {StoreInputCode,StoreCode3Dview,StoreMyClass} from "$lib/function/storage"  
   export let inputList:Map<string, any>; 
+
   let element:HTMLElement;
-  let editor:EditorView|null;
+
   let nodeElement:HTMLElement;
   const optReg=/(?<=const\s+defaults\s+\=\s+)\{[^\}]+\}/m
-  const getValue = () => {
-      return editor?.state.doc.toString() || ''
-  }
+
+ 
+    
   const setValue = (val: string) => {
       editor?.dispatch({ changes: { from: 0, to: editor.state.doc.length, insert: val } })
   }
@@ -59,15 +67,13 @@
   })
   onMount(()=>{
     window.document.addEventListener("keydown",(e) => {     
-      if (e.ctrlKey && (e.code=="Enter"||e.code=="KeyS")){
+      if (e.ctrlKey && (e.code=="KeyS")){
         e.preventDefault();    
         StoreCode3Dview.set({code:getValue(),show:true}) 
         return
       }  
     })
     editor =   new EditorView({
-        //  lineWrapping:true,
-      //doc: solid1,
       extensions: [
         basicSetup, 
         keymap.of([indentWithTab]),
@@ -77,10 +83,9 @@
       ],
       parent: nodeElement,      
     })   
-    //console.log(editor.update([jsSnippets]))
   })
 </script>
-<div bind:this={element} class=" "  style="visibility:collapse">
+<div bind:this={element} class=""  style="visibility:collapse">
 <div bind:this={nodeElement} class="pointer-events-auto opacity-90 bg-gray-200 max-h-[80vh] w-full md:w-1/2  lg:w-1/3  resize-x overflow-auto" > 
 
 </div>

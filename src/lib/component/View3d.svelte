@@ -28,13 +28,13 @@ const updataCode = (hash:string)=>{
   if (halist[0]==="remote"){
     formModal=true 
     waitting = true
-    fetch(`https://stl.miguotuijian.cn?url=${encodeURI($page.url.origin)}&k=${halist[1]}`).then((r)=>{      
+    fetch(`https://stl.miguotuijian.cn/?url=${encodeURI($page.url.origin)}&k=${halist[1]}`).then((r)=>{      
       r.arrayBuffer().then((v)=>{ 
         const fl = (new TextDecoder('utf-8')).decode(v).split("\n======\n")
         let codes = fl.slice(1)
         let titles = fl[0].split(",")
         if (halist.length===3 && halist[2]==="QR"){
-          shareUrl = `${$page.url.origin}#remote:${halist[1]}`
+          shareUrl = `${$page.url.origin}/#remote:${halist[1]}`
           var canvas =document.createElement("canvas")  
           QRCode.toCanvas(canvas, shareUrl, function (error) {
             waitting=false
@@ -70,6 +70,8 @@ const updataCode = (hash:string)=>{
         //console.log(v)
       })
     })
+  }else if (halist[0]==="solid1"){
+    StoreInputCode.set(window.localStorage.getItem("solid1")||solid1 );
   }else{
     const code = window.localStorage.getItem(halist[0])
     if (code) StoreInputCode.set(code);
@@ -89,6 +91,7 @@ onMount(()=>{
   });
   container.appendChild(el)    
   window.addEventListener("hashchange", (e)=>{ 
+    //console.log(e)
     updataCode(new URL(e.newURL).hash)
   });
  

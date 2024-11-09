@@ -1,6 +1,6 @@
 <script lang="ts">
        import { Modal,Textarea,AccordionItem, Accordion } from 'flowbite-svelte';
-       import ChildList from "$lib/component/ChildList.svelte"
+       //import ChildList from "$lib/component/ChildList.svelte"
        export let inputList:Map<string, any> ;
        export let obj:object;
        export let activateClickOutside:boolean
@@ -16,7 +16,7 @@
 {#if typeof(value) == "object" && !Array.isArray(value) }
 <AccordionItem   paddingDefault=" p-1" defaultClass="flex items-center justify-between w-full font-medium text-left group-first:rounded-t-xl border-gray-200 dark:border-gray-700" borderClass="" >
        <span  slot="header">{key}</span>
-       <ChildList parent={`${parent}.${key}`} bind:activateClickOutside={activateClickOutside} {inputList} obj={value}  ></ChildList>  
+       <svelte:self parent={`${parent}.${key}`} bind:activateClickOutside={activateClickOutside} {inputList} obj={value}  />  
  
 </AccordionItem>
 {:else}
