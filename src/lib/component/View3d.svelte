@@ -17,106 +17,98 @@ let waitting = false
 //let shareUrl = ""
 let canvas:HTMLElement;
 
-formModal=true 
-  waitting = true
+formModal = true 
+waitting = true
 onDestroy(()=>{
   if (worker) {
     worker.terminate();
   }
 })
-const updataCode = (hash:string)=>{
-  //console.log(hash)
-  if (!hash){
+const getRemote = (k:string)=>{
+
+  fetch(`https://stl.miguotuijian.cn/?url=${encodeURI($page.url.origin)}&k=${k}`).then((r)=>{     
+    waitting =false 
     formModal=false
-    waitting = false
-    return
-  }  
-  const halist = hash.substring(1).split(":")
-  if (!halist ){
-    formModal=false
-    waitting = false
-    return
-  }  
-
-
-
-  if (halist[0]==="qrcode" && halist.length===3 ){
-    
-    const code = window.localStorage.getItem(halist[1])
-    if (code) StoreInputCode.set(code);
-    //shareUrl = 
-
- 
-    QRCode.toCanvas(canvas, `${$page.url.origin}/#remote:${halist[1]}:${halist[2]}`, function (error) {
-      if (error) console.error(error)
-      else{
-        
-        qrcode.appendChild(canvas!)
-        console.log('success!');
-      }   
-      waitting=false         
-    })
-   // waitting=false   
-   // return
-  }else if (halist[0]==="remote"){
-    fetch(`https://stl.miguotuijian.cn/?url=${encodeURI($page.url.origin)}&k=${halist[1]}:${halist[2]}`).then((r)=>{      
-      //const db = r.formData()
-      //console.log(r.formData())
-      //r.arrayBuffer()
-      //console.log(r.body)
-      //const  f = new FormData()
-      //new Request()
-      //const resq = new Response(r.body)    
-      waitting=false 
-      formModal=false
-      r.arrayBuffer().then((v)=>{ 
-        const fl = (new TextDecoder('utf-8')).decode(v).split("\n======\n")
-        let codes = fl.slice(1)
-        let titles = fl[0].split(",")
-        titles = titles.map((vn)=>{
-          let newName=vn
-          for (let n = 1;;n++){            
-            if (!window.localStorage.getItem(newName))break;
-            newName = vn+"_"+n
-          }    
-          if (vn !== newName){
-            codes = codes.map((code_val)=>{
-              return code_val.replaceAll(vn,newName)
-            })
-          } 
-          return newName
-        })
-        titles.forEach((codeN,i)=>{
-          window.localStorage.setItem(codeN,codes[i])
-          console.log(codeN,codes[i])
-          worker!.postMessage({code:codes[i],name:codeN,show:false})
-        })
-         
-        
-        
-       
-        StoreInputCode.set(codes[0]);
-     
-      }).catch(e=>{
-        console.log(e)
+    r.arrayBuffer().then((v)=>{ 
+      const fl = (new TextDecoder('utf-8')).decode(v).split("\n======\n")
+      let codes = fl.slice(1)
+      let titles = fl[0].split(",")
+      const name = k.split("__")
+      titles = titles.map((vn)=>{
+        //vn = vn.split("_")[0]+"_"+name[1]
+        let newName=vn.split("__")[0]+"__"+name[1]
+   
+        if (vn !== newName){
+          codes = codes.map((code_val)=>{
+            return code_val.replaceAll(vn,newName)
+          })
+        } 
+        return newName
       })
-    }).finally(()=>{
-      waitting=false   
-      formModal=false
+      titles.forEach((codeN,i)=>{
+        window.localStorage.setItem(codeN,codes[i])
+        console.log(codeN,codes[i])
+        worker!.postMessage({code:codes[i],name:codeN,show:false})
+      })
+      StoreInputCode.set(codes[0]);
+  
+    }).catch(e=>{
+      console.log(e)
     })
- 
-  }else{
-    if (halist[0]==="solid1")
-      StoreInputCode.set(window.localStorage.getItem("solid1")||solid1 );
-    else {
-      const code = window.localStorage.getItem(halist[0])
-      if (code) StoreInputCode.set(code);
-    }
-
+  }).finally(()=>{
     waitting=false   
     formModal=false
-  }
+  })
+}
+const getQrcode = (k:string,oldk:string)=>{
+  //const k =hashName[1]   
+  StoreInputCode.set(window.localStorage.getItem(oldk)||""); 
+  QRCode.toCanvas(canvas, `${$page.url.origin}/#${k}`, function (error) {
+    if (error) console.error(error)
+    else{
+      
+      qrcode.appendChild(canvas!)
+      console.log('success!');
+    }   
+    waitting=false         
+  })
+}
+const updataCode = (hash:string)=>{ 
+  if (hash){
+    const hashName = hash.substring(1).split(":")
+    if (hashName ){
+      const firstName = hashName[0]
+      switch (firstName) {
+        case 'solid1':
+          StoreInputCode.set(solid1);
+          break
+        case 'remote':
+          if (hashName.length>1){
+            getRemote(hashName[1])
+            return
+          }
+          break      
+        case 'qrcode':
+          if (hashName.length>2){
+            getQrcode(hashName[1],hashName[2])
+            return
+          }
+          break
+        default:
+          const code = window.localStorage.getItem(hashName[0])
+          if (code)
+            StoreInputCode.set(code);
+          else{
+            getRemote(hashName[0])
+            return
+          }
 
+          break
+      }
+    }  
+  }  
+  formModal=false
+  waitting = false
 }
 
 onMount(()=>{    

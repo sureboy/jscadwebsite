@@ -12,6 +12,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	}
 	//request.body
 	//const db = await request.formData()
+	//const d = new Date().getTime().toString(36).substring(2)
 	
 	return await resolve(event)
 	
