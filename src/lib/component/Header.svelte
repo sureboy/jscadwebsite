@@ -51,11 +51,11 @@
 <Button color="light"  ><DownloadOutline  />  <ChevronDownOutline  /></Button>
   <Dropdown     >
       <DropdownItem class="flex items-center  gap-2"  on:click={()=>{  
-        StoreCode3Dview.set({code:$StoreInputCode,stl:true,name:$StoreAlertMsg.name})
+        StoreCode3Dview.set({code:getValue(),stl:true,name:$StoreAlertMsg.name})
       }     
     }>STL</DropdownItem>
     <DropdownItem class="flex items-center gap-2" on:click={()=>{
-      const file = new File([$StoreInputCode], $StoreAlertMsg.name+".webcad", {
+      const file = new File([getValue()], $StoreAlertMsg.name+".webcad", {
         type: 'text/plain',
       }); 
       let aTag = document.createElement('a'); 
