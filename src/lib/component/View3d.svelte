@@ -14,7 +14,11 @@ let qrcode:HTMLElement;
 let worker:Worker|null
 let formModal=false
 let waitting = false
-let shareUrl = ""
+//let shareUrl = ""
+let canvas:HTMLElement;
+
+formModal=true 
+  waitting = true
 onDestroy(()=>{
   if (worker) {
     worker.terminate();
@@ -22,65 +26,102 @@ onDestroy(()=>{
 })
 const updataCode = (hash:string)=>{
   //console.log(hash)
-  if (!hash) return 
+  if (!hash){
+    formModal=false
+    waitting = false
+    return
+  }  
   const halist = hash.substring(1).split(":")
-  if (!halist )return;
-  if (halist[0]==="remote"){
-    formModal=true 
-    waitting = true
-    fetch(`https://stl.miguotuijian.cn/?url=${encodeURI($page.url.origin)}&k=${halist[1]}`).then((r)=>{      
+  if (!halist ){
+    formModal=false
+    waitting = false
+    return
+  }  
+
+
+
+  if (halist[0]==="qrcode" && halist.length===3 ){
+    
+    const code = window.localStorage.getItem(halist[1])
+    if (code) StoreInputCode.set(code);
+    //shareUrl = 
+
+ 
+    QRCode.toCanvas(canvas, `${$page.url.origin}/#remote:${halist[1]}:${halist[2]}`, function (error) {
+      if (error) console.error(error)
+      else{
+        
+        qrcode.appendChild(canvas!)
+        console.log('success!');
+      }   
+      waitting=false         
+    })
+   // waitting=false   
+   // return
+  }else if (halist[0]==="remote"){
+    fetch(`https://stl.miguotuijian.cn/?url=${encodeURI($page.url.origin)}&k=${halist[1]}:${halist[2]}`).then((r)=>{      
+      //const db = r.formData()
+      //console.log(r.formData())
+      //r.arrayBuffer()
+      //console.log(r.body)
+      //const  f = new FormData()
+      //new Request()
+      //const resq = new Response(r.body)    
+      waitting=false 
+      formModal=false
       r.arrayBuffer().then((v)=>{ 
         const fl = (new TextDecoder('utf-8')).decode(v).split("\n======\n")
         let codes = fl.slice(1)
         let titles = fl[0].split(",")
-        if (halist.length===3 && halist[2]==="QR"){
-          shareUrl = `${$page.url.origin}/#remote:${halist[1]}`
-          var canvas =document.createElement("canvas")  
-          QRCode.toCanvas(canvas, shareUrl, function (error) {
-            waitting=false
-            if (error) console.error(error)
-            else{
-              qrcode.appendChild(canvas!)
-              console.log('success!');
-            }            
-          })
-        }else{
-          formModal=false
-          titles = titles.map((vn)=>{
-            let newName=vn
-            for (let n = 1;;n++){            
-              if (!window.localStorage.getItem(newName))break;
-              newName = vn+"_"+n
-            }    
-            //console.log(vn,newName)     
-            if (vn !== newName){
-              codes = codes.map((code_val)=>{
-                return code_val.replaceAll(vn,newName)
-              })
-            } 
-            return newName
-          })
-          titles.forEach((codeN,i)=>{
-            window.localStorage.setItem(codeN,codes[i])
-            console.log(codeN,codes[i])
-            worker!.postMessage({code:codes[i],name:codeN,show:false})
-          })
-        }
+        titles = titles.map((vn)=>{
+          let newName=vn
+          for (let n = 1;;n++){            
+            if (!window.localStorage.getItem(newName))break;
+            newName = vn+"_"+n
+          }    
+          if (vn !== newName){
+            codes = codes.map((code_val)=>{
+              return code_val.replaceAll(vn,newName)
+            })
+          } 
+          return newName
+        })
+        titles.forEach((codeN,i)=>{
+          window.localStorage.setItem(codeN,codes[i])
+          console.log(codeN,codes[i])
+          worker!.postMessage({code:codes[i],name:codeN,show:false})
+        })
+         
+        
+        
+       
         StoreInputCode.set(codes[0]);
-        //console.log(v)
+     
+      }).catch(e=>{
+        console.log(e)
       })
+    }).finally(()=>{
+      waitting=false   
+      formModal=false
     })
-  }else if (halist[0]==="solid1"){
-    StoreInputCode.set(window.localStorage.getItem("solid1")||solid1 );
+ 
   }else{
-    const code = window.localStorage.getItem(halist[0])
-    if (code) StoreInputCode.set(code);
+    if (halist[0]==="solid1")
+      StoreInputCode.set(window.localStorage.getItem("solid1")||solid1 );
+    else {
+      const code = window.localStorage.getItem(halist[0])
+      if (code) StoreInputCode.set(code);
+    }
+
+    waitting=false   
+    formModal=false
   }
 
 }
 
 onMount(()=>{    
   const el  =createCanvasElement() ;
+  canvas =document.createElement("canvas")  
   el.width = window.innerWidth;
   el.height = window.innerHeight;
   WorkerInit(el)
@@ -177,7 +218,7 @@ const WorkerInit =(el:HTMLCanvasElement)=>{
 </div>
 
 <Modal bind:open={formModal} size="xs" autoclose class="w-full pointer-events-auto" > 
-  <div bind:this={qrcode} class=" text-center " >   
+  <div bind:this={qrcode} class=" text-center " >    
     {#if waitting}
     <Spinner  color="green" />
     {/if}
