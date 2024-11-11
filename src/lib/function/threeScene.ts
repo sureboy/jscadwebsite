@@ -45,45 +45,39 @@ const animate = (t:number) => {
 };
   
 export function onWindowResize(el: HTMLCanvasElement) {
-	//let w = el.width>el.height?el.height:el.width
-	//if (!renderer){
-		//if (!window.navigator.gpu)
-	//	renderer = new WebGLRenderer({ antialias: true,alpha:true, canvas: el,preserveDrawingBuffer:false, });
-		//else 
-		//renderer = new WebGPURenderer({ antialias: true,alpha:true, canvas: el,  });
-		//renderer.render(scene, camera)
-	//	animate();
-	//}
+
 	if (!renderer)return;
 	camera.aspect = el.width/el.height
 	camera.updateProjectionMatrix()
 	renderer.setSize(el.width,el.height)	
 	renderer.render(scene, camera)
 }
-export const createSceneOBJ = (el: HTMLCanvasElement,m:Object3D[] ) => { 
+export const createSceneOBJ = (el: HTMLCanvasElement,m:Object3D[],backData:Function ) => { 
 	if (el !== _el){
-		renderer = new WebGLRenderer({ antialias: true,alpha:true, canvas: el,preserveDrawingBuffer:false, });
+		renderer = new WebGLRenderer({ antialias: true,alpha:true, canvas: el,preserveDrawingBuffer:true, });
 		OrbControls = new OrbitControls(camera, el);
 		stopAnimate = true
 		_el = el
 		OrbControls.enableDamping = true
+		
 	}	
 	scene.clear();
 	scene.add(hemisphereLight);
 	scene.add(directionalLight); 
 	scene.add(...m )
-	const sceneSize = new Box3().setFromObject(scene).getSize(new Vector3())
+	const fobj = new Box3().setFromObject(scene)
+	const sceneSize = fobj.getSize(new Vector3())
 	const size = sceneSize.length();
 	const fov =  camera.fov*(Math.PI /180); 
-	camera.position.z = size /1.5/Math.tan(fov/2); 
-
+	camera.position.z = size /2/Math.tan(fov/2); 
+	console.log(camera.position,camera.fov,camera)
 	onWindowResize(el)	 
 	if (stopAnimate){
 		stopAnimate=false
 		animate(0);
 	}
 
-
+	backData(fobj)
 	//directionalLight.position.z=  camera.position.z 
 	//console.log(size,sceneSize)
 			 	 

@@ -1,13 +1,35 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  import { createEventDispatcher } from 'svelte';
   import {  PlayOutline, QrCodeOutline, TrashBinOutline,  DownloadOutline ,PlusOutline,ChevronDownOutline , BookOpenOutline, FileCodeOutline ,EditOutline,GridPlusOutline,CloseOutline,CloudArrowUpOutline} from 'flowbite-svelte-icons';
   import {  Navbar,Alert  ,Dropdown, DropdownItem,Spinner,DropdownDivider,Button, Modal,  Checkbox ,ButtonGroup} from 'flowbite-svelte';   
   import {getStoragelist,removeStorage,StoreHelpHidden,StoreInputCode,StoreAlertMsg,StoreCode3Dview,ClassToString} from "$lib/function/storage"   
   let formModal = false; 
   let waitting = false
   let QrCodeMap:Map<string,string> 
+  
+  //export let elCanvas:HTMLCanvasElement|null
   export let getValue:()=>string 
- 
+ /*
+  const screenHandle = ()=>{
+    console.log(elCanvas)
+    elCanvas?.toBlob((blob:any)=>{ 
+        let aTag = document.createElement('a'); 
+        aTag.download = $StoreAlertMsg.name+"_screen.png";
+        let href = URL.createObjectURL(blob); 
+        aTag.href = href;
+        aTag.click();
+        URL.revokeObjectURL(href);  		
+      })
+  }
+  */
+  const dispatch = createEventDispatcher();
+
+  function screenHandle() {
+    dispatch('message', {
+      name: $StoreAlertMsg.name
+    });
+  }
 </script>
  
 <Navbar color="none"  class="pointer-events-auto" > 
@@ -66,11 +88,20 @@
     }}>
     CODE
     </DropdownItem>
+    <DropdownItem class="flex items-center gap-2" on:click={()=>{
+      screenHandle()
+    }}>
+    PNG
+    </DropdownItem>
+ 
+
+
     <DropdownItem class="flex items-center gap-2"   on:click={()=>{
       formModal = true
       QrCodeMap = ClassToString($StoreInputCode,$StoreAlertMsg.name) 
     }}>
     <QrCodeOutline class="w-4 h-4 me-2" />Url </DropdownItem>
+
   </Dropdown>
  
    {/if}    

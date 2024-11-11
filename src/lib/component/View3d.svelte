@@ -1,3 +1,20 @@
+<script context="module" lang="ts" >
+ let el:HTMLCanvasElement|null; 
+ let size:any
+ export const screenHandle = (e:any)=>{
+    //console.log(elCanvas)
+    console.log(size)
+    el?.toBlob((blob:any)=>{ 
+        let aTag = document.createElement('a'); 
+        aTag.download = e.detail.name+"_screen.png";
+        let href = URL.createObjectURL(blob); 
+        console.log(href)
+        aTag.href = href;
+        aTag.click();
+        URL.revokeObjectURL(href);  		
+      })
+  }
+</script>
 <script lang="ts"> 
 import {mimeType} from "@jscad/stl-serializer"  
 import {CSG2Three} from "$lib/function/csg2Three"   
@@ -7,11 +24,12 @@ import {createSceneOBJ,onWindowResize} from "$lib/function/threeScene"
 import { createCanvasElement } from "three";
 import { onMount ,onDestroy} from 'svelte';  
 import type {CodeToWorker,WorkerMsg} from '$lib/function/share' 
-import {  Modal,Spinner ,Textarea } from 'flowbite-svelte';  
+import {  Modal,Spinner  } from 'flowbite-svelte';  
 import   QRCode  from 'qrcode';   
 let container:HTMLElement; 
 let qrcode:HTMLElement;
 let worker:Worker|null
+
 let formModal=false
 let waitting = false
 //let shareUrl = ""
@@ -19,6 +37,8 @@ let canvas:HTMLElement;
 
 formModal = true 
 waitting = true
+
+
 onDestroy(()=>{
   if (worker) {
     worker.terminate();
@@ -112,7 +132,7 @@ const updataCode = (hash:string)=>{
 }
 
 onMount(()=>{    
-  const el  =createCanvasElement() ;
+  el = createCanvasElement() ;
   canvas =document.createElement("canvas")  
   el.width = window.innerWidth;
   el.height = window.innerHeight;
@@ -170,7 +190,10 @@ const WorkerInit =(el:HTMLCanvasElement)=>{
       }            
       if (el && mesh.length>0 ){
         try{
-          createSceneOBJ(el!,mesh)
+          createSceneOBJ(el!,mesh,function(z:any){
+            console.log(z)
+            size = z
+          })
         }catch(e:any){
           $StoreAlertMsg.errMsg = e.toString()
         }
