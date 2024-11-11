@@ -1,10 +1,10 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import {  PlayOutline, QrCodeOutline, TrashBinOutline,  DownloadOutline ,PlusOutline,ChevronDownOutline , BookOpenOutline, FileCodeOutline ,EditOutline,GridPlusOutline,CloseOutline,CloudArrowUpOutline} from 'flowbite-svelte-icons';
-  import {  Navbar,Alert  ,Dropdown, DropdownItem,NavBrand,Spinner,DropdownDivider,Button, Modal,  Checkbox ,ButtonGroup} from 'flowbite-svelte';   
-  import {getStoragelist,removeStorage,StoreHelpHidden,StoreInputCode,StoreAlertMsg,StoreCode3Dview,ClassToString} from "$lib/function/storage"  
-  let formModal = false;
-  let navHidden = true;
+  import {  Navbar,Alert  ,Dropdown, DropdownItem,Spinner,DropdownDivider,Button, Modal,  Checkbox ,ButtonGroup} from 'flowbite-svelte';   
+  import {getStoragelist,removeStorage,StoreHelpHidden,StoreInputCode,StoreAlertMsg,StoreCode3Dview,ClassToString} from "$lib/function/storage"   
+  let formModal = false; 
+  let waitting = false
   let QrCodeMap:Map<string,string> 
   export let getValue:()=>string 
  
@@ -26,8 +26,7 @@
           <BookOpenOutline class="w-4 h-4 me-2 " />
         </DropdownItem>
       </Dropdown>
-    {#if $StoreAlertMsg.name} 
-   
+    {#if $StoreAlertMsg.name}    
       <Button   color="light" on:click={()=>{
         //dispatch('viewCode');
         StoreCode3Dview.set({code:getValue(),show:true})     
@@ -79,26 +78,22 @@
  
   {#if  $StoreAlertMsg.waitting} <Spinner color="gray" />{/if}
   {#if  $StoreAlertMsg.errMsg}<Alert color="red">{$StoreAlertMsg.errMsg}</Alert>{/if}
-  
-    
-  
- 
- 
-        
-   
-    
-  
+
 </Navbar>
 <Modal bind:open={formModal} size="xs" autoclose={false} class="w-full pointer-events-auto" >
-  <form class="flex flex-col space-y-6" enctype="multipart/form-data" method="POST" action="https://stl.miguotuijian.cn/?url={$page.url.origin}&keyName={$StoreAlertMsg.name}"  >
+  {#if waitting}
+  <Spinner  color="green" />
+{:else}
+  <form class="flex flex-col space-y-6" enctype="multipart/form-data"   method="POST" action="https://stl.miguotuijian.cn/?url={$page.url.origin}&keyName={$StoreAlertMsg.name}"  >
     <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white"><CloudArrowUpOutline/></h3> 
     {#each [...QrCodeMap] as [k,v] }
-    <Checkbox name="{k}" color="primary"   checked  value={v}>{k}</Checkbox>
+    <Checkbox name="{k}" color="primary" readonly="{k==$StoreAlertMsg.name}"  checked  value={v}>{k}</Checkbox>
     {/each}
     <div class="text-center"> 
-    <Button type="submit"   color="alternative" ><QrCodeOutline/></Button> 
+    <Button type="submit"   color="alternative"  ><QrCodeOutline/></Button> 
     </div>
   </form>
+  {/if}
 </Modal>
 
  

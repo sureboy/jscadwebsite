@@ -1,4 +1,5 @@
 const secondsFromNow = 3600*48
+const regexpGetClass = /^\s*const\s+(\w+)\s*=\s*class\s*\{/ 
 export default {
   async fetch(request, env, ctx) {
     
@@ -30,9 +31,14 @@ export default {
       const db = await request.formData()
 
       db.forEach((v,k) => {
-        codeHeader.push(k)
+        
         //db[k]=v
-        codePage+=`\n======\n${v.toString()}`
+        
+        let value = v.toString()
+        if (!regexpGetClass.test(value))
+          return new Response(null,{status:404}) 
+        codePage+=`\n======\n${value}`
+        codeHeader.push(k)
       }) 
       if (!codePage)return new Response(null,{status:404}) 
       
