@@ -84,7 +84,7 @@
   {#if waitting}
   <Spinner  color="green" />
 {:else}
-  <form class="flex flex-col space-y-6" enctype="multipart/form-data"   method="POST" action="https://stl.miguotuijian.cn/?url={$page.url.origin}&keyName={$StoreAlertMsg.name}"  >
+  <form class="flex flex-col space-y-6" enctype="multipart/form-data"   method="POST" action="https://db.solidjscad.com/?url={$page.url.origin}&keyName={$StoreAlertMsg.name}"  >
     <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white"><CloudArrowUpOutline/></h3> 
     {#each [...QrCodeMap] as [k,v] }
     <Checkbox name="{k}" color="primary" readonly="{k==$StoreAlertMsg.name}"  checked  value={v}>{k}</Checkbox>
