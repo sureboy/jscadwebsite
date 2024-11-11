@@ -7,7 +7,9 @@ import Help from '$lib/component/Help.svelte'
 import type { PageData } from './$types'; 
 export let data:PageData;  
 </script>
-
+<svelte:head>
+  <title>solidJsCAD</title>
+</svelte:head>
 <main>
   <div class="z-10 absolute top-0 left-0  w-full  pointer-events-none">
   <Header   {getValue} > 
