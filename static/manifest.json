@@ -1,14 +1,20 @@
 {
     "name": "solidJSCAD",
+    "short_name": "solidJSCAD",
     "icons": [
-      {
+        {
+			"src": "favicon-192.png",
+			"sizes": "192x192",
+			"type": "image/png"
+		},
+        {
         "src": "favicon.png",
         "type": "image/png",
         "sizes": "512x512"
-      }
+        }
     ],
     "start_url": "/",
-    "display": "fullscreen",
-    "display_override": "fullscreen"
-  }
+    "display": "minimal-ui",
+    "display_override": "minimal-ui"
+}
   
