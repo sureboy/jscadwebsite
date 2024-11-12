@@ -15,7 +15,9 @@ export const StoreMyClass = writable<Map<string, any>>(new Map())
 export const splitTag = "\n==split==\n"
 //const solidListKey="solidList"  
 export const solidB = new solidLogo() as solidEditStruct 
-export const solid1 = "const solid1=class{\n\/\/Input Ctrl+S perview and save this solid\n main(){\n return [this.cube({size:200,center:[0,0,0]})]\n};\n}"
+export const solid =(name?:string )=> {
+  return `const ${name?name:"solid"}=class{\n\/\/Input Ctrl+S perview and save this solid\n main(){\n return [this.cube({size:200,center:[0,0,0]})]\n};\n}`
+}
 export const StringToClass = (data:string,name:string,msg:AlertMsgType)=>{
   if (!name)return; 
   try{  

@@ -32,12 +32,11 @@
   }
 </script>
  
-<Navbar color="none"  class="pointer-events-auto" > 
- 
-    <ButtonGroup>
-      <Button    color="light" > <GridPlusOutline   />  <ChevronDownOutline   /></Button>
-      <Dropdown    >
-        <DropdownItem class="flex items-center  gap-2" href="#solid1"  ><PlusOutline class="w-4 h-4 me-2" /> </DropdownItem>     
+<Navbar color="none" fluid class="pointer-events-auto" >  
+    <ButtonGroup    >
+      <Button     color="light" > <GridPlusOutline  />  <ChevronDownOutline   /></Button>
+      <Dropdown    >    
+        <DropdownItem class="flex items-center  gap-2" href="#new"  ><PlusOutline class="w-4 h-4 me-2" /> </DropdownItem>            
         {#each getStoragelist() as item}
         <DropdownItem class="flex items-center gap-2"  href="#{item}"  > <FileCodeOutline class="w-4 h-4 me-2 " /> {item}</DropdownItem> 
         {/each} 
@@ -49,22 +48,22 @@
         </DropdownItem>
       </Dropdown>
     {#if $StoreAlertMsg.name}    
-      <Button   color="light" on:click={()=>{
+      <Button  href="#{$StoreAlertMsg.name}" color="light" on:click={()=>{
         //dispatch('viewCode');
         StoreCode3Dview.set({code:getValue(),show:true})     
       }}><PlayOutline   />{$StoreAlertMsg.name}</Button>
     {#if $StoreInputCode}
-      <Button   color="light"   on:click={()=>{
+      <Button  href="#{$StoreAlertMsg.name}"  color="light"   on:click={()=>{
         StoreCode3Dview.set({code:getValue(),show:true})
         StoreInputCode.set(""); 
         //Ham.$$.context.navHidden.set("")
       }}><CloseOutline />  </Button> 
     {:else}
-      <Button  color="light"   on:click={()=>{
+      <Button   href="#{$StoreAlertMsg.name}" color="light"   on:click={()=>{
         StoreInputCode.set(window.localStorage.getItem($StoreAlertMsg.name)||"");
       }}><EditOutline   />  </Button>
     {/if}
-    <Button  color="light"  on:click={()=>{
+    <Button  href="#" color="light"  on:click={()=>{
       if(confirm("Remove "+$StoreAlertMsg.name)){
         removeStorage($StoreAlertMsg.name);StoreInputCode.set(""); 
         $StoreAlertMsg.name=""

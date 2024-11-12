@@ -19,7 +19,7 @@
 import {mimeType} from "@jscad/stl-serializer"  
 import {CSG2Three} from "$lib/function/csg2Three"   
 import { page } from '$app/stores';
-import {StoreCode3Dview,saveStorage,initMySolid,StoreAlertMsg,StoreMyClass,StoreInputCode,solid1} from "$lib/function/storage"
+import {StoreCode3Dview,saveStorage,initMySolid,StoreAlertMsg,StoreMyClass,StoreInputCode,solid} from "$lib/function/storage"
 import {createSceneOBJ,onWindowResize} from "$lib/function/threeScene" 
 import { createCanvasElement } from "three";
 import { onMount ,onDestroy} from 'svelte';  
@@ -75,6 +75,8 @@ const getRemote = (k:string)=>{
     }).catch(e=>{
       console.log(e)
     })
+  }).catch(()=>{
+
   }).finally(()=>{
     waitting=false   
     formModal=false
@@ -95,38 +97,36 @@ const getQrcode = (k:string,oldk:string)=>{
 }
 const updataCode = (hash:string)=>{ 
   if (hash){
-    const hashName = hash.substring(1).split(":")
-    if (hashName ){
-      const firstName = hashName[0]
-      switch (firstName) {
-        case 'solid1':
-          StoreInputCode.set(solid1);
-          break
-        case 'remote':
-          if (hashName.length>1){
-            getRemote(hashName[1])
-            return
-          }
-          break      
-        case 'qrcode':
-          if (hashName.length>2){
-            getQrcode(hashName[1],hashName[2])
-            return
-          }
-          break
-        default:
-          const code = window.localStorage.getItem(hashName[0])
-          if (code)
-            StoreInputCode.set(code);
-          else{
-            getRemote(hashName[0])
-            return
-          }
+    console.log(hash)
+    const hashName = hash.substring(1).split(":") 
+    const firstName = hashName[0]
+    switch (firstName) {
+      case 'new':
+        StoreInputCode.set(solid("solid__"+new Date().getTime().toString(36).substring(2)));
+        break
+      case 'qrcode':
+        if (hashName.length>2){
+          getQrcode(hashName[1],hashName[2])
+          return
+        }
+        break
+      default:
+        const code = window.localStorage.getItem(hashName[0])
+        if (!code){   
+          getRemote(hashName[0])
+          return
+        }
+        StoreInputCode.set(code);
+        break
+    }
+  
+  }else{
+    StoreInputCode.set(window.localStorage.getItem("solid")||solid());
+  }
 
-          break
-      }
-    }  
-  }  
+  
+  
+  
   formModal=false
   waitting = false
 }
