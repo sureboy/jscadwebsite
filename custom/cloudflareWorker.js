@@ -30,15 +30,16 @@ export default {
       let codeHeader = []
       const db = await request.formData()
 
-      db.forEach((v,k) => {
-        
-        //db[k]=v
-        
-        let value = v.toString()
-        if (!regexpGetClass.test(value))
+      db.forEach((v,k) => { 
+        const value = v.toString()
+        const vm = value.match(regexpGetClass)
+        if (vm && vm[1] && v===vm[1]){
+          codePage+=`\n======\n${value}`
+          codeHeader.push(k)
+        }else{
           return new Response(null,{status:404}) 
-        codePage+=`\n======\n${value}`
-        codeHeader.push(k)
+        }
+     
       }) 
       if (!codePage)return new Response(null,{status:404}) 
       

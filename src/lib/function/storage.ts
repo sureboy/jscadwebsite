@@ -1,19 +1,13 @@
 import { writable } from 'svelte/store';
 import type {solidEditStruct,AlertMsgType,CodeToWorker} from './share'
 import {solidLogo} from './solidClass'
-import zlib from "zlib"
-import qrcode from "qrcode"
-
-//export const StoreWorkerCmd = writable("");
 
 export const StoreInputCode = writable(""); 
 export const StoreHelpHidden = writable(true); 
 
 export const StoreCode3Dview = writable<CodeToWorker>({code:""});
 export const StoreAlertMsg = writable<AlertMsgType>( {waitting:false,errMsg:"",name:"" });
-export const StoreMyClass = writable<Map<string, any>>(new Map())
-export const splitTag = "\n==split==\n"
-//const solidListKey="solidList"  
+export const StoreMyClass = writable<Map<string, any>>(new Map())  
 export const solidB = new solidLogo() as solidEditStruct 
 export const solid =(name?:string )=> {
   return `const ${name?name:"solid"}=class{\n\/\/Input Ctrl+S perview and save this solid\n main(){\n return [this.cube({size:200,center:[0,0,0]})]\n};\n}`
@@ -42,7 +36,6 @@ export const StringToClass = (data:string,name:string,msg:AlertMsgType)=>{
 }
 
 export const  ClassToString = (c:string,n:string)=>{
-
   const codelist:Map<string,string> = new Map<string,string>()
   codelist.set(n,c)
   const key:string[] =[];
