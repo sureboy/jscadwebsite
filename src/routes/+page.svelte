@@ -9,7 +9,8 @@ import type { PageData } from './$types';
 export let data:PageData;  
 </script>
 <svelte:head>
-  <title>solidJsCAD</title>
+  <link rel="manifest" href="manifest.json" />
+  <title>solidJSCAD</title>
 </svelte:head>
 <main>
   <div class="z-10 absolute top-0 left-0  w-full  pointer-events-none">
