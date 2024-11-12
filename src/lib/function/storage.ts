@@ -40,9 +40,7 @@ export const StringToClass = (data:string,name:string,msg:AlertMsgType)=>{
     return null
   }
 }
-export const StringToQrcode = (c:string)=>{
 
-}
 export const  ClassToString = (c:string,n:string)=>{
 
   const codelist:Map<string,string> = new Map<string,string>()
@@ -50,10 +48,12 @@ export const  ClassToString = (c:string,n:string)=>{
   const key:string[] =[];
   getSolidKey(k=> key.push(k) )   
   if (!key)return codelist;
-  const item = c.matchAll(/(?<=this\.)[\w\d]+/g)
+  const item = c.matchAll(/(?<=this\.)[\w\$]+/g)
+  if (!item)return codelist
   const li = new Set<string>()
   console.log(key)
   item.forEach((v)=>{
+    console.log(v)
     if (li.has(v[0]))return
     li.add(v[0]) 
     console.log(v[0])
@@ -68,7 +68,7 @@ const getSolidKey = (f:(key:string)=>void)=>{
   const sl = window.localStorage.length
   for (let i=0;i<sl;i++){ 
     const k = window.localStorage.key(i)
-    if (k==="solidList")window.localStorage.removeItem(k)
+    //if (k==="solidList")window.localStorage.removeItem(k)
     if (!k)continue
     f(k)
   }

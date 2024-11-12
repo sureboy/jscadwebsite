@@ -1,5 +1,5 @@
 const secondsFromNow = 3600*48
-const regexpGetClass = /^\s*const\s+(\w+)\s*=\s*class\s*\{/ 
+const regexpGetClass = /^\s*const\s+([\w\$]+)\s*=\s*class\s*\{/ 
 export default {
   async fetch(request, env, ctx) {
     
