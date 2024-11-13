@@ -44,16 +44,17 @@ export const  ClassToString = (c:string,n:string)=>{
   const item = c.matchAll(/(?<=this\.)[\w\$]+/g)
   if (!item)return codelist
   const li = new Set<string>()
-  console.log(key)
-  item.forEach((v)=>{
+  console.log(item)
+  for (const v of item){
+  
     console.log(v)
-    if (li.has(v[0]))return
+    if (li.has(v[0]))continue
     li.add(v[0]) 
     console.log(v[0])
-    if (!key.includes(v[0])) return
+    if (!key.includes(v[0])) continue
     const c_ = window.localStorage.getItem(v[0])
     if (c_) codelist.set(v[0],c_ )
-  })
+  }
   return codelist
    
 }

@@ -1,5 +1,13 @@
 const secondsFromNow = 3600*48
 const regexpGetClass = /^\s*const\s+([\w\$]+)\s*=\s*class\s*\{/ 
+const gethtml =(uri)=>{
+  return `<!doctype html>
+<html lang="en">
+<head> 
+<meta http-equiv="refresh" content="0;url=${uri}">
+</head>
+</html>`
+} 
 export default {
   async fetch(request, env, ctx) {
     
@@ -33,15 +41,15 @@ export default {
       db.forEach((v,k) => { 
         const value = v.toString()
         const vm = value.match(regexpGetClass)
-        if (vm && vm[1] && v===vm[1]){
+        if (vm && vm[1] && k===vm[1]){
           codePage+=`\n======\n${value}`
           codeHeader.push(k)
         }else{
-          return new Response(null,{status:404}) 
+          return new Response(gethtml(`${encodeURI(reurl)}#${name}`),{status:404}) 
         }
      
       }) 
-      if (!codePage)return new Response(null,{status:404}) 
+      if (!codePage)return new Response(gethtml(`${encodeURI(reurl)}#${name}`),{status:404}) 
       
       codePage = codeHeader.join(",")  + codePage
       
@@ -50,13 +58,8 @@ export default {
       await env.solidtmp.put(codeKey,codePage,{
         expirationTtl: secondsFromNow,
       });   
-      const html= `<!doctype html>
-<html lang="en">
-<head> 
-<meta http-equiv="refresh" content="0;url=${encodeURI(reurl)}#qrcode:${codeKey}:${name}">
-</head>
-</html>`
-      return  new Response(html,
+ 
+      return  new Response(gethtml(`${encodeURI(reurl)}#qrcode:${codeKey}:${name}`),
         {headers:new Headers({
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Headers': '*',
@@ -64,7 +67,7 @@ export default {
         })
       })
     }catch(e){
-      return new Response(e,{status:404}) 
+      return new Response(gethtml(`${encodeURI(reurl)}#${name}`),{status:404}) 
     }
   }
 };
