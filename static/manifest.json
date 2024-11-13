@@ -14,7 +14,7 @@
         }
     ],
     "start_url": "/",
-    "display": "minimal-ui",
-    "display_override": "minimal-ui"
+    "display": "fullscreen",
+    "display_override": "fullscreen"
 }
   
