@@ -28,7 +28,7 @@ import {  Modal,Spinner  } from 'flowbite-svelte';
 import   QRCode  from 'qrcode';   
 let container:HTMLElement; 
 let qrcode:HTMLElement;
-let worker:SharedWorker|null
+let worker:SharedWorker|Worker|null
 
 let formModal=false
 let waitting = false
@@ -39,11 +39,19 @@ formModal = true
 waitting = true
 
 
-//onDestroy(()=>{
- // if (worker) {
- //   worker.terminate();
- // }
-//})
+onDestroy(()=>{
+  if (worker && worker instanceof Worker) {
+    worker.terminate();
+  }
+})
+const workerPostMessage = (v:any)=>{
+  if (worker){
+          if (worker instanceof Worker)
+            worker.postMessage(v)
+          else
+            worker.port.postMessage(v)
+        }    
+}
 const getRemote = (k:string)=>{
 
   fetch(`https://stl.miguotuijian.cn/?url=${encodeURI($page.url.origin)}&k=${k}`).then((r)=>{     
@@ -68,7 +76,8 @@ const getRemote = (k:string)=>{
       titles.forEach((codeN,i)=>{
         window.localStorage.setItem(codeN,codes[i])
         console.log(codeN,codes[i])
-        worker!.port.postMessage({code:codes[i],name:codeN,show:false})
+        workerPostMessage({code:codes[i],name:codeN,show:false})
+            
       })
       StoreInputCode.set(codes[0]);
   
@@ -87,8 +96,7 @@ const getQrcode = (k:string,oldk:string)=>{
   StoreInputCode.set(window.localStorage.getItem(oldk)||""); 
   QRCode.toCanvas(canvas, `${$page.url.origin}/#${k}`, function (error) {
     if (error) console.error(error)
-    else{
-      
+    else{      
       qrcode.appendChild(canvas!)
       console.log('success!');
     }   
@@ -162,18 +170,15 @@ const downSTL = (stl:BlobPart[],name:string)=>{
   URL.revokeObjectURL(href);  
 }
 StoreCode3Dview.subscribe((t:CodeToWorker)=>{
-  if (!worker)return 
-  worker.port.postMessage(t)
+  workerPostMessage(t)
+  //if (!worker)return 
+  //worker.port.postMessage(t)
   $StoreAlertMsg.waitting ==true   
   $StoreAlertMsg.errMsg=""
 })
-const WorkerInit =(el:HTMLCanvasElement)=>{
-  let mesh:any[] = [] 
-  //if (browser && window.Worker) {
-  import('$workers/codeToThree.ts?sharedworker').then((MyWorker)=>{
-    worker = new MyWorker.default(); 
-    worker.port.onmessage = function (e:MessageEvent<WorkerMsg>) { 
-      $StoreAlertMsg.errMsg=""
+const workerMessage = (e:MessageEvent<WorkerMsg>,mesh:any[])=>{
+  //  let mesh:any[] = [] 
+  $StoreAlertMsg.errMsg=""
       if(e.data.stl){
         downSTL(e.data.stl,e.data.name!) 
         $StoreAlertMsg.waitting = false;
@@ -221,12 +226,33 @@ const WorkerInit =(el:HTMLCanvasElement)=>{
         }) 
       }
       $StoreAlertMsg.waitting = false; 
-    };
-    //worker.port.start()
+}
+const WorkerInit =(el:HTMLCanvasElement)=>{
+  let mesh:any[] = [] 
+  //if (browser && window.Worker) {
+  import('$workers/codeToThree.ts?sharedworker').then((MyWorker)=>{
+    worker = new MyWorker.default(); 
+    worker.port.onmessage = (e:MessageEvent<WorkerMsg>)=> { 
+      workerMessage(e,mesh)
+    }; 
     initMySolid((v,k)=>{
-      worker!.port.postMessage({code:v,name:k,show:false})
+      workerPostMessage({code:v,name:k,show:false})
     })
     updataCode(window.location.hash)
+  }).catch((e)=>{
+    $StoreAlertMsg.errMsg = e.toString()
+    import('$workers/codeToThree.ts?worker').then((MyWorker)=>{
+      worker = new MyWorker.default(); 
+      worker.onmessage = (e:MessageEvent<WorkerMsg>)=> { 
+        workerMessage(e,mesh)
+      }; 
+      initMySolid((v,k)=>{
+        workerPostMessage({code:v,name:k,show:false})
+      })
+      updataCode(window.location.hash)
+    }).catch(e=>{
+      $StoreAlertMsg.errMsg = e.toString()
+    })
   }) 
 }
 </script>

@@ -32,10 +32,10 @@ const initSolid = ()=>{
 initSolid()
 */
 //const regexpGetClass = /^\s*const\s+(\w+)\s*=\s*class(?=\s+extends\s+(\w+))?\s*\{/ 
-//self.onmessage = (e) => {
+self.onmessage = (e) => {
     //console.log(e)
-//    handCode(e.data,self)
-//}
+    handCode(e.data,self)
+}
 self.addEventListener("connect", (e:any) => { 
    // const port = e.ports[0];
     for (const port of e.ports)  {
