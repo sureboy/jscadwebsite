@@ -28,7 +28,7 @@ import {  Modal,Spinner  } from 'flowbite-svelte';
 import   QRCode  from 'qrcode';   
 let container:HTMLElement; 
 let qrcode:HTMLElement;
-let worker:Worker|null
+let worker:SharedWorker|null
 
 let formModal=false
 let waitting = false
@@ -39,11 +39,11 @@ formModal = true
 waitting = true
 
 
-onDestroy(()=>{
-  if (worker) {
-    worker.terminate();
-  }
-})
+//onDestroy(()=>{
+ // if (worker) {
+ //   worker.terminate();
+ // }
+//})
 const getRemote = (k:string)=>{
 
   fetch(`https://stl.miguotuijian.cn/?url=${encodeURI($page.url.origin)}&k=${k}`).then((r)=>{     
@@ -68,7 +68,7 @@ const getRemote = (k:string)=>{
       titles.forEach((codeN,i)=>{
         window.localStorage.setItem(codeN,codes[i])
         console.log(codeN,codes[i])
-        worker!.postMessage({code:codes[i],name:codeN,show:false})
+        worker!.port.postMessage({code:codes[i],name:codeN,show:false})
       })
       StoreInputCode.set(codes[0]);
   
@@ -163,16 +163,16 @@ const downSTL = (stl:BlobPart[],name:string)=>{
 }
 StoreCode3Dview.subscribe((t:CodeToWorker)=>{
   if (!worker)return 
-  worker.postMessage(t)
+  worker.port.postMessage(t)
   $StoreAlertMsg.waitting ==true   
   $StoreAlertMsg.errMsg=""
 })
 const WorkerInit =(el:HTMLCanvasElement)=>{
   let mesh:any[] = [] 
   //if (browser && window.Worker) {
-  import('$workers/codeToThree.ts?worker').then((MyWorker)=>{
+  import('$workers/codeToThree.ts?sharedworker').then((MyWorker)=>{
     worker = new MyWorker.default(); 
-    worker.onmessage = function (e:MessageEvent<WorkerMsg>) { 
+    worker.port.onmessage = function (e:MessageEvent<WorkerMsg>) { 
       $StoreAlertMsg.errMsg=""
       if(e.data.stl){
         downSTL(e.data.stl,e.data.name!) 
@@ -222,8 +222,9 @@ const WorkerInit =(el:HTMLCanvasElement)=>{
       }
       $StoreAlertMsg.waitting = false; 
     };
+    //worker.port.start()
     initMySolid((v,k)=>{
-      worker!.postMessage({code:v,name:k,show:false})
+      worker!.port.postMessage({code:v,name:k,show:false})
     })
     updataCode(window.location.hash)
   }) 

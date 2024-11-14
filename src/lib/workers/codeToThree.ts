@@ -32,18 +32,28 @@ const initSolid = ()=>{
 initSolid()
 */
 //const regexpGetClass = /^\s*const\s+(\w+)\s*=\s*class(?=\s+extends\s+(\w+))?\s*\{/ 
-self.onmessage = (e) => {
+//self.onmessage = (e) => {
     //console.log(e)
-    handCode(e.data)
-
-}
-const handCode  = (data:CodeToWorker)=>{
+//    handCode(e.data,self)
+//}
+self.addEventListener("connect", (e:any) => { 
+   // const port = e.ports[0];
+    for (const port of e.ports)  {
+        port.onmessage = (e:any) => {
+            handCode(e.data,port) 
+            };
+        port.start();
+    } 
+});
+  
+const handCode  = (data:CodeToWorker,port:any)=>{
+    //self = port
     //console.log(data)
     if (!data.name ){
         if (!data.code)   return
         let vm = data.code.match(regexpGetClass)    
         if (!vm || !vm[1]){
-            self.postMessage(<WorkerMsg>{errMsg:"class declare err"})
+            port.postMessage(<WorkerMsg>{errMsg:"class declare err"})
             return;
         }
         data.name = vm[1]
@@ -54,18 +64,17 @@ const handCode  = (data:CodeToWorker)=>{
     if (!obj){
        
         if(AlertMsg.errMsg){
-            self.postMessage(<WorkerMsg>{errMsg:AlertMsg.errMsg})
+            port.postMessage(<WorkerMsg>{errMsg:AlertMsg.errMsg})
         }
         return
     }
-    self.postMessage(<WorkerMsg>{Flist:obj.Flist})
+    port.postMessage(<WorkerMsg>{Flist:obj.Flist})
     //console.log(Object.keys(obj))
     //console.log(obj)
     if (data.stl&&data.name){
         //const da = serialize({ binary: true }, ...obj?.main()) 
-        self.postMessage(<WorkerMsg>{stl:serialize({ binary: true }, 
+        port.postMessage(<WorkerMsg>{stl:serialize({ binary: true }, 
             ...obj?.main()),name:data.name})
-
         return
     }
     if (!data.show)return
@@ -76,28 +85,26 @@ const handCode  = (data:CodeToWorker)=>{
             const v = li[i]
             try{
                 if (geometries.geom3.isA(v)){
-                    self.postMessage(<WorkerMsg>{ver:CSG2Vertices(v)})
+                    port.postMessage(<WorkerMsg>{ver:CSG2Vertices(v)})
                     continue;
                 }
                 if (geometries.geom2.isA(v)){
-                    self.postMessage(<WorkerMsg>{ver:CSGSides2LineSegmentsVertices(v)})
-                  
+                    port.postMessage(<WorkerMsg>{ver:CSGSides2LineSegmentsVertices(v)})                  
                     continue;
                 }
                 if (geometries.path2.isA(v)){
-                    self.postMessage(<WorkerMsg>{ver:CSG2LineVertices(v)})               
+                    port.postMessage(<WorkerMsg>{ver:CSG2LineVertices(v)})               
                     continue;
                 }
             }catch(e:any){
-                self.postMessage(<WorkerMsg>{errMsg:e.toString})
+                port.postMessage(<WorkerMsg>{errMsg:e.toString})
             }
-
             //self.postMessage({ver:CSG2Vertices(li[i])})
         }
-        self.postMessage(<WorkerMsg>data)
+        port.postMessage(<WorkerMsg>data)
     }catch(e:any){
         //AlertMsg.errMsg = e.toString()
-        self.postMessage(<WorkerMsg>{errMsg:e.toString()})
+        port.postMessage(<WorkerMsg>{errMsg:e.toString()})
     }
 }
 

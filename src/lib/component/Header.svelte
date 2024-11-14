@@ -92,9 +92,6 @@
     }}>
     PNG
     </DropdownItem>
- 
-
-
     <DropdownItem class="flex items-center gap-2"   on:click={()=>{
       formModal = true
       QrCodeMap = ClassToString($StoreInputCode,$StoreAlertMsg.name) 
