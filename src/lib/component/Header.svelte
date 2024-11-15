@@ -33,7 +33,7 @@
 </script>
  
 <Navbar color="none" fluid class="pointer-events-auto" >  
-    <ButtonGroup    >
+    <ButtonGroup  size="sm"  >
       <Button     color="light" > <GridPlusOutline  />  <ChevronDownOutline   /></Button>
       <Dropdown    >    
         <DropdownItem class="flex items-center  gap-2" href="#new"  ><PlusOutline class="w-4 h-4 me-2" /> </DropdownItem>            

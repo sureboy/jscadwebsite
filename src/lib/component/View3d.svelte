@@ -29,7 +29,7 @@ import   QRCode  from 'qrcode';
 let container:HTMLElement; 
 let qrcode:HTMLElement;
 let worker:SharedWorker|Worker|null
-
+let mesh:any[] =  []
 let formModal=false
 let waitting = false
 //let shareUrl = ""
@@ -46,11 +46,11 @@ onDestroy(()=>{
 })
 const workerPostMessage = (v:any)=>{
   if (worker){
-          if (worker instanceof Worker)
-            worker.postMessage(v)
-          else
-            worker.port.postMessage(v)
-        }    
+    if (worker instanceof Worker)
+      worker.postMessage(v)
+    else
+      worker.port.postMessage(v)
+  }    
 }
 const getRemote = (k:string)=>{
 
@@ -176,75 +176,77 @@ StoreCode3Dview.subscribe((t:CodeToWorker)=>{
   $StoreAlertMsg.waitting ==true   
   $StoreAlertMsg.errMsg=""
 })
-const workerMessage = (e:MessageEvent<WorkerMsg>,mesh:any[])=>{
-  //  let mesh:any[] = [] 
+const workerMessage = (e:MessageEvent<WorkerMsg>)=>{
+  //let mesh:any[] = m || []
   $StoreAlertMsg.errMsg=""
-      if(e.data.stl){
-        downSTL(e.data.stl,e.data.name!) 
-        $StoreAlertMsg.waitting = false;
-        return 
-      }
-      if (e.data.ver){
-        $StoreAlertMsg.waitting = true; 
-        try{
-          mesh.push(CSG2Three(e.data.ver,{}))
-        }catch(e:any){
-          $StoreAlertMsg.errMsg = e.toString()
-        }         
-        return
-      }            
-      if (el && mesh.length>0 ){
-        try{
-          createSceneOBJ(el!,mesh,function(z:any){
-            console.log(z)
-            size = z
-          })
-        }catch(e:any){
-          $StoreAlertMsg.errMsg = e.toString()
-        }
-        
-        mesh = []
-      } 
-      if (e.data.name){
-        $StoreAlertMsg.name = e.data.name     
-        if (e.data.code){
-          saveStorage(e.data.name,e.data.code)
-        }
-      }
-      if (e.data.errMsg){
-        $StoreAlertMsg.errMsg = e.data.errMsg
-      }
-      if (e.data.Flist){    
-        //console.log(e.data.Flist)
-        StoreMyClass.update((v_:Map<string, any>)=>{      
-          e.data.Flist!.forEach(v=>{
-            //if (!v)return;
-            v_.set(v[0],v[1]);
-          });
-          //v_.delete("constructor")
-          return v_ 
-        }) 
-      }
-      $StoreAlertMsg.waitting = false; 
+  if(e.data.stl){
+    downSTL(e.data.stl,e.data.name!) 
+    $StoreAlertMsg.waitting = false;
+    return 
+  }
+  if (e.data.ver){
+    $StoreAlertMsg.waitting = true; 
+    try{
+      mesh.push(CSG2Three(e.data.ver,{}))
+    }catch(e:any){
+      $StoreAlertMsg.errMsg = e.toString()
+    }         
+    return
+  }            
+  console.log(e.data)
+  if (el && mesh.length>0 ){
+    try{
+      createSceneOBJ(el!,mesh,function(z:any){
+        console.log(z)
+        size = z
+      })
+    }catch(e:any){
+      $StoreAlertMsg.errMsg = e.toString()
+    }
+    
+    mesh = []
+  } 
+  if (e.data.name){
+    $StoreAlertMsg.name = e.data.name     
+    if (e.data.code){
+      saveStorage(e.data.name,e.data.code)
+    }
+  }
+  if (e.data.errMsg){
+    $StoreAlertMsg.errMsg = e.data.errMsg
+  }
+  if (e.data.Flist){    
+    //console.log(e.data.Flist)
+    StoreMyClass.update((v_:Map<string, any>)=>{      
+      e.data.Flist!.forEach(v=>{
+        //if (!v)return;
+        v_.set(v[0],v[1]);
+      });
+      //v_.delete("constructor")
+      return v_ 
+    }) 
+  }
+  $StoreAlertMsg.waitting = false; 
 }
 const WorkerInit =(el:HTMLCanvasElement)=>{
-  let mesh:any[] = [] 
+  //let mesh:any[] = [] 
   //if (browser && window.Worker) {
   import('$workers/codeToThree.ts?sharedworker').then((MyWorker)=>{
     worker = new MyWorker.default(); 
     worker.port.onmessage = (e:MessageEvent<WorkerMsg>)=> { 
-      workerMessage(e,mesh)
+      workerMessage(e)
     }; 
+    //worker.port.start();
     initMySolid((v,k)=>{
       workerPostMessage({code:v,name:k,show:false})
     })
     updataCode(window.location.hash)
-  }).catch((e)=>{
-    $StoreAlertMsg.errMsg = e.toString()
+  }).catch(()=>{
+    //$StoreAlertMsg.errMsg = e.toString()
     import('$workers/codeToThree.ts?worker').then((MyWorker)=>{
       worker = new MyWorker.default(); 
       worker.onmessage = (e:MessageEvent<WorkerMsg>)=> { 
-        workerMessage(e,mesh)
+        workerMessage(e)
       }; 
       initMySolid((v,k)=>{
         workerPostMessage({code:v,name:k,show:false})

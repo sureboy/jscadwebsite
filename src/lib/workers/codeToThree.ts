@@ -37,12 +37,13 @@ self.onmessage = (e) => {
     handCode(e.data,self)
 }
 self.addEventListener("connect", (e:any) => { 
-   // const port = e.ports[0];
+    //const port = e.ports[0];
+    //console.log(e.ports)
     for (const port of e.ports)  {
         port.onmessage = (e:any) => {
             handCode(e.data,port) 
-            };
-        port.start();
+        };
+        //port.start();
     } 
 });
   
