@@ -128,8 +128,8 @@ const updataCode = (hash:string)=>{
         break
     }
   
-  }else{
-    StoreInputCode.set(window.localStorage.getItem("solid")||solid());
+  //}else{
+    //StoreInputCode.set(window.localStorage.getItem("solid")||solid());
   }
 
   
