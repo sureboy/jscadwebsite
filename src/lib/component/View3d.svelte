@@ -230,7 +230,7 @@ const workerMessage = (e:MessageEvent<WorkerMsg>)=>{
   $StoreAlertMsg.waitting = false; 
 }
 
-const WorkerInit_ =(el:HTMLCanvasElement)=>{
+const WorkerInit =(el:HTMLCanvasElement)=>{
   import('$workers/codeToThree.ts?worker').then((MyWorker)=>{
       worker = new MyWorker.default(); 
       worker.onmessage = (e:MessageEvent<WorkerMsg>)=> { 
@@ -244,7 +244,7 @@ const WorkerInit_ =(el:HTMLCanvasElement)=>{
       $StoreAlertMsg.errMsg = e.toString()
     })
 }
-const WorkerInit =(el:HTMLCanvasElement)=>{
+const WorkerInit_ =(el:HTMLCanvasElement)=>{
   //let mesh:any[] = [] 
   //if (browser && window.Worker) {
   import('$workers/codeToThree.ts?sharedworker').then((MyWorker)=>{

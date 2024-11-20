@@ -27,6 +27,7 @@ export interface csgObj {
     type?:any;
     //csg:Geometry;
 }  
+const Console = console.log
 const flatShading = false
 const materials:Record<string,any> = {
   mesh: {
@@ -242,7 +243,93 @@ const setPoints = (points:TypedArray, p:Vec2|Vec3, i:number) => {
   points[i++] = p[1]
   points[i++] = p[2] || 0
 }
-export function CSG2Vertices (csg:Geom3) { 
+
+export function CSG2Vertices (csg:Geom3) {
+ 
+  let vLen = 0; let iLen = 0
+
+  let hasVertexColors// v1 colors support
+  for (const poly of csg.polygons) {// v1 colors support
+    if(poly.color) hasVertexColors = true
+    const len = poly.vertices.length
+    vLen += len * 3
+    iLen += 3 * (len - 2)
+  }
+  Console(csg)
+  Console("hasVertexColors",hasVertexColors)
+  let vertices = new Float32Array(vLen)
+  let normals = new Float32Array(vLen)
+  let indices = vLen > 65535 ? new Uint32Array(iLen) : new Uint16Array(iLen)
+  let colors
+  let color_
+  let color = csg.color
+  let vertOffset = 0
+  let indOffset = 0
+  let posOffset = 0
+  let first = 0
+
+  if(hasVertexColors){// v1 colors support
+    let lastColor = [1,0.5,0.5,1]
+    // color is fore each index
+    colors = new Float32Array(iLen*4)
+    for (const poly of csg.polygons) {
+      color_ = poly.color || lastColor
+      // lastColor = color
+      let count = poly.vertices.length
+      for(var i=0; i<count-2; i++){
+        colors[vertOffset++] = color_[0]
+        colors[vertOffset++] = color_[1]
+        colors[vertOffset++] = color_[2]
+        colors[vertOffset++] = color_[3] ?? 1
+
+        colors[vertOffset++] = color_[0]
+        colors[vertOffset++] = color_[1]
+        colors[vertOffset++] = color_[2]
+        colors[vertOffset++] = color_[3] ?? 1
+
+        colors[vertOffset++] = color_[0]
+        colors[vertOffset++] = color_[1]
+        colors[vertOffset++] = color_[2]
+        colors[vertOffset++] = color_[3] ?? 1
+
+        // colors[vertOffset++] = color[3] || 1
+      }
+  	}
+  }
+
+  vertOffset = 0
+  for (const poly of csg.polygons) {
+    let arr = poly.vertices
+    //if(arr[0].pos){// v1 polygon with pos:{x,y,z} support, bu converting to array
+    //  arr = arr.map(({pos})=>{
+    //    return [pos.x, pos.y, pos.z]
+    //  })
+    //}
+    const normal = calculateNormal(arr)
+    const len = arr.length
+    first = posOffset
+    vertices.set(arr[0], vertOffset)
+    normals.set(normal, vertOffset)
+    vertOffset += 3
+    vertices.set(arr[1], vertOffset)
+    normals.set(normal, vertOffset)
+    vertOffset += 3
+    posOffset += 2
+    for (let i = 2; i < len; i++) {
+      vertices.set(arr[i], vertOffset)
+      normals.set(normal, vertOffset)
+
+      indices[indOffset++] = first
+      indices[indOffset++] = first + i -1
+      indices[indOffset++] = first + i
+      vertOffset += 3
+      posOffset += 1
+    }
+  }
+
+  return { type: 'mesh', vertices, indices, normals,color, colors, isTransparent:hasVertexColors }
+}
+export function CSG2Vertices_ (csg:Geom3) { 
   let vLen = 0; let iLen = 0
   for (const poly of csg.polygons) {
     const len = poly.vertices.length
