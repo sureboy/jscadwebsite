@@ -255,8 +255,8 @@ export function CSG2Vertices (csg:Geom3) {
     vLen += len * 3
     iLen += 3 * (len - 2)
   }
-  Console(csg)
-  Console("hasVertexColors",hasVertexColors)
+  //Console(csg)
+  //Console("hasVertexColors",hasVertexColors)
   let vertices = new Float32Array(vLen)
   let normals = new Float32Array(vLen)
   let indices = vLen > 65535 ? new Uint32Array(iLen) : new Uint16Array(iLen)

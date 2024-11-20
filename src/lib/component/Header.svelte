@@ -68,7 +68,7 @@
     {:else}
       <Button   href="#{$StoreAlertMsg.name}" color="light"   on:click={()=>{
         StoreInputCode.set(window.localStorage.getItem($StoreAlertMsg.name)||"");
-      }}><EditOutline   />  </Button>
+      }}><EditOutline   />  <p class="truncate max-w-20">{$StoreAlertMsg.name}</p></Button>
     {/if}
  
 <Button color="light"  ><DownloadOutline  />  <ChevronDownOutline  /></Button>
