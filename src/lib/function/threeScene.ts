@@ -31,7 +31,7 @@ const directionalLight = new DirectionalLight( 0xffffff, 0.5 );
 directionalLight.position.set(0, 1, 0)  
 const hemisphereLight = new HemisphereLight(0xffffff, 0x444444);
 hemisphereLight.position.set(1, 1, 1);
-let stopAnimate=false;
+let stopAnimate=true;
 const animate = (t:number) => {
 	if (stopAnimate)return;
 	requestAnimationFrame(animate);
@@ -56,14 +56,26 @@ export const createSceneOBJ = (el: HTMLCanvasElement,m:Object3D[],backData:Funct
 	if (el !== _el){
 		renderer = new WebGLRenderer({ antialias: true,alpha:true, canvas: el,preserveDrawingBuffer:true, });
 		OrbControls = new OrbitControls(camera, el);
-		stopAnimate = true
+		//stopAnimate = true
 		_el = el
-		OrbControls.enableDamping = true
+		//OrbControls.enableDamping = true
+		//OrbControls
+		//OrbControls.update();
+		OrbControls.addEventListener("start",(e)=>{ 
+			if (stopAnimate){
+				stopAnimate=false
+				animate(0)
+			}			
+		})
+		OrbControls.addEventListener("end",(e)=>{ 
+			stopAnimate=true
+		})
+		 
 		
 	}	
 	scene.clear();
 	scene.add(hemisphereLight);
-	scene.add(directionalLight); 
+	//scene.add(directionalLight); 
 	scene.add(...m )
 	const fobj = new Box3().setFromObject(scene)
 	const sceneSize = fobj.getSize(new Vector3())
@@ -72,10 +84,10 @@ export const createSceneOBJ = (el: HTMLCanvasElement,m:Object3D[],backData:Funct
 	camera.position.z = size /2/Math.tan(fov/2); 
 	//console.log(camera.position,camera.fov,camera)
 	onWindowResize(el)	 
-	if (stopAnimate){
-		stopAnimate=false
-		animate(0);
-	}
+	//if (stopAnimate){
+	//	stopAnimate=false
+	//	animate(0);
+	//}
 
 	backData(fobj)
 	//directionalLight.position.z=  camera.position.z 
