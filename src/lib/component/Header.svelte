@@ -38,7 +38,13 @@
       <Dropdown    >    
         <DropdownItem class="flex items-center  gap-2" href="#new"  ><PlusOutline class="w-4 h-4 me-2" /> </DropdownItem>            
         {#each getStoragelist() as item}
-        <DropdownItem class="flex items-center gap-2"  href="#{item}"  > <FileCodeOutline class="w-4 h-4 me-2 " /> {item}</DropdownItem> 
+        <DropdownItem class="flex items-center gap-2"   >  <a class="flex items-center gap-2" href="#{item}"><FileCodeOutline class="w-4 h-4 me-2 " />{item}</a>
+          <Button class="flex items-center gap-2" href="#"  on:click={()=>{
+            if(confirm("Remove "+item)){
+              removeStorage(item); 
+              location.reload()
+          }}}><TrashBinOutline  class="w-4 h-4 me-2 " /> </Button>
+        </DropdownItem> 
         {/each} 
         <DropdownDivider  />    
         <DropdownItem  class="flex items-center gap-2" on:click={(e)=>{
@@ -47,12 +53,13 @@
           <BookOpenOutline class="w-4 h-4 me-2 " />
         </DropdownItem>
       </Dropdown>
-    {#if $StoreAlertMsg.name}    
-      <Button  href="#{$StoreAlertMsg.name}" color="light" on:click={()=>{
+    {#if $StoreAlertMsg.name}   
+    {#if $StoreInputCode} 
+      <Button   href="#{$StoreAlertMsg.name}" color="light" on:click={()=>{
         //dispatch('viewCode');
         StoreCode3Dview.set({code:getValue(),show:true})     
-      }}><PlayOutline   />{$StoreAlertMsg.name}</Button>
-    {#if $StoreInputCode}
+      }}><PlayOutline   /><p class="truncate max-w-20">{$StoreAlertMsg.name}</p></Button>
+    
       <Button  href="#{$StoreAlertMsg.name}"  color="light"   on:click={()=>{
         StoreCode3Dview.set({code:getValue(),show:true})
         StoreInputCode.set(""); 
@@ -63,11 +70,7 @@
         StoreInputCode.set(window.localStorage.getItem($StoreAlertMsg.name)||"");
       }}><EditOutline   />  </Button>
     {/if}
-    <Button  href="#" color="light"  on:click={()=>{
-      if(confirm("Remove "+$StoreAlertMsg.name)){
-        removeStorage($StoreAlertMsg.name);StoreInputCode.set(""); 
-        $StoreAlertMsg.name=""
-    }}}><TrashBinOutline  /> </Button>
+ 
 <Button color="light"  ><DownloadOutline  />  <ChevronDownOutline  /></Button>
   <Dropdown     >
       <DropdownItem class="flex items-center  gap-2"  on:click={()=>{  
@@ -94,7 +97,7 @@
     </DropdownItem>
     <DropdownItem class="flex items-center gap-2"   on:click={()=>{
       formModal = true
-      QrCodeMap = ClassToString($StoreInputCode,$StoreAlertMsg.name) 
+      QrCodeMap = ClassToString(getValue(),$StoreAlertMsg.name) 
     }}>
     <QrCodeOutline class="w-4 h-4 me-2" />Url </DropdownItem>
 

@@ -12,11 +12,24 @@ export const solidB = new solidLogo() as solidEditStruct
 export const solid =(name?:string )=> {
   return `const ${name?name:"solid"}=class{\n\/\/Input Ctrl+S perview and save this solid\n main(){\n return [this.cube({size:200,center:[0,0,0]})]\n};\n}`
 }
-export const StringToClass = (data:string,name:string,msg:AlertMsgType)=>{
+const Console = console.log
+ 
+ 
+export const StringToClass = (data:string,name:string,errMsg:Function)=>{
   if (!name)return; 
+  console.log = function (...message) {
+    errMsg(message)
+   
+    //port.postMessage(<WorkerMsg>{errMsg:AlertMsg.errMsg})
+  
+  }
   try{  
-    const obj = eval(`(()=>{${data};return ${name}})()`)   
+   
+    const obj = eval(`(()=>{${data};return ${name} })()`)   
+    
     obj.prototype.__proto__ = solidB 
+   
+ 
     const obje = new obj as solidEditStruct 
     let Flist = Object.getOwnPropertyNames(obj.prototype).map((v)=>{
       //if (v!=="constructor")
@@ -29,9 +42,20 @@ export const StringToClass = (data:string,name:string,msg:AlertMsgType)=>{
     solidB[name] = obje  
     return obje 
   }catch(e:any){
-    msg.errMsg = e.toString()  
+    errMsg(e)
+    //msg.errMsg = e.toString()  
     console.log(e)
     return null
+  }
+}
+const classToStringEach = (val:string,f:Function)=>{
+  const item = val.matchAll(/(?<=this\.)[\w\$]+/g)
+  if (!item)return
+  const li = new Set<string>()
+  for (const v of item){
+    if (li.has(v[0]))continue
+    li.add(v[0])
+    f(v[0])
   }
 }
 
@@ -41,20 +65,15 @@ export const  ClassToString = (c:string,n:string)=>{
   const key:string[] =[];
   getSolidKey(k=> key.push(k) )   
   if (!key)return codelist;
-  const item = c.matchAll(/(?<=this\.)[\w\$]+/g)
-  if (!item)return codelist
-  const li = new Set<string>()
-  console.log(item)
-  for (const v of item){
-  
-    console.log(v)
-    if (li.has(v[0]))continue
-    li.add(v[0]) 
-    console.log(v[0])
-    if (!key.includes(v[0])) continue
-    const c_ = window.localStorage.getItem(v[0])
-    if (c_) codelist.set(v[0],c_ )
+  const f = (v:string)=>{
+    if (!key.includes(v))return
+    if (codelist.has(v))return
+    const c_ = window.localStorage.getItem(v)
+    if (!c_) return
+    codelist.set(v,c_ )
+    classToStringEach(c_,f)
   }
+  classToStringEach(c,f)
   return codelist
    
 }

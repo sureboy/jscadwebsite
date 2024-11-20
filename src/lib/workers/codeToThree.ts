@@ -4,34 +4,8 @@ import {CSG2Vertices,CSGSides2LineSegmentsVertices,CSG2LineVertices} from "$lib/
 import {regexpGetClass} from "$lib/function/share"  
 import pkg from '@jscad/modeling';
 const {geometries} = pkg;
-import type {AlertMsgType,CodeToWorker,WorkerMsg} from '$lib/function/share'
-const AlertMsg:AlertMsgType = {waitting:false,errMsg:"",name:""}
-//import type {csgObj} from "$lib/function/csg2Three"  
-
-//const base  = new solidBase()
-//const solidClassMap:Map<string,solidEditStruct>= new Map()
-/*
-const initSolid = ()=>{
-
-    //solidClassMap.set("solidBase",new solidBase())
-    const namelist = localStorage.getItem(solidListKey)?.split(',')
-    namelist?.forEach((v)=>{
-      //const code = window.localStorage.getItem(v)||""
-      //const obje =Object.create(eval(window.localStorage.getItem(v)||"").prototype) 
-      const obj =  eval(localStorage.getItem(v)||"")
-      obj.prototype.__proto__ = base
-     
-      const obj_ = Object.create(obj.prototype)
-      obj_._my=solidClassMap
-      solidClassMap.set(v, obj_)
-      //stringCodeToObj(window.localStorage.getItem(v),v)
-      
-    })
-
-} 
-initSolid()
-*/
-//const regexpGetClass = /^\s*const\s+(\w+)\s*=\s*class(?=\s+extends\s+(\w+))?\s*\{/ 
+import type {CodeToWorker,WorkerMsg} from '$lib/function/share'
+ 
 self.onmessage = (e) => {
     //console.log(e)
     handCode(e.data,self)
@@ -60,13 +34,14 @@ const handCode  = (data:CodeToWorker,port:any)=>{
         data.name = vm[1]
     }
     //console.log(data)
-    const obj = StringToClass(data.code,data.name,AlertMsg)
-   
+    const obj = StringToClass(data.code,data.name,(e:any)=>{
+        port.postMessage(<WorkerMsg>{errMsg:e})
+        //Console(e)
+    })
+    //if(AlertMsg.errMsg){
+    //    port.postMessage(<WorkerMsg>{errMsg:AlertMsg.errMsg})
+    //}
     if (!obj){
-       
-        if(AlertMsg.errMsg){
-            port.postMessage(<WorkerMsg>{errMsg:AlertMsg.errMsg})
-        }
         return
     }
     port.postMessage(<WorkerMsg>{Flist:obj.Flist})

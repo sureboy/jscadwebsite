@@ -178,7 +178,10 @@ StoreCode3Dview.subscribe((t:CodeToWorker)=>{
 })
 const workerMessage = (e:MessageEvent<WorkerMsg>)=>{
   //let mesh:any[] = m || []
-  $StoreAlertMsg.errMsg=""
+  //$StoreAlertMsg.errMsg=""
+  if (e.data.errMsg){
+    $StoreAlertMsg.errMsg += e.data.errMsg +"\n"
+  }
   if(e.data.stl){
     downSTL(e.data.stl,e.data.name!) 
     $StoreAlertMsg.waitting = false;
@@ -193,11 +196,11 @@ const workerMessage = (e:MessageEvent<WorkerMsg>)=>{
     }         
     return
   }            
-  console.log(e.data)
+  //console.log(e.data)
   if (el && mesh.length>0 ){
     try{
       createSceneOBJ(el!,mesh,function(z:any){
-        console.log(z)
+        //console.log(z)
         size = z
       })
     }catch(e:any){
@@ -212,9 +215,7 @@ const workerMessage = (e:MessageEvent<WorkerMsg>)=>{
       saveStorage(e.data.name,e.data.code)
     }
   }
-  if (e.data.errMsg){
-    $StoreAlertMsg.errMsg = e.data.errMsg
-  }
+
   if (e.data.Flist){    
     //console.log(e.data.Flist)
     StoreMyClass.update((v_:Map<string, any>)=>{      
@@ -227,6 +228,21 @@ const workerMessage = (e:MessageEvent<WorkerMsg>)=>{
     }) 
   }
   $StoreAlertMsg.waitting = false; 
+}
+
+const WorkerInit_ =(el:HTMLCanvasElement)=>{
+  import('$workers/codeToThree.ts?worker').then((MyWorker)=>{
+      worker = new MyWorker.default(); 
+      worker.onmessage = (e:MessageEvent<WorkerMsg>)=> { 
+        workerMessage(e)
+      }; 
+      initMySolid((v,k)=>{
+        workerPostMessage({code:v,name:k,show:false})
+      })
+      updataCode(window.location.hash)
+    }).catch(e=>{
+      $StoreAlertMsg.errMsg = e.toString()
+    })
 }
 const WorkerInit =(el:HTMLCanvasElement)=>{
   //let mesh:any[] = [] 
