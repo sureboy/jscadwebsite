@@ -244,7 +244,7 @@ const setPoints = (points:TypedArray, p:Vec2|Vec3, i:number) => {
   points[i++] = p[2] || 0
 }
 
-export function CSG2Vertices (csg:Geom3) {
+export function CSG2Vertices_ (csg:Geom3) {
  
   let vLen = 0; let iLen = 0
 
@@ -257,12 +257,12 @@ export function CSG2Vertices (csg:Geom3) {
   }
   //Console(csg)
   //Console("hasVertexColors",hasVertexColors)
-  let vertices = new Float32Array(vLen)
-  let normals = new Float32Array(vLen)
-  let indices = vLen > 65535 ? new Uint32Array(iLen) : new Uint16Array(iLen)
+  const vertices = new Float32Array(vLen)
+  const normals = new Float32Array(vLen)
+  const  indices = vLen > 65535 ? new Uint32Array(iLen) : new Uint16Array(iLen)
   let colors
   let color_
-  let color = csg.color
+  const color = csg.color
   let vertOffset = 0
   let indOffset = 0
   let posOffset = 0
@@ -329,7 +329,7 @@ export function CSG2Vertices (csg:Geom3) {
 
   return { type: 'mesh', vertices, indices, normals,color, colors, isTransparent:hasVertexColors }
 }
-export function CSG2Vertices_ (csg:Geom3) { 
+export function CSG2Vertices (csg:Geom3) { 
   let vLen = 0; let iLen = 0
   for (const poly of csg.polygons) {
     const len = poly.vertices.length
@@ -339,7 +339,7 @@ export function CSG2Vertices_ (csg:Geom3) {
   const vertices = new Float32Array(vLen)
   const normals = new Float32Array(vLen)
   const indices = vLen > 65535 ? new Uint32Array(iLen) : new Uint16Array(iLen)
-
+  const color = csg.color
   let vertOffset = 0
   let indOffset = 0
   let posOffset = 0
@@ -367,7 +367,7 @@ export function CSG2Vertices_ (csg:Geom3) {
       posOffset += 1
     }
   }
-  return { type: 'mesh', vertices, indices, normals ,transforms:csg.transforms} as csgObj
+  return { type: 'mesh', vertices, indices,color, normals ,transforms:csg.transforms} as csgObj
 }
 const calculateNormal = (vertices:any) => {
   const v0 = vertices[0]
