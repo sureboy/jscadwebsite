@@ -70,7 +70,7 @@ export const createSceneOBJ = (el: HTMLCanvasElement,m:Object3D[],backData:Funct
 	const size = sceneSize.length();
 	const fov =  camera.fov*(Math.PI /180); 
 	camera.position.z = size /2/Math.tan(fov/2); 
-	console.log(camera.position,camera.fov,camera)
+	//console.log(camera.position,camera.fov,camera)
 	onWindowResize(el)	 
 	if (stopAnimate){
 		stopAnimate=false

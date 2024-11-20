@@ -5,7 +5,7 @@
   import {  Navbar,Alert  ,Dropdown, DropdownItem,Spinner,DropdownDivider,Button, Modal,  Checkbox ,ButtonGroup} from 'flowbite-svelte';   
   import {getStoragelist,removeStorage,StoreHelpHidden,StoreInputCode,StoreAlertMsg,StoreCode3Dview,ClassToString} from "$lib/function/storage"   
   let formModal = false; 
-  let waitting = false
+  //let waitting = false
   let QrCodeMap:Map<string,string> 
   
   //export let elCanvas:HTMLCanvasElement|null
@@ -74,6 +74,8 @@
 <Button color="light"  ><DownloadOutline  />  <ChevronDownOutline  /></Button>
   <Dropdown     >
       <DropdownItem class="flex items-center  gap-2"  on:click={()=>{  
+         
+        //$StoreAlertMsg.waitting = true
         StoreCode3Dview.set({code:getValue(),stl:true,name:$StoreAlertMsg.name})
       }     
     }>STL</DropdownItem>
@@ -105,15 +107,12 @@
  
    {/if}    
     </ButtonGroup>
- 
+  
   {#if  $StoreAlertMsg.waitting} <Spinner color="gray" />{/if}
   {#if  $StoreAlertMsg.errMsg}<Alert color="red">{$StoreAlertMsg.errMsg}</Alert>{/if}
-
 </Navbar>
 <Modal bind:open={formModal} size="xs" autoclose={false} class="w-full pointer-events-auto" >
-  {#if waitting}
-  <Spinner  color="green" />
-{:else}
+   
   <form class="flex flex-col space-y-6" enctype="multipart/form-data"   method="POST" action="https://db.solidjscad.com/?url={$page.url.origin}&keyName={$StoreAlertMsg.name}"  >
     <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white"><CloudArrowUpOutline/></h3> 
     {#each [...QrCodeMap] as [k,v] }
@@ -123,7 +122,7 @@
     <Button type="submit"   color="alternative"  ><QrCodeOutline/></Button> 
     </div>
   </form>
-  {/if}
+ 
 </Modal>
 
  

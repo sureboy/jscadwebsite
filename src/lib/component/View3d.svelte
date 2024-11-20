@@ -173,7 +173,8 @@ StoreCode3Dview.subscribe((t:CodeToWorker)=>{
   workerPostMessage(t)
   //if (!worker)return 
   //worker.port.postMessage(t)
-  $StoreAlertMsg.waitting ==true   
+  $StoreAlertMsg.waitting = true   
+  //console.log($StoreAlertMsg)
   $StoreAlertMsg.errMsg=""
 })
 const workerMessage = (e:MessageEvent<WorkerMsg>)=>{
@@ -184,7 +185,9 @@ const workerMessage = (e:MessageEvent<WorkerMsg>)=>{
   }
   if(e.data.stl){
     downSTL(e.data.stl,e.data.name!) 
+    //console.log($StoreAlertMsg)
     $StoreAlertMsg.waitting = false;
+
     return 
   }
   if (e.data.ver){
@@ -201,6 +204,7 @@ const workerMessage = (e:MessageEvent<WorkerMsg>)=>{
     try{
       createSceneOBJ(el!,mesh,function(z:any){
         //console.log(z)
+        $StoreAlertMsg.waitting = false; 
         size = z
       })
     }catch(e:any){
@@ -208,12 +212,14 @@ const workerMessage = (e:MessageEvent<WorkerMsg>)=>{
     }
     
     mesh = []
+   
   } 
   if (e.data.name){
     $StoreAlertMsg.name = e.data.name     
     if (e.data.code){
       saveStorage(e.data.name,e.data.code)
     }
+    $StoreAlertMsg.waitting = false; 
   }
 
   if (e.data.Flist){    
@@ -227,7 +233,7 @@ const workerMessage = (e:MessageEvent<WorkerMsg>)=>{
       return v_ 
     }) 
   }
-  $StoreAlertMsg.waitting = false; 
+  //$StoreAlertMsg.waitting = false; 
 }
 
 const WorkerInit =(el:HTMLCanvasElement)=>{
