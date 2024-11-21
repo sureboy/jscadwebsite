@@ -24,15 +24,15 @@ self.addEventListener("connect", (e:any) => {
 const handCode  = (data:CodeToWorker,port:any)=>{
     //self = port
     //console.log(data)
-    if (!data.name ){
-        if (!data.code)   return
-        let vm = data.code.match(regexpGetClass)    
-        if (!vm || !vm[1]){
-            port.postMessage(<WorkerMsg>{errMsg:"class declare err"})
-            return;
-        }
-        data.name = vm[1]
+    //if (!data.name ){
+    if (!data.code)   return
+    let vm = data.code.match(regexpGetClass)    
+    if (!vm || !vm[1]){
+        port.postMessage(<WorkerMsg>{errMsg:"class declare err"})
+        return;
     }
+    if (data.name !== vm[1]) data.name = vm[1]
+    //}
     //console.log(data)
     const obj = StringToClass(data.code,data.name,(e:any)=>{
         port.postMessage(<WorkerMsg>{errMsg:e})
@@ -77,7 +77,8 @@ const handCode  = (data:CodeToWorker,port:any)=>{
             }
             //self.postMessage({ver:CSG2Vertices(li[i])})
         }
-        port.postMessage(<WorkerMsg>data)
+        //data.end=true
+        port.postMessage(<WorkerMsg>{end:true,name:data.name,code:data.code})
     }catch(e:any){
         //AlertMsg.errMsg = e.toString()
         port.postMessage(<WorkerMsg>{errMsg:e.toString()})

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { createEventDispatcher } from 'svelte';
-  import {  PlayOutline, QrCodeOutline, TrashBinOutline,  DownloadOutline ,PlusOutline,ChevronDownOutline , BookOpenOutline, FileCodeOutline ,EditOutline,GridPlusOutline,CloseOutline,CloudArrowUpOutline} from 'flowbite-svelte-icons';
+  import {  PlayOutline, QrCodeOutline, TrashBinOutline,  DownloadOutline ,PlusOutline,ChevronDownOutline , BookOpenOutline, FileCodeOutline ,EditOutline,GridPlusOutline,CloudArrowUpOutline} from 'flowbite-svelte-icons';
   import {  Navbar,Alert  ,Dropdown, DropdownItem,Spinner,DropdownDivider,Button, Modal,  Checkbox ,ButtonGroup} from 'flowbite-svelte';   
   import {getStoragelist,removeStorage,StoreHelpHidden,StoreInputCode,StoreAlertMsg,StoreCode3Dview,ClassToString} from "$lib/function/storage"   
   let formModal = false; 
@@ -9,20 +9,8 @@
   let QrCodeMap:Map<string,string> 
   
   //export let elCanvas:HTMLCanvasElement|null
-  export let getValue:()=>string 
- /*
-  const screenHandle = ()=>{
-    console.log(elCanvas)
-    elCanvas?.toBlob((blob:any)=>{ 
-        let aTag = document.createElement('a'); 
-        aTag.download = $StoreAlertMsg.name+"_screen.png";
-        let href = URL.createObjectURL(blob); 
-        aTag.href = href;
-        aTag.click();
-        URL.revokeObjectURL(href);  		
-      })
-  }
-  */
+  export let getValue:(name?:string)=>string 
+ 
   const dispatch = createEventDispatcher();
 
   function screenHandle() {
@@ -55,18 +43,17 @@
       </Dropdown>
     {#if $StoreAlertMsg.name}   
     {#if $StoreInputCode} 
-      <Button   href="#{$StoreAlertMsg.name}" color="light" on:click={()=>{
-        //dispatch('viewCode');
-        StoreCode3Dview.set({code:getValue(),show:true})     
+      <Button    href="#{$StoreAlertMsg.name}"  color="light" on:click={()=>{
+        //dispatch('viewCode');$page.url
+        if ($StoreAlertMsg.name !== $page.url.hash.substring(1)) return
+        //console.log(e,$page.url.hash)
+        StoreCode3Dview.set({code:getValue(),show:true,name:$StoreAlertMsg.name})   
+        StoreInputCode.set("");   
       }}><PlayOutline   /><p class="truncate max-w-20">{$StoreAlertMsg.name}</p></Button>
-    
-      <Button  href="#{$StoreAlertMsg.name}"  color="light"   on:click={()=>{
-        StoreCode3Dview.set({code:getValue(),show:true})
-        StoreInputCode.set(""); 
-        //Ham.$$.context.navHidden.set("")
-      }}><CloseOutline />  </Button> 
+     
     {:else}
       <Button   href="#{$StoreAlertMsg.name}" color="light"   on:click={()=>{
+
         StoreInputCode.set(window.localStorage.getItem($StoreAlertMsg.name)||"");
       }}><EditOutline   />  <p class="truncate max-w-20">{$StoreAlertMsg.name}</p></Button>
     {/if}
@@ -76,11 +63,11 @@
       <DropdownItem class="flex items-center  gap-2"  on:click={()=>{  
          
         //$StoreAlertMsg.waitting = true
-        StoreCode3Dview.set({code:getValue(),stl:true,name:$StoreAlertMsg.name})
+        StoreCode3Dview.set({code:getValue($StoreAlertMsg.name),stl:true,name:$StoreAlertMsg.name})
       }     
     }>STL</DropdownItem>
     <DropdownItem class="flex items-center gap-2" on:click={()=>{
-      const file = new File([getValue()], $StoreAlertMsg.name+".webcad", {
+      const file = new File([getValue($StoreAlertMsg.name)], $StoreAlertMsg.name+".webcad", {
         type: 'text/plain',
       }); 
       let aTag = document.createElement('a'); 
@@ -99,7 +86,7 @@
     </DropdownItem>
     <DropdownItem class="flex items-center gap-2"   on:click={()=>{
       formModal = true
-      QrCodeMap = ClassToString(getValue(),$StoreAlertMsg.name) 
+      QrCodeMap = ClassToString(getValue($StoreAlertMsg.name),$StoreAlertMsg.name) 
     }}>
     <QrCodeOutline class="w-4 h-4 me-2" />Url </DropdownItem>
 

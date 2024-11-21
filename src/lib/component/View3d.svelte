@@ -20,21 +20,21 @@ import {mimeType} from "@jscad/stl-serializer"
 import {CSG2Three} from "$lib/function/csg2Three"   
 import { page } from '$app/stores';
 import {StoreCode3Dview,saveStorage,initMySolid,StoreAlertMsg,StoreMyClass,StoreInputCode,solid} from "$lib/function/storage"
-import {createSceneOBJ,onWindowResize} from "$lib/function/threeScene" 
+import {onWindowResize,startSceneOBJ,addSceneOBJ} from "$lib/function/threeScene" 
 import { createCanvasElement } from "three";
 import { onMount ,onDestroy} from 'svelte';  
 import type {CodeToWorker,WorkerMsg} from '$lib/function/share' 
-import {  Modal,Spinner  } from 'flowbite-svelte';  
+import {  Modal,Spinner ,Button } from 'flowbite-svelte';  
 import   QRCode  from 'qrcode';   
 let container:HTMLElement; 
 let qrcode:HTMLElement;
 let worker:SharedWorker|Worker|null
-let mesh:any[] =  []
+//let mesh:any[] =  []
 let formModal=false
 let waitting = false
 //let shareUrl = ""
 let canvas:HTMLElement;
-
+let remoteName = ""
 formModal = true 
 waitting = true
 
@@ -46,6 +46,7 @@ onDestroy(()=>{
 })
 const workerPostMessage = (v:any)=>{
   if (worker){
+    if (el)startSceneOBJ(el)
     if (worker instanceof Worker)
       worker.postMessage(v)
     else
@@ -54,7 +55,7 @@ const workerPostMessage = (v:any)=>{
 }
 const getRemote = (k:string)=>{
 
-  fetch(`https://stl.miguotuijian.cn/?url=${encodeURI($page.url.origin)}&k=${k}`).then((r)=>{     
+  fetch(`https://db.solidjscad.com/?url=${encodeURI($page.url.origin)}&k=${k}`).then((r)=>{     
     waitting =false 
     formModal=false
     r.arrayBuffer().then((v)=>{ 
@@ -94,18 +95,20 @@ const getRemote = (k:string)=>{
 const getQrcode = (k:string,oldk:string)=>{
   //const k =hashName[1]   
   StoreInputCode.set(window.localStorage.getItem(oldk)||""); 
+  $StoreAlertMsg.name = oldk
+  remoteName = "#"+k
   QRCode.toCanvas(canvas, `${$page.url.origin}/#${k}`, function (error) {
     if (error) console.error(error)
     else{      
       qrcode.appendChild(canvas!)
-      console.log('success!');
+      //console.log('success!');
     }   
     waitting=false         
   })
 }
 const updataCode = (hash:string)=>{ 
   if (hash){
-    console.log(hash)
+    //console.log(hash)
     const hashName = hash.substring(1).split(":") 
     const firstName = hashName[0]
     switch (firstName) {
@@ -124,7 +127,8 @@ const updataCode = (hash:string)=>{
           getRemote(hashName[0])
           return
         }
-        StoreInputCode.set(code);
+        StoreCode3Dview.set({code,show:true})
+        //StoreInputCode.set(code);
         break
     }
   
@@ -169,49 +173,35 @@ const downSTL = (stl:BlobPart[],name:string)=>{
   aTag.click();
   URL.revokeObjectURL(href);  
 }
-StoreCode3Dview.subscribe((t:CodeToWorker)=>{
-  workerPostMessage(t)
-  //if (!worker)return 
-  //worker.port.postMessage(t)
-  $StoreAlertMsg.waitting = true   
-  //console.log($StoreAlertMsg)
-  $StoreAlertMsg.errMsg=""
+StoreCode3Dview.subscribe((t:CodeToWorker)=>{  
+  workerPostMessage(t) 
+  $StoreAlertMsg.name = t.name || ""
+  $StoreAlertMsg.waitting = true    
+  $StoreAlertMsg.errMsg = ""
 })
-const workerMessage = (e:MessageEvent<WorkerMsg>)=>{
-  //let mesh:any[] = m || []
-  //$StoreAlertMsg.errMsg=""
+const workerMessage = (e:MessageEvent<WorkerMsg>)=>{ 
   if (e.data.errMsg){
     $StoreAlertMsg.errMsg += e.data.errMsg +"\n"
   }
   if(e.data.stl){
-    downSTL(e.data.stl,e.data.name!) 
-    //console.log($StoreAlertMsg)
+    downSTL(e.data.stl,e.data.name!)  
     $StoreAlertMsg.waitting = false;
-
     return 
   }
   if (e.data.ver){
     $StoreAlertMsg.waitting = true; 
     try{
-      mesh.push(CSG2Three(e.data.ver,{}))
+      if (el)
+      addSceneOBJ(el,CSG2Three(e.data.ver,{})) 
     }catch(e:any){
       $StoreAlertMsg.errMsg = e.toString()
     }         
     return
   }            
   //console.log(e.data)
-  if (el && mesh.length>0 ){
-    try{
-      createSceneOBJ(el!,mesh,function(z:any){
-        //console.log(z)
-        $StoreAlertMsg.waitting = false; 
-        size = z
-      })
-    }catch(e:any){
-      $StoreAlertMsg.errMsg = e.toString()
-    }
-    
-    mesh = []
+  if (e.data.end){
+    $StoreAlertMsg.waitting = false; 
+ 
    
   } 
   if (e.data.name){
@@ -236,7 +226,7 @@ const workerMessage = (e:MessageEvent<WorkerMsg>)=>{
   //$StoreAlertMsg.waitting = false; 
 }
 
-const WorkerInit =(el:HTMLCanvasElement)=>{
+const WorkerInit_ =(el:HTMLCanvasElement)=>{
   import('$workers/codeToThree.ts?worker').then((MyWorker)=>{
       worker = new MyWorker.default(); 
       worker.onmessage = (e:MessageEvent<WorkerMsg>)=> { 
@@ -250,7 +240,7 @@ const WorkerInit =(el:HTMLCanvasElement)=>{
       $StoreAlertMsg.errMsg = e.toString()
     })
 }
-const WorkerInit_ =(el:HTMLCanvasElement)=>{
+const WorkerInit =(el:HTMLCanvasElement)=>{
   //let mesh:any[] = [] 
   //if (browser && window.Worker) {
   import('$workers/codeToThree.ts?sharedworker').then((MyWorker)=>{
@@ -285,8 +275,11 @@ const WorkerInit_ =(el:HTMLCanvasElement)=>{
 
 <Modal bind:open={formModal} size="xs" autoclose class="w-full pointer-events-auto" > 
   <div bind:this={qrcode} class=" text-center " >    
+    
     {#if waitting}
     <Spinner  color="green" />
+    {:else}
+    <Button color="none" href="/{remoteName}">{remoteName}</Button>
     {/if}
   </div> 
 </Modal> 

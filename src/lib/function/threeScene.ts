@@ -52,6 +52,63 @@ export function onWindowResize(el: HTMLCanvasElement) {
 	renderer.setSize(el.width,el.height)	
 	renderer.render(scene, camera)
 }
+export const  startSceneOBJ = (el: HTMLCanvasElement)=>{
+	if (el !== _el){
+		renderer = new WebGLRenderer({ antialias: true,alpha:true, canvas: el,preserveDrawingBuffer:true, });
+		OrbControls = new OrbitControls(camera, el);
+		//stopAnimate = true
+		_el = el
+		//OrbControls.enableDamping = true
+		//OrbControls
+		//OrbControls.update();
+		OrbControls.addEventListener("start",(e)=>{ 
+			if (stopAnimate){
+				stopAnimate=false
+				animate(0)
+			}			
+		})
+		OrbControls.addEventListener("end",(e)=>{ 
+			stopAnimate=true
+		})	
+	}	
+	scene.clear();
+	scene.add(hemisphereLight);
+	onWindowResize(el)	 
+
+}
+export const  addSceneOBJ = (el: HTMLCanvasElement,...m:Object3D[])=>{
+	if (el !== _el){
+		renderer = new WebGLRenderer({ antialias: true,alpha:true, canvas: el,preserveDrawingBuffer:true, });
+		OrbControls = new OrbitControls(camera, el);
+		//stopAnimate = true
+		_el = el
+		//OrbControls.enableDamping = true
+		//OrbControls
+		//OrbControls.update();
+		OrbControls.addEventListener("start",(e)=>{ 
+			if (stopAnimate){
+				stopAnimate=false
+				animate(0)
+			}			
+		})
+		OrbControls.addEventListener("end",(e)=>{ 
+			stopAnimate=true
+		})	
+	}	
+	//scene.clear();
+	//scene.add(hemisphereLight);
+	scene.add(...m )
+	const fobj = new Box3().setFromObject(scene)
+	const sceneSize = fobj.getSize(new Vector3())
+	const size = sceneSize.length();
+	const fov =  camera.fov*(Math.PI /180); 
+	camera.position.z = size /2/Math.tan(fov/2); 
+	//console.log(camera.position,camera.fov,camera)
+	 
+	onWindowResize(el)	 
+
+}
+
 export const createSceneOBJ = (el: HTMLCanvasElement,m:Object3D[],backData:Function ) => { 
 	if (el !== _el){
 		renderer = new WebGLRenderer({ antialias: true,alpha:true, canvas: el,preserveDrawingBuffer:true, });

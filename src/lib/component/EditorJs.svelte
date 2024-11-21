@@ -1,7 +1,11 @@
 <script context="module" lang="ts" >
   let editor:EditorView|null;
-  export const getValue = () => {
-    return editor?.state.doc.toString() || ''
+  export const getValue = (name?:string) => {
+    let val = editor?.state.doc.toString()
+    if (val)return val
+    if (!name)return ""
+    return window.localStorage.getItem(name)||""
+    //return editor?.state.doc.toString() || window.localStorage.getItem(name)
   }
 </script>
 
@@ -12,7 +16,7 @@
   import {indentWithTab} from "@codemirror/commands"
   import type { CompletionContext } from '@codemirror/autocomplete'     
   import { onMount } from 'svelte'
-	import {StoreInputCode,StoreCode3Dview,StoreMyClass} from "$lib/function/storage"  
+	import {StoreInputCode,StoreCode3Dview,StoreMyClass,StoreAlertMsg} from "$lib/function/storage"  
   export let inputList:Map<string, any>; 
 
   let element:HTMLElement;
@@ -30,7 +34,7 @@
 			if (element)element.style.visibility = "collapse";
 			return;
 		} 
-		StoreCode3Dview.set({code:t,show:true})
+		//StoreCode3Dview.set({code:t,show:true})
 		if ( editor) {
 			element.style.visibility = "visible"
       setValue(t) 
@@ -69,7 +73,7 @@
     window.document.addEventListener("keydown",(e) => {     
       if (e.ctrlKey && (e.code=="KeyS")){
         e.preventDefault();    
-        StoreCode3Dview.set({code:getValue(),show:true}) 
+        StoreCode3Dview.set({code:getValue(),show:true,name:$StoreAlertMsg.name}) 
         return
       }  
     })
