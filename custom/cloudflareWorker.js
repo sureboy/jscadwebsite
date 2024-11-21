@@ -8,6 +8,11 @@ const gethtml =(uri)=>{
 </head>
 </html>`
 } 
+const header = new Headers({
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': '*',
+  "content-type": "text/html",
+})
 export default {
   async fetch(request, env, ctx) {
     
@@ -18,12 +23,7 @@ export default {
     if (k){
       const value = await env.solidtmp.get(k);
       if (value){  
-        return  new Response(value ,{headers:new Headers({
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Headers': '*',
-            "content-type": "text/html",
-          })
-        });
+        return  new Response(value ,{headers:header });
       }           
     } 
     const reurl = url.searchParams.get("url")
@@ -45,11 +45,11 @@ export default {
           codePage+=`\n======\n${value}`
           codeHeader.push(k)
         }else{
-          return new Response(gethtml(`${encodeURI(reurl)}#${name}`),{status:404}) 
+          return new Response(gethtml(`${encodeURI(reurl)}#${name}`),{status:404,headers:header }) 
         }
      
       }) 
-      if (!codePage)return new Response(gethtml(`${encodeURI(reurl)}#${name}`),{status:404}) 
+      if (!codePage)return new Response(gethtml(`${encodeURI(reurl)}#${name}`),{status:404,headers:header }) 
       
       codePage = codeHeader.join(",")  + codePage
       
@@ -59,15 +59,9 @@ export default {
         expirationTtl: secondsFromNow,
       });   
  
-      return  new Response(gethtml(`${encodeURI(reurl)}#qrcode:${codeKey}:${name}`),
-        {headers:new Headers({
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Headers': '*',
-          "content-type": "text/html",
-        })
-      })
+      return  new Response(gethtml(`${encodeURI(reurl)}#qrcode:${codeKey}:${name}`), {headers:header })
     }catch(e){
-      return new Response(gethtml(`${encodeURI(reurl)}#${name}`),{status:404}) 
+      return new Response(gethtml(`${encodeURI(reurl)}#${name}`),{status:404,headers:header }) 
     }
   }
 };

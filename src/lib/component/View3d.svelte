@@ -274,7 +274,7 @@ const WorkerInit =(el:HTMLCanvasElement)=>{
 </div>
 
 <Modal bind:open={formModal} size="xs" autoclose class="w-full pointer-events-auto" > 
-  <div bind:this={qrcode} class=" text-center " >    
+  <div bind:this={qrcode} class=" text-center flex" >    
     
     {#if waitting}
     <Spinner  color="green" />
