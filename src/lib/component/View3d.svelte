@@ -46,7 +46,11 @@ onDestroy(()=>{
 })
 const workerPostMessage = (v:any)=>{
   if (worker){
-    if (el)startSceneOBJ(el)
+    
+    if (el){
+      startSceneOBJ(el)
+      //$StoreAlertMsg.waitting = true   
+    }
     if (worker instanceof Worker)
       worker.postMessage(v)
     else
@@ -176,11 +180,13 @@ const downSTL = (stl:BlobPart[],name:string)=>{
 StoreCode3Dview.subscribe((t:CodeToWorker)=>{  
   workerPostMessage(t) 
   $StoreAlertMsg.name = t.name || ""
-  $StoreAlertMsg.waitting = true    
+  
+   
   $StoreAlertMsg.errMsg = ""
 })
 const workerMessage = (e:MessageEvent<WorkerMsg>)=>{ 
   if (e.data.errMsg){
+    //$StoreAlertMsg.waitting = false;
     $StoreAlertMsg.errMsg += e.data.errMsg +"\n"
   }
   if(e.data.stl){
@@ -201,7 +207,6 @@ const workerMessage = (e:MessageEvent<WorkerMsg>)=>{
   //console.log(e.data)
   if (e.data.end){
     $StoreAlertMsg.waitting = false; 
- 
    
   } 
   if (e.data.name){
@@ -213,7 +218,9 @@ const workerMessage = (e:MessageEvent<WorkerMsg>)=>{
   }
 
   if (e.data.Flist){    
-    //console.log(e.data.Flist)
+    $StoreAlertMsg.waitting = true; 
+     
+    console.log(e.data.Flist)
     StoreMyClass.update((v_:Map<string, any>)=>{      
       e.data.Flist!.forEach(v=>{
         //if (!v)return;

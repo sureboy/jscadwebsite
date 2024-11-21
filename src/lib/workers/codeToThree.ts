@@ -53,8 +53,11 @@ const handCode  = (data:CodeToWorker,port:any)=>{
             ...obj?.main()),name:data.name})
         return
     }
-    if (!data.show)return
-    try{
+    if (!data.show){
+        port.postMessage(<WorkerMsg>{end:true})
+        return
+    }
+    try{           
         const li = obj?.main() || []    
         for (const i in li){
             //console.log(v)
@@ -74,14 +77,12 @@ const handCode  = (data:CodeToWorker,port:any)=>{
                 }
             }catch(e:any){
                 port.postMessage(<WorkerMsg>{errMsg:e.toString})
-            }
-            //self.postMessage({ver:CSG2Vertices(li[i])})
-        }
-        //data.end=true
+            } 
+        } 
         port.postMessage(<WorkerMsg>{end:true,name:data.name,code:data.code})
     }catch(e:any){
         //AlertMsg.errMsg = e.toString()
-        port.postMessage(<WorkerMsg>{errMsg:e.toString()})
+        port.postMessage(<WorkerMsg>{errMsg:e.toString(),end:true})
     }
 }
 
