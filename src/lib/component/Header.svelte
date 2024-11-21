@@ -26,8 +26,8 @@
       <Dropdown    >    
         <DropdownItem class="flex items-center  gap-2" href="#new"  ><PlusOutline class="w-4 h-4 me-2" /> </DropdownItem>            
         {#each getStoragelist() as item}
-        <DropdownItem class="flex items-center gap-2"   >  <a class="flex items-center gap-2" href="#{item}"><FileCodeOutline class="w-4 h-4 me-2 " />{item}</a>
-          <Button class="flex items-center gap-2" href="#"  on:click={()=>{
+        <DropdownItem class="flex items-center gap-2"      href="#{item}"><FileCodeOutline class="w-4 h-4 me-2 " />{item} 
+          <Button  on:click={()=>{
             if(confirm("Remove "+item)){
               removeStorage(item); 
               location.reload()
