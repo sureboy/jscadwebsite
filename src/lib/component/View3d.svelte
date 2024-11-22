@@ -185,8 +185,6 @@ const downSTL = (stl:BlobPart[],name:string)=>{
 StoreCode3Dview.subscribe((t:CodeToWorker)=>{  
   workerPostMessage(t) 
   $StoreAlertMsg.name = t.name || ""
-  
-   
   $StoreAlertMsg.errMsg = ""
 })
 const workerMessage = (e:MessageEvent<WorkerMsg>)=>{ 
@@ -225,7 +223,7 @@ const workerMessage = (e:MessageEvent<WorkerMsg>)=>{
   if (e.data.Flist){    
     $StoreAlertMsg.waitting = true; 
      
-    console.log(e.data.Flist)
+    //console.log(e.data.Flist)
     StoreMyClass.update((v_:Map<string, any>)=>{      
       e.data.Flist!.forEach(v=>{
         //if (!v)return;

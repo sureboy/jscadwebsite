@@ -22,11 +22,14 @@
  
 <Navbar color="none" fluid class="pointer-events-auto" >  
     <ButtonGroup  size="sm"  >
-      <Button     color="light" > <GridPlusOutline  />  <ChevronDownOutline   /></Button>
+      <Button     color="light" id="start" > <GridPlusOutline  />  <ChevronDownOutline   /></Button>
       <Dropdown    >    
         <DropdownItem class="flex items-center  gap-2" href="#new"  ><PlusOutline class="w-4 h-4 me-2" /> </DropdownItem>            
         {#each getStoragelist() as item}
-        <DropdownItem class="flex items-center gap-2"      href="#{item}"><FileCodeOutline class="w-4 h-4 me-2 " />{item} 
+        <DropdownItem class="flex items-center gap-2"    href="#{item}" on:click={(e)=>{
+          //console.log(e.target?.blur())
+          document.getElementById("start")?.click()
+        }}><FileCodeOutline class="w-4 h-4 me-2 " />{item} 
           <Button  on:click={()=>{
             if(confirm("Remove "+item)){
               removeStorage(item); 
