@@ -217,7 +217,7 @@ const workerMessage = (e:MessageEvent<WorkerMsg>)=>{
     if (e.data.code){
       saveStorage(e.data.name,e.data.code)
     }
-    $StoreAlertMsg.waitting = false; 
+    //$StoreAlertMsg.waitting = false; 
   }
 
   if (e.data.Flist){    

@@ -32,6 +32,8 @@ const handCode  = (data:CodeToWorker,port:any)=>{
         return;
     }
     if (data.name !== vm[1]) data.name = vm[1]
+    port.postMessage(<WorkerMsg>{name:data.name,code:data.code})
+    
     //}
     //console.log(data)
     const obj = StringToClass(data.code,data.name,(e:any)=>{
@@ -79,7 +81,7 @@ const handCode  = (data:CodeToWorker,port:any)=>{
                 port.postMessage(<WorkerMsg>{errMsg:e.toString})
             } 
         } 
-        port.postMessage(<WorkerMsg>{end:true,name:data.name,code:data.code})
+        port.postMessage(<WorkerMsg>{end:true })
     }catch(e:any){
         //AlertMsg.errMsg = e.toString()
         port.postMessage(<WorkerMsg>{errMsg:e.toString(),end:true})
