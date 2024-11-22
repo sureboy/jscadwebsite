@@ -80,7 +80,7 @@ const getRemote = (k:string)=>{
       })
       titles.forEach((codeN,i)=>{
         window.localStorage.setItem(codeN,codes[i])
-        console.log(codeN,codes[i])
+        //console.log(codeN,codes[i])
         workerPostMessage({code:codes[i],name:codeN,show:false})
             
       })
@@ -112,12 +112,17 @@ const getQrcode = (k:string,oldk:string)=>{
 }
 const updataCode = (hash:string)=>{ 
   if (hash){
+    StoreInputCode.set("");   
     //console.log(hash)
     const hashName = hash.substring(1).split(":") 
     const firstName = hashName[0]
     switch (firstName) {
       case 'new':
-        StoreInputCode.set(solid("solid__"+new Date().getTime().toString(36).substring(2)));
+        let name = "solid__"+new Date().getTime().toString(36).substring(2)
+        let code_ = solid(name)
+        StoreInputCode.set(code_);
+        StoreCode3Dview.set({code:code_,show:true,name:name})
+        $StoreAlertMsg.name = name
         break
       case 'qrcode':
         if (hashName.length>2){
@@ -131,7 +136,7 @@ const updataCode = (hash:string)=>{
           getRemote(hashName[0])
           return
         }
-        StoreCode3Dview.set({code,show:true})
+        StoreCode3Dview.set({code,show:true,name:hashName[0]})
         //StoreInputCode.set(code);
         break
     }
