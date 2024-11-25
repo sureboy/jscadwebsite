@@ -222,7 +222,6 @@ const workerMessage = (e:MessageEvent<WorkerMsg>)=>{
 
   if (e.data.Flist){    
     $StoreAlertMsg.waitting = true; 
-     
     //console.log(e.data.Flist)
     StoreMyClass.update((v_:Map<string, any>)=>{      
       e.data.Flist!.forEach(v=>{

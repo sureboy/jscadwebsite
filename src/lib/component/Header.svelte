@@ -38,8 +38,8 @@
         </DropdownItem> 
         {/each} 
         <DropdownDivider  />    
-        <DropdownItem  class="flex items-center gap-2" on:click={(e)=>{
-          StoreHelpHidden.set(false)
+        <DropdownItem  class="flex items-center gap-2" href="/docs/index.html" on:click={(e)=>{
+          //StoreHelpHidden.set(false)
         }}>
           <BookOpenOutline class="w-4 h-4 me-2 " />
         </DropdownItem>

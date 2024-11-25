@@ -1,0 +1,29 @@
+{
+    "tags": {
+        "allowUnknownTags": true
+    },
+    "source": {
+        "include":["./src/lib/modeling/src/"],
+        "includePattern": ".+\\.js(doc|x)?$",
+        "excludePattern": "(^|\\/|\\\\)_"
+    },
+    "plugins": [
+        "plugins/markdown"
+    ],
+    "templates": {
+        "referenceTitle": "My SDK Name",
+        "disableSort": false,
+        "collapse": true,
+        "default":{
+            "layoutFile":"./docTemplate/tmpl/layout.tmpl"
+        }   
+ 
+    }, 
+    "opts": { 
+        "destination": "./static/docs/",
+        "encoding": "utf8",         
+        "recurse": true, 
+        "private": true 
+    }
+
+}

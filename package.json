@@ -7,7 +7,8 @@
 		"build": "vite build",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"docs": "jsdoc -r --configure docConfig.json --verbose"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^3.0.0",
@@ -37,6 +38,7 @@
 		"codemirror": "^6.0.1",
 		"qrcode": "^1.5.4",
 		"sveltekit-i18n": "^2.4.2",
+		"taffydb": "^2.7.3",
 		"three": "^0.169.0"
 	}
 }
