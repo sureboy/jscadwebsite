@@ -2,7 +2,7 @@
 import type { Handle,HandleServerError } from '@sveltejs/kit';
 
 const u = new URL("https://cdn.jsdelivr.net/gh/sureboy/games@master")
- 
+const u1 = new URL("https://cdn.jsdelivr.net/gh/sureboy/jscadwebsite@master")
 export const handle: Handle = async ({ event, resolve }) => {
 	
 	const { url,request } = event;
@@ -14,15 +14,33 @@ export const handle: Handle = async ({ event, resolve }) => {
 	//const db = await request.formData()
 	//const d = new Date().getTime().toString(36).substring(2)
 	//new Response()
+	
 	console.log(pathname)
 	if (pathname.startsWith("/docs/")){
 		try{
-			const file = await import(`/${pathname}.html?raw`).then(m => m.default);
+			u1.pathname+=pathname
+			const modifiedRequest = new Request(u1.toString(), {	
+				redirect: 'follow'
+			});
+			const response = await fetch(modifiedRequest);
+			if (response.status !==200){
+				
+				return new Response("err "+u1.toString())
+			}
+			const modifiedResponse = new Response(response.body, response);  
+			//response
+			modifiedResponse.headers.set('Access-Control-Allow-Origin', '*');
+			modifiedResponse.headers.set('Access-Control-Allow-Headers', '*');
+			return modifiedResponse;
+
+/*
+			const file = await import(`https://cdn.jsdelivr.net/gh/sureboy/games@master${pathname}.html?raw`).then(m => m.default);
 			return new Response(file, {
 				headers: {
 					'Content-Type': 'text/html',
 				},
 			});
+			*/
 		}catch(e:any){
 			return new Response(e.toString() );
 		}
