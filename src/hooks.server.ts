@@ -27,12 +27,14 @@ export const handle: Handle = async ({ event, resolve }) => {
 				
 				return new Response("err "+u1.toString())
 			}
-			const modifiedResponse = new Response(response.body, response);  
+			return new Response(response.body,{ headers: {
+				'Content-Type': 'text/html',
+			}});  
 			//response
-			modifiedResponse.headers.set('Access-Control-Allow-Origin', '*');
-			modifiedResponse.headers.set('Access-Control-Allow-Headers', '*');
-			modifiedResponse.headers.set('Content-Type', 'text/html');
-			return modifiedResponse;
+			//modifiedResponse.headers.set('Access-Control-Allow-Origin', '*');
+			//modifiedResponse.headers.set('Access-Control-Allow-Headers', '*');
+			//modifiedResponse.headers.set('Content-Type', 'text/html');
+			//return modifiedResponse;
 
 /*
 			const file = await import(`https://cdn.jsdelivr.net/gh/sureboy/games@master${pathname}.html?raw`).then(m => m.default);
