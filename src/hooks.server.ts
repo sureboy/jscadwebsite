@@ -31,6 +31,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 			//response
 			modifiedResponse.headers.set('Access-Control-Allow-Origin', '*');
 			modifiedResponse.headers.set('Access-Control-Allow-Headers', '*');
+			modifiedResponse.headers.set('Content-Type', 'text/html');
 			return modifiedResponse;
 
 /*
