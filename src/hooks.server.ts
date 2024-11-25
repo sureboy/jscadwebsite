@@ -17,7 +17,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	console.log(pathname)
 	if (pathname.startsWith("/docs/")){
 		try{
-			const file = await import(`${pathname}.html?raw`).then(m => m.default);
+			const file = await import(`/${pathname}.html?raw`).then(m => m.default);
 			return new Response(file, {
 				headers: {
 					'Content-Type': 'text/html',
