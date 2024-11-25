@@ -20,7 +20,7 @@ const config = {
 			// See below for an explanation of these options
 			routes: {
 				include: ['/*'],
-				exclude: ['<all>']
+				exclude: ['']
 			},
 			platformProxy: {
 				persist: './custom',

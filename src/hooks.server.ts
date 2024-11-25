@@ -6,14 +6,25 @@ const u = new URL("https://cdn.jsdelivr.net/gh/sureboy/games@master")
 export const handle: Handle = async ({ event, resolve }) => {
 	
 	const { url,request } = event;
-	const { pathname } = url;
+	const { pathname, } = url;
 	if ( pathname.endsWith(".stl")) {
 		return await resStl(event)
 	}
 	//request.body
 	//const db = await request.formData()
 	//const d = new Date().getTime().toString(36).substring(2)
+	//new Response()
+	console.log(pathname)
+	if (pathname.startsWith("/docs/")){
+		const file = await import(`${pathname}.html?raw`).then(m => m.default);
+		return new Response(file, {
+			headers: {
+				'Content-Type': 'text/html',
+			},
+		});
+	}
 	
+
 	return await resolve(event)
 	
 
