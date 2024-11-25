@@ -18,14 +18,14 @@ export const handle: Handle = async ({ event, resolve }) => {
 	console.log(pathname)
 	if (pathname.startsWith("/docs/")){
 		try{
-			u1.pathname+=pathname
-			const modifiedRequest = new Request(u1.toString(), {	
+			const pa = u1.pathname+"/static/"+pathname
+			const modifiedRequest = new Request(pa, {	
 				redirect: 'follow'
 			});
 			const response = await fetch(modifiedRequest);
 			if (response.status !==200){
 				
-				return new Response("err "+u1.toString())
+				return new Response("err "+pa)
 			}
 			const modifiedResponse = new Response(response.body, response);  
 			//response
