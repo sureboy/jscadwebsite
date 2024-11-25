@@ -16,12 +16,17 @@ export const handle: Handle = async ({ event, resolve }) => {
 	//new Response()
 	console.log(pathname)
 	if (pathname.startsWith("/docs/")){
-		const file = await import(`${pathname}.html?raw`).then(m => m.default);
-		return new Response(file, {
-			headers: {
-				'Content-Type': 'text/html',
-			},
-		});
+		try{
+			const file = await import(`${pathname}.html?raw`).then(m => m.default);
+			return new Response(file, {
+				headers: {
+					'Content-Type': 'text/html',
+				},
+			});
+		}catch(e:any){
+			return new Response(e.toString() );
+		}
+		
 	}
 	
 
