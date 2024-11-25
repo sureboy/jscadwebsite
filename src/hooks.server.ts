@@ -25,7 +25,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 			const response = await fetch(modifiedRequest);
 			if (response.status !==200){
 				
-				return new Response("err "+u1.toString())
+				return new Response("err ")
 			}
 			return new Response(response.body,{ headers: {
 				'Content-Type': 'text/html',
