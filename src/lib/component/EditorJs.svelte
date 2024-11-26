@@ -31,6 +31,10 @@
   }
   StoreInputCode.subscribe(t=>{ 
 		if (!t){ 
+      let tmpval = getValue()
+      if (tmpval && $StoreAlertMsg.name){
+        window.localStorage.setItem($StoreAlertMsg.name,tmpval)
+      }
 			if (element)element.style.visibility = "collapse";
 			return;
 		} 
