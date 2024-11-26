@@ -73,7 +73,7 @@ export const  startSceneOBJ = (el: HTMLCanvasElement)=>{
 	}	
 	scene.clear();
 	scene.add(hemisphereLight);
-	onWindowResize(el)	 
+	//onWindowResize(el)	 
 
 }
 export const  addSceneOBJ = (el: HTMLCanvasElement,...m:Object3D[])=>{

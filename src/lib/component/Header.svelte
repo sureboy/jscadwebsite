@@ -66,7 +66,7 @@
       <DropdownItem class="flex items-center  gap-2"  on:click={()=>{  
          
         //$StoreAlertMsg.waitting = true
-        StoreCode3Dview.set({code:getValue($StoreAlertMsg.name),stl:true,name:$StoreAlertMsg.name})
+        StoreCode3Dview.set({code:"",stl:true,name:$StoreAlertMsg.name})
       }     
     }>STL</DropdownItem>
     <DropdownItem class="flex items-center gap-2" on:click={()=>{

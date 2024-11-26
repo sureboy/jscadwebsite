@@ -170,8 +170,10 @@ onMount(()=>{
   });
  
 })
-const downSTL = (stl:BlobPart[],name:string)=>{
-  const file = new File(stl,name+".stl", {
+
+const downSTL = (stl: BlobPart[],name:string)=>{
+ 
+  const file = new File( stl,name+".stl", {
     type: mimeType,
   });
   //console.log(file)
@@ -210,6 +212,7 @@ const workerMessage = (e:MessageEvent<WorkerMsg>)=>{
   //console.log(e.data)
   if (e.data.end){
     $StoreAlertMsg.waitting = false; 
+    if (el)   onWindowResize(el)	
    
   } 
   if (e.data.name){

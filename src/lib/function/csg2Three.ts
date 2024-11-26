@@ -8,8 +8,10 @@ import {
     LineSegments,
     Color,
     Vector3,
+    
 } from "three"; 
-
+//import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js'
+//import { STLExporter } from 'three/addons/exporters/STLExporter.js';
 import type {MeshPhongMaterialParameters,LineBasicMaterialParameters,TypedArray,Matrix4,Matrix4Tuple} from "three" 
 import type {Geom3, Geom2, Path2} from '@jscad/modeling/src/geometries/types';
 import type {Vec3,Vec2} from '@jscad/modeling/src/maths/types'
@@ -25,7 +27,15 @@ export interface csgObj {
     opacity? :any;
     transforms?:Matrix4Tuple;
     type?:any;
+
     //csg:Geometry;
+}  
+export interface meshOut {
+  geo:BufferGeometry;
+  material:any;
+  objType:string;
+  transforms?:Matrix4Tuple;
+  //csg:Geometry;
 }  
 const Console = console.log
 const flatShading = false
@@ -42,6 +52,66 @@ const materials:Record<string,any> = {
 }
 materials.lines = materials.line
 materials.instance = materials.mesh // todo support instances for lines
+
+export function CSG2ThreeArray(obj:csgObj  ) {
+  const { vertices, indices, normals, color, colors, isTransparent = false, opacity } = obj
+    //let { transforms } = obj
+    const objType = obj.type || 'mesh'
+
+    const materialDef = materials[objType]
+    if (!materialDef) {
+      console.error(`material not found for type ${objType}`, obj)
+      return
+    }
+    let material = materialDef.def
+    //const isInstanced = obj.type === 'instance'
+    if (color || colors)   {
+      const c = color || colors
+      const opts:{color?:Color,vertexColors:boolean,opacity:any,transparent:boolean} = {       
+        vertexColors: !!colors,
+        opacity: c![3] === undefined ? 1 : c![3],
+        transparent: (color && c![3] !== 1 && c![3] !== undefined) || isTransparent,
+      }
+      if (opacity) opts.opacity = opacity
+      if (!colors) opts.color =  new Color(color![0], color![1], color![2])
+      material = materialDef.make(opts)
+      if (opacity) {
+        material.transparent = true
+        material.opacity = opacity
+      }
+    }
+
+    let geo = new BufferGeometry()
+    geo.setAttribute('position', new BufferAttribute(vertices, 3))
+    if (indices) geo.setIndex(new BufferAttribute(indices, 1))
+    if (normals) geo.setAttribute('normal', new BufferAttribute(normals, 3))
+    //if(smooth) geo = toCreasedNormals( geo, Math.PI / 10)
+    if (colors) geo.setAttribute('color', new BufferAttribute(colors, isTransparent ? 4 : 3))
+    
+    return <meshOut>{geo,material,objType,transforms:obj.transforms}
+}
+export function getMesh(meshout:meshOut){
+  const {geo,material,objType,transforms}=meshout
+  let mesh:any
+  //mesh = new Mesh(geo, material)
+  console.log(geo, material)
+  switch (objType) {
+    case 'mesh':
+      mesh = new Mesh(geo, material)
+      break
+ 
+    case 'line':
+      mesh = new Line(geo, material)
+      break
+    case 'lines':
+      // https://threejs.org/docs/#api/en/materials/LineBasicMaterial
+      mesh = new LineSegments(geo, material)
+      break
+  }      
+  if (transforms  ) mesh.applyMatrix4({ elements: transforms }as Matrix4)
+  return mesh
+}
+
 export function CSG2Three(obj:csgObj , { smooth = false }) {
     //const obj = CSG2Vertices(csg)
     const { vertices, indices, normals, color, colors, isTransparent = false, opacity } = obj
@@ -80,7 +150,7 @@ export function CSG2Three(obj:csgObj , { smooth = false }) {
 
     let mesh:any
     //mesh = new Mesh(geo, material)
-   
+    //console.log(geo, material)
     switch (objType) {
       case 'mesh':
         mesh = new Mesh(geo, material)
