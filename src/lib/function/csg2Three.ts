@@ -124,8 +124,8 @@ export function CSG2Three(obj:csgObj , { smooth = false }) {
       return
     }
     let material = materialDef.def
-    const isInstanced = obj.type === 'instance'
-    if ((color || colors) && !isInstanced) {
+    //const isInstanced = obj.type === 'instance'
+    if (color || colors)  {
       const c = color || colors
       const opts:{color?:Color,vertexColors:boolean,opacity:any,transparent:boolean} = {       
         vertexColors: !!colors,
@@ -155,9 +155,9 @@ export function CSG2Three(obj:csgObj , { smooth = false }) {
       case 'mesh':
         mesh = new Mesh(geo, material)
         break
-      case 'instance':
-        const { list } = obj
-        console.log(list)
+     // case 'instance':
+     //   const { list } = obj
+     //   console.log(list)
         /*
         mesh = new InstancedMesh(geo, materials.mesh.make({ color: 0x0084d1 }), list.length)
         list.forEach((item, i) => {
@@ -165,7 +165,7 @@ export function CSG2Three(obj:csgObj , { smooth = false }) {
         })
         transforms = undefined
         */
-        break
+     //   break
       case 'line':
         mesh = new Line(geo, material)
         break
@@ -175,7 +175,7 @@ export function CSG2Three(obj:csgObj , { smooth = false }) {
         break
     }
         
-    if (transforms && !isInstanced) mesh.applyMatrix4({ elements: transforms }as Matrix4)
+    if (transforms ) mesh.applyMatrix4({ elements: transforms }as Matrix4)
     return mesh
 }
 function copyTransformToArray(te:TypedArray, array:TypedArray , offset = 0) {
@@ -412,7 +412,7 @@ export function CSG2Vertices (csg:Geom3) {
   const color = csg.color
   let vertOffset = 0
   let indOffset = 0
-  let posOffset = 0
+  let posOffset = 0 
   let first = 0
   for (const poly of csg.polygons) {
     const arr = poly.vertices

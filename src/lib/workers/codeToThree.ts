@@ -5,11 +5,11 @@ import {regexpGetClass} from "$lib/function/share"
 import pkg from '@jscad/modeling';
 import { STLExporter } from 'three/addons/exporters/STLExporter.js';
 //import { OBJExporter } from 'three/addons/exporters/OBJExporter.js';
-const {geometries} = pkg;
-import type {CodeToWorker,WorkerMsg,solidEditStruct} from '$lib/function/share'
+const {geometries,booleans} = pkg;
+import type {CodeToWorker,WorkerMsg} from '$lib/function/share'
 const exporter = new STLExporter();
 
-import { Scene } from "three"; 
+//import { Scene,Group } from "three"; 
 
 self.onmessage = (e) => {
     //console.log(e)
@@ -26,28 +26,26 @@ self.addEventListener("connect", (e:any) => {
     } 
 });
 let tmpdb:any[] = []
-const getCsgDB = (tmpdb:any[])=>{
-    
+const getCsgObj = (v:any )=>{
+    if (geometries.geom3.isA(v)){ 
+        return CSG2Vertices(v)
+        
+    }
+    if (geometries.geom2.isA(v)){ 
+        return CSGSides2LineSegmentsVertices(v)               
+        
+    }
+    if (geometries.path2.isA(v)){
+        //back(CSG2LineVertices(v))
+        //back(<WorkerMsg>{ver:CSG2LineVertices(v)})               
+        return CSG2LineVertices(v);
+    }        
 }
-const getCsgObj = (db:any[],back:Function)=>{
+const getCsgObjArray = (db:any[],back:Function)=>{
     try{
         //tmpdb = obj?.main() || []    
         for (const v of db){
-            //console.log(v)
-            //const v = li[i]        
-            if (geometries.geom3.isA(v)){ 
-                back(<WorkerMsg>{ver:CSG2Vertices(v)})
-                continue;
-            }
-            if (geometries.geom2.isA(v)){ 
-                back(<WorkerMsg>{ver:CSGSides2LineSegmentsVertices(v)})                  
-                continue;
-            }
-            if (geometries.path2.isA(v)){
-                //back(CSG2LineVertices(v))
-                back(<WorkerMsg>{ver:CSG2LineVertices(v)})               
-                continue;
-            }        
+            back(<WorkerMsg>{ver:getCsgObj(v)})         
         } 
         back(<WorkerMsg>{end:true })
     }catch(e:any){ 
@@ -57,26 +55,17 @@ const getCsgObj = (db:any[],back:Function)=>{
 }
 const handCode  = (data:CodeToWorker,port:any)=>{
     if (data.stl&&data.name && tmpdb.length>0){
-         
-        const scene = new Scene();
-        getCsgObj(tmpdb,(v:WorkerMsg)=>{
-            if (v.ver)scene.add(CSG2Three(v.ver,{}))
-            //port.postMessage(v)
-        })
-        const req = exporter.parse( scene,{binary:true} )  
-        port.postMessage(<WorkerMsg>{stl:[req.buffer] ,name:data.name})
+        //const group = new Group()
+        //const scene = new Scene();
+ 
+        let g =getCsgObj(booleans.union(...tmpdb))
+        if (g){
+            const req = exporter.parse( CSG2Three(g,{smooth:false}),{binary:true} )  
+            port.postMessage(<WorkerMsg>{stl:[req.buffer] ,name:data.name})
+        }else{
+            port.postMessage(<WorkerMsg>{errMsg:"stl err"})
+        }
         return
-        /*
-        const da = serialize({ binary: true }, ...tmpdb) 
-        //console.log(tmpdb.length)
-        //scene.clear()
-        //for (const v of tmpdb)
-        //scene.add(...tmpdb)
-        //const req = exporter.parse( scene, { binary: true })        
-        //req.
-        port.postMessage(<WorkerMsg>{stl:da ,name:data.name})
-        return
-        */
     }
     if (!data.code)   return
     let vm = data.code.match(regexpGetClass)    
@@ -111,7 +100,7 @@ const handCode  = (data:CodeToWorker,port:any)=>{
     //console.log("clear")
     //scene.clear()
     tmpdb = obj?.main() || [] 
-    getCsgObj(tmpdb,(v:WorkerMsg)=>{
+    getCsgObjArray(tmpdb,(v:WorkerMsg)=>{
         //if (v.ver)tmpdb.push(v.ver)
         port.postMessage(v)
     })

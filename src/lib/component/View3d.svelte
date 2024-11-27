@@ -203,7 +203,7 @@ const workerMessage = (e:MessageEvent<WorkerMsg>)=>{
     $StoreAlertMsg.waitting = true; 
     try{
       if (el)
-      addSceneOBJ(el,CSG2Three(e.data.ver,{})) 
+      addSceneOBJ(el,CSG2Three(e.data.ver,{smooth:false})) 
     }catch(e:any){
       $StoreAlertMsg.errMsg = e.toString()
     }         
