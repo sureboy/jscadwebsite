@@ -47,10 +47,10 @@ onDestroy(()=>{
 const workerPostMessage = (v:any)=>{
   if (worker){
     
-    if (el){
-      startSceneOBJ(el)
+    //if (el){
+    //  startSceneOBJ(el)
       //$StoreAlertMsg.waitting = true   
-    }
+    //}
     if (worker instanceof Worker)
       worker.postMessage(v)
     else
@@ -199,6 +199,9 @@ const workerMessage = (e:MessageEvent<WorkerMsg>)=>{
     $StoreAlertMsg.waitting = false;
     return 
   }
+  if (e.data.start && el){
+    startSceneOBJ(el) 
+  }
   if (e.data.ver){
     $StoreAlertMsg.waitting = true; 
     try{
@@ -218,6 +221,7 @@ const workerMessage = (e:MessageEvent<WorkerMsg>)=>{
   if (e.data.name){
     $StoreAlertMsg.name = e.data.name     
     if (e.data.code){
+
       saveStorage(e.data.name,e.data.code)
     }
     //$StoreAlertMsg.waitting = false; 

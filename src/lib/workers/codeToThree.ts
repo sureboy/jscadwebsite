@@ -108,10 +108,12 @@ const handCode  = (data:CodeToWorker,port:any)=>{
         }else{
             tmpdb = [db]
         }
+
     }catch(e:any){
         port.postMessage(<WorkerMsg>{errMsg:e.toString(),end:true})
         return
     }
+    port.postMessage(<WorkerMsg>{start:true})
     getCsgObjArray(tmpdb,(v:WorkerMsg)=>{
         //if (v.ver)tmpdb.push(v.ver)
         port.postMessage(v)
