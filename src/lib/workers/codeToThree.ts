@@ -60,7 +60,7 @@ const handCode  = (data:CodeToWorker,port:any)=>{
         //const group = new Group()
         //const scene = new Scene();
  
-        let g =getCsgObj(booleans.union(...tmpdb))
+        let g =getCsgObj(tmpdb.length===1?tmpdb[0]:booleans.union(...tmpdb))
         if (g){
             const req = exporter.parse( CSG2Three(g,{smooth:false}),{binary:true} )  
             port.postMessage(<WorkerMsg>{stl:[req.buffer] ,name:data.name})
