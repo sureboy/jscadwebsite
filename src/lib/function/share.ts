@@ -17,6 +17,6 @@ export const solidNow:{solid:Geometry[]}={
 }
 export interface solidEditStruct  { 
   [x: string]: any;
-  main:()=>Geometry[]; 
+  main:()=>Geometry[]|Geometry; 
   init?:(option:{})=>void;
 } 

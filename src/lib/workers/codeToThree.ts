@@ -7,6 +7,7 @@ import { STLExporter } from 'three/addons/exporters/STLExporter.js';
 //import { OBJExporter } from 'three/addons/exporters/OBJExporter.js';
 const {geometries,booleans} = pkg;
 import type {CodeToWorker,WorkerMsg} from '$lib/function/share'
+import type {Geometry } from '@jscad/modeling/src/geometries/types';
 const exporter = new STLExporter();
 
 //import { Scene,Group } from "three"; 
@@ -25,7 +26,7 @@ self.addEventListener("connect", (e:any) => {
         //port.start();
     } 
 });
-let tmpdb:any[] = []
+let tmpdb:any[]
 const getCsgObj = (v:any,back?:Function )=>{
     try{
         if (geometries.geom3.isA(v)){ 
@@ -101,7 +102,12 @@ const handCode  = (data:CodeToWorker,port:any)=>{
     //console.log("clear")
     //scene.clear()
     try{
-        tmpdb = obj?.main() || [] 
+        const db = obj?.main() || [] 
+        if (Array.isArray(db)){
+            tmpdb = db
+        }else{
+            tmpdb = [db]
+        }
     }catch(e:any){
         port.postMessage(<WorkerMsg>{errMsg:e.toString(),end:true})
         return
