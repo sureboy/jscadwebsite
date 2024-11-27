@@ -33,7 +33,8 @@
           <Button  on:click={()=>{
             if(confirm("Remove "+item)){
               removeStorage(item); 
-              location.reload()
+              document.getElementById("start")?.click()
+              //location.reload()
           }}}><TrashBinOutline  class="w-4 h-4 me-2 " /> </Button>
         </DropdownItem> 
         {/each} 
