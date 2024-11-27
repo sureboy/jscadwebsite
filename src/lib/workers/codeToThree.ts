@@ -26,26 +26,27 @@ self.addEventListener("connect", (e:any) => {
     } 
 });
 let tmpdb:any[] = []
-const getCsgObj = (v:any )=>{
-    if (geometries.geom3.isA(v)){ 
-        return CSG2Vertices(v)
-        
-    }
-    if (geometries.geom2.isA(v)){ 
-        return CSGSides2LineSegmentsVertices(v)               
-        
-    }
-    if (geometries.path2.isA(v)){
-        //back(CSG2LineVertices(v))
-        //back(<WorkerMsg>{ver:CSG2LineVertices(v)})               
-        return CSG2LineVertices(v);
-    }        
+const getCsgObj = (v:any,back?:Function )=>{
+    try{
+        if (geometries.geom3.isA(v)){ 
+            return CSG2Vertices(v)            
+        }
+        if (geometries.geom2.isA(v)){ 
+            return CSGSides2LineSegmentsVertices(v)                
+        }
+        if (geometries.path2.isA(v)){         
+            return CSG2LineVertices(v);
+        }   
+    }catch(e:any){ 
+        //back(<WorkerMsg>{errMsg:e.toString})
+        if (back) back(<WorkerMsg>{errMsg:e.toString(),end:true})
+    }      
 }
 const getCsgObjArray = (db:any[],back:Function)=>{
     try{
         //tmpdb = obj?.main() || []    
         for (const v of db){
-            back(<WorkerMsg>{ver:getCsgObj(v)})         
+            back(<WorkerMsg>{ver:getCsgObj(v,back)})         
         } 
         back(<WorkerMsg>{end:true })
     }catch(e:any){ 
@@ -99,12 +100,16 @@ const handCode  = (data:CodeToWorker,port:any)=>{
     //tmpdb = []
     //console.log("clear")
     //scene.clear()
-    tmpdb = obj?.main() || [] 
+    try{
+        tmpdb = obj?.main() || [] 
+    }catch(e:any){
+        port.postMessage(<WorkerMsg>{errMsg:e.toString(),end:true})
+        return
+    }
     getCsgObjArray(tmpdb,(v:WorkerMsg)=>{
         //if (v.ver)tmpdb.push(v.ver)
         port.postMessage(v)
-    })
-    
+    })    
 }
 
 
