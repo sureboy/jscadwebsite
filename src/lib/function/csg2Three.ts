@@ -81,13 +81,12 @@ export function CSG2ThreeArray(obj:csgObj  ) {
       }
     }
 
-    let geo = new BufferGeometry()
+    const geo = new BufferGeometry()
     geo.setAttribute('position', new BufferAttribute(vertices, 3))
     if (indices) geo.setIndex(new BufferAttribute(indices, 1))
     if (normals) geo.setAttribute('normal', new BufferAttribute(normals, 3))
     //if(smooth) geo = toCreasedNormals( geo, Math.PI / 10)
-    if (colors) geo.setAttribute('color', new BufferAttribute(colors, isTransparent ? 4 : 3))
-    
+    if (colors) geo.setAttribute('color', new BufferAttribute(colors, isTransparent ? 4 : 3)) 
     return <meshOut>{geo,material,objType,transforms:obj.transforms}
 }
 export function getMesh(meshout:meshOut){

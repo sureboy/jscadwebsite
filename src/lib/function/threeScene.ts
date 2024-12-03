@@ -97,6 +97,7 @@ export const  addSceneOBJ = (el: HTMLCanvasElement,...m:Object3D[])=>{
 	}	
 	//scene.clear();
 	//scene.add(hemisphereLight);
+	//console.log(m)
 	scene.add(...m )
 	const fobj = new Box3().setFromObject(scene)
 	const sceneSize = fobj.getSize(new Vector3())

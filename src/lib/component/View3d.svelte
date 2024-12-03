@@ -17,7 +17,7 @@
 </script>
 <script lang="ts"> 
 import {mimeType} from "@jscad/stl-serializer"  
-import {CSG2Three} from "$lib/function/csg2Three"   
+import {CSG2Three,getMesh} from "$lib/function/csg2Three"   
 import { page } from '$app/stores';
 import {StoreCode3Dview,saveStorage,initMySolid,StoreAlertMsg,StoreMyClass,StoreInputCode,solid} from "$lib/function/storage"
 import {onWindowResize,startSceneOBJ,addSceneOBJ} from "$lib/function/threeScene" 
@@ -205,8 +205,11 @@ const workerMessage = (e:MessageEvent<WorkerMsg>)=>{
   if (e.data.ver){
     $StoreAlertMsg.waitting = true; 
     try{
-      if (el)
-      addSceneOBJ(el,CSG2Three(e.data.ver,{smooth:false})) 
+      if (el){
+        addSceneOBJ(el,CSG2Three(e.data.ver, {} )) 
+        //console.log("mesh",e.data.mesh)
+      }
+     
     }catch(e:any){
       $StoreAlertMsg.errMsg = e.toString()
     }         
