@@ -1,5 +1,7 @@
 import {StringToClass} from '$lib/function/storage'
-import {serialize} from "@jscad/stl-serializer"   
+//import {serialize} from "@jscad/stl-serializer"   
+import {serializeBinary} from "$lib/function/CSGToStlb"   
+import { CSG } from 'three-csg-ts';
 import {CSG2Vertices,CSGSides2LineSegmentsVertices,CSG2LineVertices,CSG2Three,CSG2ThreeArray} from "$lib/function/csg2Three"  
 import {regexpGetClass} from "$lib/function/share"  
 import pkg from '@jscad/modeling';
@@ -10,7 +12,7 @@ import {
 //const group = new Group()
 //group
 //import { OBJExporter } from 'three/addons/exporters/OBJExporter.js';
-const {geometries,booleans} = pkg;
+const {geometries,booleans,utils} = pkg;
 import type {CodeToWorker,WorkerMsg} from '$lib/function/share'
 //import type {Geometry } from '@jscad/modeling/src/geometries/types';
 const exporter = new STLExporter();
@@ -64,19 +66,19 @@ const handCode  = (data:CodeToWorker,port:any)=>{
     if (data.stl&&data.name && tmpdb.length>0){
         //const group = new Group()
         //const scene = new Scene();
-         /*
-        const db  = serialize({},tmpdb)
+      
+        const db  = serializeBinary(tmpdb,{})
         port.postMessage(<WorkerMsg>{stl:db ,name:data.name})
         return
-        */
-        const group = new Group()
-        for (const g of tmpdb){
-            group.add(CSG2Three(g,{smooth:true}))
-        }
        
-        const req = exporter.parse( group,{binary:true} )  
-        port.postMessage(<WorkerMsg>{stl:[req.buffer] ,name:data.name},[req.buffer])
- 
+        try{    
+            const  g  = tmpdb.length===1?getCsgObj(tmpdb[0]):getCsgObj(booleans.union(...tmpdb))             
+            const req = exporter.parse( CSG2Three(g!,{}),{binary:true} )  
+            port.postMessage(<WorkerMsg>{stl:[req.buffer] ,name:data.name},[req.buffer])
+        }catch(e){
+            console.log(e)
+            return
+        }
         return
        
     }
@@ -113,12 +115,14 @@ const handCode  = (data:CodeToWorker,port:any)=>{
     //console.log("clear")
     //scene.clear()
     try{
-        const db = obj?.main() || [] 
+        const db = obj?.main() 
+        
         if (Array.isArray(db)){
-            tmpdb = db
+            tmpdb = utils.flatten(db)
         }else{
             tmpdb = [db]
         }
+       
 
     }catch(e:any){
         port.postMessage(<WorkerMsg>{errMsg:e.toString(),end:true})
@@ -127,10 +131,10 @@ const handCode  = (data:CodeToWorker,port:any)=>{
     //group.clear()
     port.postMessage(<WorkerMsg>{start:true})
     getCsgObjArray(tmpdb,(v:WorkerMsg)=>{
-        if (v.ver){
-            tmpdb[v.index!] = v.ver
+        //if (v.ver){
+            //tmpdb[v.index!] = v.ver
             //v.mesh = CSG2ThreeArray(v.ver)
-        }       
+        //}       
         port.postMessage(v)
     })    
 }
