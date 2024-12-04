@@ -30,7 +30,8 @@
           //console.log(e.target?.blur())
           document.getElementById("start")?.click()
         }}><FileCodeOutline class="w-4 h-4 me-2 " />{item} 
-          <Button  on:click={()=>{
+          <Button  on:click={(e)=>{
+            e.stopPropagation()
             if(confirm("Remove "+item)){
               removeStorage(item); 
               document.getElementById("start")?.click()

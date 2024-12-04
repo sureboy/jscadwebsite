@@ -133,12 +133,12 @@ const updataCode = (hash:string)=>{
         }
         break
       default:
-        const code = window.localStorage.getItem(hashName[0])
+        const code = window.localStorage.getItem(firstName)
         if (!code){   
-          getRemote(hashName[0])
-          return
-        }
-        StoreCode3Dview.set({code,show:true,name:hashName[0]})
+          getRemote(firstName)
+          //return
+        }else
+        StoreCode3Dview.set({code,show:true,name:firstName})
         //StoreInputCode.set(code);
         break
     }
