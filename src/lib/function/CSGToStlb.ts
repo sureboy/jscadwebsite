@@ -1,5 +1,5 @@
 import pkg from '@jscad/modeling';
-const {geometries,modifiers,utils} = pkg; 
+const {geometries,modifiers,utils} = pkg;  
 const toArray = (array:any) => {
     if (Array.isArray(array)) return array
     if (array === undefined || array === null) return []
@@ -9,9 +9,11 @@ const toArray = (array:any) => {
     options.statusCallback && options.statusCallback({ progress: 0 })
     objects = utils.flatten(objects)
 
+    //modifiers.generalize.generalize
   // convert only 3D geometries
-  let objects3d = objects.filter((object:any) => geometries.geom3.isA(object))
-     objects3d = toArray(modifiers.generalize({ snap: true, triangulate: true }, objects))
+    let objects3d = objects.filter((object:any[]) => geometries.geom3.isA(object))
+    objects3d = modifiers.generalize({ snap: true, triangulate: true,simplify:false }, objects3d)
+     objects3d = toArray(objects3d)
     
     // first check if the host is little-endian:
     const buffer = new ArrayBuffer(4)

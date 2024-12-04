@@ -1,14 +1,12 @@
 import {StringToClass} from '$lib/function/storage'
 //import {serialize} from "@jscad/stl-serializer"   
 import {serializeBinary} from "$lib/function/CSGToStlb"   
-import { CSG } from 'three-csg-ts';
+//import { CSG } from 'three-csg-ts';
 import {CSG2Vertices,CSGSides2LineSegmentsVertices,CSG2LineVertices,CSG2Three,CSG2ThreeArray} from "$lib/function/csg2Three"  
 import {regexpGetClass} from "$lib/function/share"  
 import pkg from '@jscad/modeling';
 import { STLExporter } from 'three/addons/exporters/STLExporter.js';
-import {
-    Group   
-} from "three"; 
+//import {  Group   } from "three"; 
 //const group = new Group()
 //group
 //import { OBJExporter } from 'three/addons/exporters/OBJExporter.js';
