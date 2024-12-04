@@ -84,7 +84,8 @@ const getRemote = (k:string)=>{
         workerPostMessage({code:codes[i],name:codeN,show:false})
             
       })
-      StoreInputCode.set(codes[0]);
+      workerPostMessage({code:codes[0],name:titles[0],show:true})
+      //StoreInputCode.set(codes[0]);
   
     }).catch(e=>{
       console.log(e)
