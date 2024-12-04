@@ -99,8 +99,9 @@ const getRemote = (k:string)=>{
 }
 const getQrcode = (k:string,oldk:string)=>{
   //const k =hashName[1]   
-  StoreInputCode.set(window.localStorage.getItem(oldk)||""); 
-  $StoreAlertMsg.name = oldk
+  workerPostMessage({code:window.localStorage.getItem(oldk),name:oldk,show:true})
+  //StoreInputCode.set(window.localStorage.getItem(oldk)||""); 
+  //$StoreAlertMsg.name = oldk
   remoteName = "#"+k
   QRCode.toCanvas(canvas, `${$page.url.origin}/#${k}`, function (error) {
     if (error) console.error(error)
