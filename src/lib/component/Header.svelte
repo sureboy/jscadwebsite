@@ -1,10 +1,11 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { createEventDispatcher } from 'svelte';
-  import {  PlayOutline, QrCodeOutline, TrashBinOutline,  DownloadOutline ,PlusOutline,ChevronDownOutline , BookOpenOutline, FileCodeOutline ,EditOutline,GridPlusOutline,CloudArrowUpOutline} from 'flowbite-svelte-icons';
+  import {PrinterOutline, CameraPhotoOutline, PlayOutline, QrCodeOutline, TrashBinOutline,  DownloadOutline ,PlusOutline,ChevronDownOutline , BookOpenOutline, FileCodeOutline ,EditOutline,GridPlusOutline,CloudArrowUpOutline} from 'flowbite-svelte-icons';
   import {  Navbar,Alert  ,Dropdown, DropdownItem,Spinner,DropdownDivider,Button, Modal,  Checkbox ,ButtonGroup} from 'flowbite-svelte';   
   import {getStoragelist,removeStorage,StoreHelpHidden,StoreInputCode,StoreAlertMsg,StoreCode3Dview,ClassToString} from "$lib/function/storage"   
   let formModal = false; 
+  let active = false
   //let waitting = false
   let QrCodeMap:Map<string,string> 
   
@@ -24,19 +25,22 @@
     <ButtonGroup  size="sm"  >
       <Button     color="light" id="start" > <GridPlusOutline  />  <ChevronDownOutline   /></Button>
       <Dropdown    >    
-        <DropdownItem class="flex items-center  gap-2" href="#new"  ><PlusOutline class="w-4 h-4 me-2" /> </DropdownItem>            
-        {#each getStoragelist() as item}
-        <DropdownItem class="flex items-center gap-2"    href="#{item}" on:click={(e)=>{
-          //console.log(e.target?.blur())
+        <DropdownItem class="flex items-center  gap-2" href="#new"  on:click={(e)=>{ 
           document.getElementById("start")?.click()
-        }}><FileCodeOutline class="w-4 h-4 me-2 " />{item} 
+        }} ><PlusOutline class="w-4 h-4 me-2" /> </DropdownItem>            
+        {#each getStoragelist() as item}
+        <DropdownItem   class="flex items-center gap-2" >
+          <ButtonGroup  size="sm"  >
+        <Button href="#{item}"  on:click={(e)=>{ 
+          document.getElementById("start")?.click()
+        }}><FileCodeOutline class="w-4 h-4 me-2 " />{item} </Button>
           <Button  on:click={(e)=>{
-            e.stopPropagation()
             if(confirm("Remove "+item)){
               removeStorage(item); 
               document.getElementById("start")?.click()
               //location.reload()
           }}}><TrashBinOutline  class="w-4 h-4 me-2 " /> </Button>
+          </ButtonGroup>
         </DropdownItem> 
         {/each} 
         <DropdownDivider  />    
@@ -70,9 +74,9 @@
         //$StoreAlertMsg.waitting = true
         StoreCode3Dview.set({code:"",stl:true,name:$StoreAlertMsg.name})
       }     
-    }>STL</DropdownItem>
+    }><PrinterOutline class="w-4 h-4 me-2" />STL</DropdownItem>
     <DropdownItem class="flex items-center gap-2" on:click={()=>{
-      const file = new File([getValue($StoreAlertMsg.name)], $StoreAlertMsg.name+".webcad", {
+      const file = new File([getValue($StoreAlertMsg.name)], $StoreAlertMsg.name+".solid", {
         type: 'text/plain',
       }); 
       let aTag = document.createElement('a'); 
@@ -81,12 +85,13 @@
       aTag.href = href;
       aTag.click();
       URL.revokeObjectURL(href); 
-    }}>
+    }}><FileCodeOutline class="w-4 h-4 me-2" />
     CODE
     </DropdownItem>
     <DropdownItem class="flex items-center gap-2" on:click={()=>{
       screenHandle()
     }}>
+    <CameraPhotoOutline class="w-4 h-4 me-2" />
     PNG
     </DropdownItem>
     <DropdownItem class="flex items-center gap-2"   on:click={()=>{
