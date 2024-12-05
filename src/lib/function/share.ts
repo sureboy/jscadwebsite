@@ -3,8 +3,9 @@ import type {Geometry } from '@jscad/modeling/src/geometries/types';
 
 import type {csgObj} from "$lib/function/csg2Three"  
 //export const solidB = new solidBase()
-export type CodeToWorker = {code:string,name?:string,show?:boolean,stl?:boolean  }
-export type  WorkerMsg = {Flist?:string[][],code?:string,name?:string,ver?:csgObj,stl?: BlobPart[],errMsg?:string,end?:boolean,start?:boolean,index?:number,mesh?:any }
+export type CodeToWorker = {code:string,name?:string,show?:boolean,stl?:boolean ,camera?:boolean }
+export type  WorkerMsg = {Flist?:string[][],code?:string,name?:string,ver?:csgObj,stl?: BlobPart[],
+  errMsg?:string,end?:boolean,start?:boolean,camera?:boolean }
 export type AlertMsgType = {waitting:boolean,errMsg:string ,name:string}
 //export let AlertMsg:AlertMsgType={waitting:false,errMsg:"3D Create" }
 export interface SearchDataCallback {

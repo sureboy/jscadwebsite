@@ -37,7 +37,7 @@ let canvas:HTMLElement;
 let remoteName = ""
 formModal = true 
 waitting = true
-//let ischange = true
+//let ischange = false
 
 
 onDestroy(()=>{
@@ -205,6 +205,7 @@ const workerMessage = (e:MessageEvent<WorkerMsg>)=>{
   }
   if (e.data.start && el){
     startSceneOBJ(el) 
+    //ischange=true
   }
   if (e.data.ver){
     $StoreAlertMsg.waitting = true; 
@@ -222,8 +223,9 @@ const workerMessage = (e:MessageEvent<WorkerMsg>)=>{
   //console.log(e.data)
   if (e.data.end){
     $StoreAlertMsg.waitting = false; 
-    if (el  )  {
-      onWindowResize(el)	
+    if (el   )  {
+      onWindowResize(el,!e.data.camera)	
+      //ischange=false
       //ischange=false
     } 
    

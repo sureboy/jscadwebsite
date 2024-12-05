@@ -77,7 +77,7 @@
     window.document.addEventListener("keydown",(e) => {     
       if (e.ctrlKey && (e.code=="KeyS")){
         e.preventDefault();    
-        StoreCode3Dview.set({code:getValue(),show:true,name:$StoreAlertMsg.name}) 
+        StoreCode3Dview.set({code:getValue(),show:true,name:$StoreAlertMsg.name,camera:true}) 
         return
       }  
     })

@@ -12,11 +12,11 @@ import {
 //import {	
 //  WebGPURenderer
 //} from "three/webgpu"
-import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js'
+//import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
 //const cube = new Mesh(geometry, material);
-const loader = new STLLoader()
+//const loader = new STLLoader()
 
 const scene = new Scene();
 const group = new Group();
@@ -47,20 +47,16 @@ const animate = (t:number) => {
 };
   
 export function onWindowResize(el: HTMLCanvasElement,changeCamera:boolean = true) {
-
 	if (!renderer)return;
 	const fobj = new Box3().setFromObject(group)
 	const sceneSize = fobj.getSize(new Vector3())
-	
-	const size = sceneSize.length();
-	const fov =  camera.fov*(Math.PI /180); 
-	if (!size)
-		camera.position.z=10
-	else
-		camera.position.z = size /2/Math.tan(fov/2); 		 
-
-	camera.aspect = el.width/el.height
-	camera.updateProjectionMatrix()
+	if (changeCamera){
+		const size = sceneSize.length();
+		const fov =  camera.fov*(Math.PI /180); 	 
+		camera.position.z = size /2/Math.tan(fov/2); 	
+		camera.aspect = el.width/el.height
+		camera.updateProjectionMatrix()
+	}
 	renderer.setSize(el.width,el.height)	
 	renderer.render(scene, camera)
 }

@@ -56,7 +56,7 @@
         //dispatch('viewCode');$page.url
         if ($StoreAlertMsg.name !== $page.url.hash.substring(1)) return
         //console.log(e,$page.url.hash)
-        StoreCode3Dview.set({code:getValue(),show:true,name:$StoreAlertMsg.name})   
+        StoreCode3Dview.set({code:getValue(),show:true,name:$StoreAlertMsg.name,camera:false})   
         StoreInputCode.set("");   
       }}><PlayOutline   /><p class="truncate max-w-20">{$StoreAlertMsg.name}</p></Button>
      
