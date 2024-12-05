@@ -37,6 +37,7 @@ let canvas:HTMLElement;
 let remoteName = ""
 formModal = true 
 waitting = true
+//let ischange = true
 
 
 onDestroy(()=>{
@@ -168,6 +169,7 @@ onMount(()=>{
   container.appendChild(el)    
   window.addEventListener("hashchange", (e)=>{ 
     //console.log(e)
+    //ischange=true
     updataCode(new URL(e.newURL).hash)
   });
  
@@ -220,7 +222,10 @@ const workerMessage = (e:MessageEvent<WorkerMsg>)=>{
   //console.log(e.data)
   if (e.data.end){
     $StoreAlertMsg.waitting = false; 
-    if (el)   onWindowResize(el)	
+    if (el  )  {
+      onWindowResize(el)	
+      //ischange=false
+    } 
    
   } 
   if (e.data.name){

@@ -1,15 +1,12 @@
 import {
-	//BoxGeometry,
 	DirectionalLight,
 	HemisphereLight,
- 
 	PerspectiveCamera,
 	Scene,
-	WebGLRenderer,
-	//WebGPURenderer,
+	WebGLRenderer, 
 	Box3,
 	Vector3,
- 
+	Group,
     Object3D
 } from "three"; 
 //import {	
@@ -22,6 +19,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 const loader = new STLLoader()
 
 const scene = new Scene();
+const group = new Group();
+
 scene.background = null; 
 const camera = new PerspectiveCamera(50, 1, 0.1, 2000); 
 let renderer:WebGLRenderer;
@@ -31,6 +30,9 @@ const directionalLight = new DirectionalLight( 0xffffff, 0.5 );
 directionalLight.position.set(0, 1, 0)  
 const hemisphereLight = new HemisphereLight(0xffffff, 0x444444);
 hemisphereLight.position.set(1, 1, 1);
+
+scene.add(group,hemisphereLight)
+
 let stopAnimate=true;
 const animate = (t:number) => {
 	if (stopAnimate)return;
@@ -44,61 +46,57 @@ const animate = (t:number) => {
 	OrbControls.update();
 };
   
-export function onWindowResize(el: HTMLCanvasElement) {
+export function onWindowResize(el: HTMLCanvasElement,changeCamera:boolean = true) {
 
 	if (!renderer)return;
+	const fobj = new Box3().setFromObject(group)
+	const sceneSize = fobj.getSize(new Vector3())
+	
+	const size = sceneSize.length();
+	const fov =  camera.fov*(Math.PI /180); 
+	if (!size)
+		camera.position.z=10
+	else
+		camera.position.z = size /2/Math.tan(fov/2); 		 
+
 	camera.aspect = el.width/el.height
 	camera.updateProjectionMatrix()
 	renderer.setSize(el.width,el.height)	
 	renderer.render(scene, camera)
 }
+const initRender = (el:HTMLCanvasElement)=>{
+	renderer = new WebGLRenderer({ antialias: true,alpha:true, canvas: el,preserveDrawingBuffer:true, });
+	OrbControls = new OrbitControls(camera, el); 
+	OrbControls.addEventListener("start",(e)=>{ 
+		if (stopAnimate){
+			stopAnimate=false
+			animate(0)
+		}			
+	})
+	OrbControls.addEventListener("end",(e)=>{ 
+		stopAnimate=true
+	})	
+	onWindowResize(el)
+}
 export const  startSceneOBJ = (el: HTMLCanvasElement)=>{
 	if (el !== _el){
-		renderer = new WebGLRenderer({ antialias: true,alpha:true, canvas: el,preserveDrawingBuffer:true, });
-		OrbControls = new OrbitControls(camera, el);
-		//stopAnimate = true
 		_el = el
-		//OrbControls.enableDamping = true
-		//OrbControls
-		//OrbControls.update();
-		OrbControls.addEventListener("start",(e)=>{ 
-			if (stopAnimate){
-				stopAnimate=false
-				animate(0)
-			}			
-		})
-		OrbControls.addEventListener("end",(e)=>{ 
-			stopAnimate=true
-		})	
+		initRender(el)
+		 
 	}	
-	scene.clear();
-	scene.add(hemisphereLight);
+	group.clear();
+	//group.add(hemisphereLight);
 	//onWindowResize(el)	 
 
 }
 export const  addSceneOBJ = (el: HTMLCanvasElement,...m:Object3D[])=>{
 	if (el !== _el){
-		renderer = new WebGLRenderer({ antialias: true,alpha:true, canvas: el,preserveDrawingBuffer:true, });
-		OrbControls = new OrbitControls(camera, el);
-		//stopAnimate = true
 		_el = el
-		//OrbControls.enableDamping = true
-		//OrbControls
-		//OrbControls.update();
-		OrbControls.addEventListener("start",(e)=>{ 
-			if (stopAnimate){
-				stopAnimate=false
-				animate(0)
-			}			
-		})
-		OrbControls.addEventListener("end",(e)=>{ 
-			stopAnimate=true
-		})	
+		initRender(el)
 	}	
-	//scene.clear();
-	//scene.add(hemisphereLight);
-	//console.log(m)
-	scene.add(...m )
+ 
+	group.add(...m )
+	return
 	const fobj = new Box3().setFromObject(scene)
 	const sceneSize = fobj.getSize(new Vector3())
 	const size = sceneSize.length();
@@ -106,24 +104,14 @@ export const  addSceneOBJ = (el: HTMLCanvasElement,...m:Object3D[])=>{
 	camera.position.z = size /2/Math.tan(fov/2); 
 	//console.log(camera.position,camera.fov,camera)
 	 
-	onWindowResize(el)	 
+	//onWindowResize(el)	 
 
 }
 
 export const createSceneOBJ = (el: HTMLCanvasElement,m:Object3D[],backData:Function ) => { 
 	if (el !== _el){
-		renderer = new WebGLRenderer({ antialias: true,alpha:true, canvas: el,preserveDrawingBuffer:true, });
-		OrbControls = new OrbitControls(camera, el); 
-		_el = el 
-		OrbControls.addEventListener("start",(e)=>{ 
-			if (stopAnimate){
-				stopAnimate=false
-				animate(0)
-			}			
-		})
-		OrbControls.addEventListener("end",(e)=>{ 
-			stopAnimate=true
-		})	 
+		_el = el
+		initRender(el)
 		
 	}	
 	scene.clear();
