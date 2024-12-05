@@ -35,7 +35,9 @@ export const StringToClass = (data:string,name:string,errMsg:Function)=>{
     solidB[name] = obje  
     return obje 
   }catch(e:any){
-    errMsg("err line:"+e.lineNumber+"<br/>"+e.toString())
+    errMsg(e)
+ 
+ 
     return null
   }
 }

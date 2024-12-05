@@ -60,6 +60,36 @@ const getCsgObjArray = (db:any[],back:Function)=>{
         back(<WorkerMsg>{errMsg:e.toString(),end:true})
     } 
 }
+function getStack(error:Error) {
+    const orig = Error.prepareStackTrace;
+    Error.prepareStackTrace = (_, stack) => stack;
+    const stack = error.stack;
+    Error.prepareStackTrace = orig;
+    return stack;
+  }
+const handErr = (e:any)=>{
+    let line = null
+
+    if (e.line) line = e.line
+    else if (e.lineNumber) line = e.lineNumber
+    
+    if (line)
+        return "line:"+line+"<br/>"+e.toString() 
+    if (e.stack){
+        Error.prepareStackTrace = (_, stack) => {
+            return stack.map((s) => ({
+              filename: s.getFileName(),
+              methodName: s.getMethodName(),
+              functionName: s.getFunctionName(),
+              lineNumber: s.getLineNumber(),
+              columnNumber: s.getColumnNumber(),
+            }));
+          };
+       
+        return "line:"+e.stack[0].lineNumber  + "<br/>"+e.toString()
+    } 
+    return e.toString()
+}
 const handCode  = (data:CodeToWorker,port:any)=>{
     if (data.stl&&data.name && tmpdb.length>0){
         //const group = new Group()
@@ -92,7 +122,7 @@ const handCode  = (data:CodeToWorker,port:any)=>{
     //}
     //console.log(data)
     const obj = StringToClass(data.code,data.name,(e:any)=>{
-        port.postMessage(<WorkerMsg>{errMsg:e})
+        port.postMessage(<WorkerMsg>{errMsg:handErr(e)})
         //Console(e)
     })
     //if(AlertMsg.errMsg){
@@ -123,7 +153,8 @@ const handCode  = (data:CodeToWorker,port:any)=>{
        
 
     }catch(e:any){
-        port.postMessage(<WorkerMsg>{errMsg:"err line:"+e.lineNumber+"<br/>"+e.toString(),end:true})
+
+        port.postMessage(<WorkerMsg>{errMsg:handErr(e),end:true})
         return
     }
     //group.clear()
