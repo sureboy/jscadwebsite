@@ -106,7 +106,7 @@
     </ButtonGroup>
   
   {#if  $StoreAlertMsg.waitting} <Spinner color="gray" />{/if}
-  {#if  $StoreAlertMsg.errMsg}<Alert color="red">{$StoreAlertMsg.errMsg}</Alert>{/if}
+  {#if  $StoreAlertMsg.errMsg}<Alert color="red">{@html $StoreAlertMsg.errMsg}</Alert>{/if}
 </Navbar>
 <Modal bind:open={formModal} size="xs" autoclose={false} class="w-full pointer-events-auto" >
    

@@ -19,14 +19,15 @@ export const StringToClass = (data:string,name:string,errMsg:Function)=>{
   if (!name)return; 
   console.log = function (...message) {
     errMsg(message)
-   
-    //port.postMessage(<WorkerMsg>{errMsg:AlertMsg.errMsg})
-  
   }
+  let obj
   try{  
    
-    const obj = eval(`(()=>{${data};return ${name} })()`)   
-    
+    obj = eval(`(()=>{${data};return ${name} })()`)   
+  }catch(e:any){
+    errMsg("err line:"+e.lineNumber+"<br/>"+e.toString())
+    return null
+  }
     obj.prototype.__proto__ = solidB 
    
  
@@ -41,12 +42,7 @@ export const StringToClass = (data:string,name:string,errMsg:Function)=>{
     obje.Flist = Flist 
     solidB[name] = obje  
     return obje 
-  }catch(e:any){
-    errMsg(e)
-    //msg.errMsg = e.toString()  
-    console.log(e)
-    return null
-  }
+
 }
 const classToStringEach = (val:string,f:Function)=>{
   const item = val.matchAll(/(?<=this\.)[\w\$]+/g)

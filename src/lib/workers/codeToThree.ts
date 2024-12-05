@@ -123,7 +123,7 @@ const handCode  = (data:CodeToWorker,port:any)=>{
        
 
     }catch(e:any){
-        port.postMessage(<WorkerMsg>{errMsg:e.toString(),end:true})
+        port.postMessage(<WorkerMsg>{errMsg:"err line:"+e.lineNumber+"<br/>"+e.toString(),end:true})
         return
     }
     //group.clear()
