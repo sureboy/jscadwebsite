@@ -19,18 +19,10 @@ export const StringToClass = (data:string,name:string,errMsg:Function)=>{
   if (!name)return; 
   console.log = function (...message) {
     errMsg(message)
-  }
-  let obj
-  try{  
-   
-    obj = eval(`(()=>{${data};return ${name} })()`)   
-  }catch(e:any){
-    errMsg("err line:"+e.lineNumber+"<br/>"+e.toString())
-    return null
-  }
-    obj.prototype.__proto__ = solidB 
-   
- 
+  }   
+  try{     
+    const obj = eval(`(()=>{${data};return ${name} })()`)   
+    obj.prototype.__proto__ = solidB  
     const obje = new obj as solidEditStruct 
     let Flist = Object.getOwnPropertyNames(obj.prototype).map((v)=>{
       //if (v!=="constructor")
@@ -42,7 +34,10 @@ export const StringToClass = (data:string,name:string,errMsg:Function)=>{
     obje.Flist = Flist 
     solidB[name] = obje  
     return obje 
-
+  }catch(e:any){
+    errMsg("err line:"+e.lineNumber+"<br/>"+e.toString())
+    return null
+  }
 }
 const classToStringEach = (val:string,f:Function)=>{
   const item = val.matchAll(/(?<=this\.)[\w\$]+/g)
