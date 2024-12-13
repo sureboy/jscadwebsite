@@ -17,9 +17,9 @@
 </script>
 <script lang="ts"> 
 import {mimeType} from "@jscad/stl-serializer"  
-import {CSG2Three,getMesh} from "$lib/function/csg2Three"   
+import {CSG2Three} from "$lib/function/csg2Three"   
 import { page } from '$app/stores';
-import {StoreCode3Dview,saveStorage,initMySolid,StoreAlertMsg,StoreMyClass,StoreInputCode,solid} from "$lib/function/storage"
+import {StoreCode3Dview,saveStorage,initMySolid,StoreAlertMsg,StoreMyClass,StoreInputCode,solid,StoreOrthographic} from "$lib/function/storage"
 import {onWindowResize,startSceneOBJ,addSceneOBJ} from "$lib/function/threeScene" 
 import { createCanvasElement } from "three";
 import { onMount ,onDestroy} from 'svelte';  
@@ -38,6 +38,9 @@ let remoteName = ""
 formModal = true 
 waitting = true
 //let ischange = false
+StoreOrthographic.subscribe(o=>{
+  if (el)  onWindowResize(el,true,o)
+})
 
 
 onDestroy(()=>{

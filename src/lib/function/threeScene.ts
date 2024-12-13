@@ -2,6 +2,7 @@ import {
 	DirectionalLight,
 	HemisphereLight,
 	PerspectiveCamera,
+	OrthographicCamera,
 	Scene,
 	WebGLRenderer, 
 	Box3,
@@ -22,7 +23,10 @@ const scene = new Scene();
 const group = new Group();
 
 scene.background = null; 
-const camera = new PerspectiveCamera(50, 1, 0.1, 2000); 
+
+const cameraP = new PerspectiveCamera(50, 1, 0.1, 2000); 
+const camerak = new OrthographicCamera()
+let camera:any =cameraP ; 
 let renderer:WebGLRenderer;
 let OrbControls:OrbitControls;
 let _el: HTMLCanvasElement;
@@ -46,22 +50,38 @@ const animate = (t:number) => {
 	OrbControls.update();
 };
   
-export function onWindowResize(el: HTMLCanvasElement,changeCamera:boolean = true) {
+export function onWindowResize(el: HTMLCanvasElement,changeCamera:boolean = true,orthographic:boolean=false) {
 	if (!renderer)return;
 	const fobj = new Box3().setFromObject(group)
 	const sceneSize = fobj.getSize(new Vector3())
-	if (changeCamera){
-		const size = sceneSize.length();
-		const fov =  camera.fov*(Math.PI /180); 	 
-		camera.position.z = size /2/Math.tan(fov/2); 	
-		camera.aspect = el.width/el.height
-		camera.updateProjectionMatrix()
+	console.log(el.width,el.height)
+	if (orthographic){
+		const k = el.width/el.height
+		const s = 200
+		camera = new OrthographicCamera( -s *k,s*k,s,-s,1,1000)
+		if (changeCamera){
+			camera.position.set(200,300,200);
+			camera.lookAt(scene.position)			
+		}
+	}else{
+		camera = cameraP
+		if (changeCamera){
+			const size = sceneSize.length();
+			const fov =  camera.fov*(Math.PI /180); 	 
+			camera.position.z = size /2/Math.tan(fov/2); 	
+			camera.aspect = el.width/el.height
+			
+		}
 	}
+	OrbControls.object = camera
+	camera.updateProjectionMatrix()
 	renderer.setSize(el.width,el.height)	
 	renderer.render(scene, camera)
 }
-const initRender = (el:HTMLCanvasElement)=>{
+const initRender = (el:HTMLCanvasElement,orthographic:boolean=false)=>{
 	renderer = new WebGLRenderer({ antialias: true,alpha:true, canvas: el,preserveDrawingBuffer:true, });
+	//camera =orthographic?(new OrthographicCamera(el.width/-2,el.width/2,el.height/2,el.height/-2,1,1000)):(new PerspectiveCamera(50, 1, 1, 1000)); 
+	
 	OrbControls = new OrbitControls(camera, el); 
 	OrbControls.addEventListener("start",(e)=>{ 
 		if (stopAnimate){
@@ -72,7 +92,8 @@ const initRender = (el:HTMLCanvasElement)=>{
 	OrbControls.addEventListener("end",(e)=>{ 
 		stopAnimate=true
 	})	
-	onWindowResize(el)
+	onWindowResize(el,true,orthographic)
+	
 }
 export const  startSceneOBJ = (el: HTMLCanvasElement)=>{
 	if (el !== _el){
@@ -93,32 +114,6 @@ export const  addSceneOBJ = (el: HTMLCanvasElement,...m:Object3D[])=>{
  
 	group.add(...m )
 	return
-	const fobj = new Box3().setFromObject(scene)
-	const sceneSize = fobj.getSize(new Vector3())
-	const size = sceneSize.length();
-	const fov =  camera.fov*(Math.PI /180); 
-	camera.position.z = size /2/Math.tan(fov/2); 
-	//console.log(camera.position,camera.fov,camera)
-	 
-	//onWindowResize(el)	 
 
 }
-
-export const createSceneOBJ = (el: HTMLCanvasElement,m:Object3D[],backData:Function ) => { 
-	if (el !== _el){
-		_el = el
-		initRender(el)
-		
-	}	
-	scene.clear();
-	scene.add(hemisphereLight);
-	//scene.add(directionalLight); 
-	scene.add(...m )
-	const fobj = new Box3().setFromObject(scene)
-	const sceneSize = fobj.getSize(new Vector3())
-	const size = sceneSize.length();
-	const fov =  camera.fov*(Math.PI /180); 
-	camera.position.z = size /2/Math.tan(fov/2);  
-	onWindowResize(el)	  
-	backData(fobj) 
-};
+ 

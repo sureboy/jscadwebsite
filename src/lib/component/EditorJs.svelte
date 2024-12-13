@@ -1,5 +1,6 @@
 <script context="module" lang="ts" >
   let editor:EditorView|null;
+  let isOrthographic = false
   export const getValue = (name?:string) => {
     let val = editor?.state.doc.toString()
     if (val)return val
@@ -16,15 +17,11 @@
   import {indentWithTab} from "@codemirror/commands"
   import type { CompletionContext } from '@codemirror/autocomplete'     
   import { onMount } from 'svelte'
-	import {StoreInputCode,StoreCode3Dview,StoreMyClass,StoreAlertMsg} from "$lib/function/storage"  
+	import {StoreInputCode,StoreCode3Dview,StoreMyClass,StoreAlertMsg,StoreOrthographic} from "$lib/function/storage"  
   export let inputList:Map<string, any>; 
-
   let element:HTMLElement;
-
   let nodeElement:HTMLElement;
-  const optReg=/(?<=const\s+defaults\s+\=\s+)\{[^\}]+\}/m
-
- 
+  const optReg=/(?<=const\s+defaults\s+\=\s+)\{[^\}]+\}/m 
     
   const setValue = (val: string) => {
       editor?.dispatch({ changes: { from: 0, to: editor.state.doc.length, insert: val } })
@@ -75,11 +72,22 @@
   })
   onMount(()=>{
     window.document.addEventListener("keydown",(e) => {     
-      if (e.ctrlKey && (e.code=="KeyS")){
-        e.preventDefault();    
-        StoreCode3Dview.set({code:getValue(),show:true,name:$StoreAlertMsg.name,camera:true}) 
-        return
-      }  
+      if (e.ctrlKey ){
+        if (e.code=="KeyS"){
+          e.preventDefault();    
+          StoreCode3Dview.set({code:getValue(),show:true,name:$StoreAlertMsg.name,camera:true}) 
+          return
+        }else if (e.code=="KeyK"){
+          e.preventDefault()
+          if ($StoreOrthographic){
+            $StoreAlertMsg.errMsg = "Ctrl+K 透视"
+          }else{
+            $StoreAlertMsg.errMsg = "Ctrl+K 正交"
+          }
+          $StoreOrthographic  = !$StoreOrthographic
+          return
+        }
+      } 
     })
     editor =   new EditorView({
       extensions: [

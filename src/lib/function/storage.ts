@@ -4,15 +4,17 @@ import {solidLogo} from './solidClass'
 
 export const StoreInputCode = writable(""); 
 export const StoreHelpHidden = writable(true); 
+export const StoreOrthographic = writable(false)
 
 export const StoreCode3Dview = writable<CodeToWorker>({code:""});
-export const StoreAlertMsg = writable<AlertMsgType>( {waitting:false,errMsg:"",name:"" });
+export const StoreAlertMsg = writable<AlertMsgType>( {waitting:false,errMsg:"",name:""});
 export const StoreMyClass = writable<Map<string, any>>(new Map())  
 export const solidB = new solidLogo() as solidEditStruct 
 export const solid =(name?:string )=> {
   return `const ${name?name:"solid"}=class{\n\/\/Input Ctrl+S perview and save this solid\n main(){\n return [this.cube({size:200,center:[0,0,0]})]\n};\n}`
 }
 const Console = console.log
+ 
  
  
 export const StringToClass = (data:string,name:string,errMsg:Function)=>{
