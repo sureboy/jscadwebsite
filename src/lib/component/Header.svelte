@@ -4,6 +4,7 @@
   import { GridSolid,WindowsSolid, PrinterOutline,  PlayOutline, QrCodeOutline, TrashBinOutline,  DownloadOutline ,PlusOutline,ChevronDownOutline , BookOpenOutline, FileCodeOutline ,EditOutline,GridPlusOutline,CloudArrowUpOutline, FileImageOutline} from 'flowbite-svelte-icons';
   import { Input, Navbar,Alert  ,Dropdown, DropdownItem,Spinner,DropdownDivider,Button, Modal,  Checkbox ,ButtonGroup} from 'flowbite-svelte';   
   import {StoreOrthographic,getStoragelist,removeStorage,StoreHelpHidden,StoreInputCode,StoreAlertMsg,StoreCode3Dview,ClassToString} from "$lib/function/storage"   
+   
   let formModal = false; 
   //let active = false
   //let waitting = false
@@ -118,11 +119,8 @@
     <QrCodeOutline class="w-4 h-4 me-2" />Url </DropdownItem>
 
   </Dropdown>
- 
-   {/if}    
-    </ButtonGroup>
-
-    <Button color="light"  on:click={()=>{
+   
+    <Button color="light" size="sm"  on:click={()=>{
        $StoreOrthographic  = !$StoreOrthographic
  
     }}>
@@ -131,10 +129,13 @@
       {:else}
       <GridSolid class="w-4 h-4 me-2" />
     {/if}
-    Ctrl +k
+    {#if window.innerWidth>window.innerHeight}
+    Ctrl+k
+    {/if}
      
-    </Button>
-  
+    </Button> {/if}  
+  </ButtonGroup>
+   
   {#if  $StoreAlertMsg.waitting} <Spinner color="gray" />{/if}
   {#if  $StoreAlertMsg.errMsg}<Alert color="red">{@html $StoreAlertMsg.errMsg}</Alert>{/if}
 </Navbar>
