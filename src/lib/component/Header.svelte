@@ -2,13 +2,13 @@
   import { page } from '$app/stores';
   import { createEventDispatcher } from 'svelte';
   import {PrinterOutline,  PlayOutline, QrCodeOutline, TrashBinOutline,  DownloadOutline ,PlusOutline,ChevronDownOutline , BookOpenOutline, FileCodeOutline ,EditOutline,GridPlusOutline,CloudArrowUpOutline, FileImageOutline} from 'flowbite-svelte-icons';
-  import {  Navbar,Alert  ,Dropdown, DropdownItem,Spinner,DropdownDivider,Button, Modal,  Checkbox ,ButtonGroup} from 'flowbite-svelte';   
+  import { Input, Navbar,Alert  ,Dropdown, DropdownItem,Spinner,DropdownDivider,Button, Modal,  Checkbox ,ButtonGroup} from 'flowbite-svelte';   
   import {getStoragelist,removeStorage,StoreHelpHidden,StoreInputCode,StoreAlertMsg,StoreCode3Dview,ClassToString} from "$lib/function/storage"   
   let formModal = false; 
   //let active = false
   //let waitting = false
   let QrCodeMap:Map<string,string> 
-  
+  let inputRCode = ""
   //export let elCanvas:HTMLCanvasElement|null
   export let getValue:(name?:string)=>string 
  
@@ -25,9 +25,21 @@
     <ButtonGroup  size="sm"  >
       <Button     color="light" id="start" > <GridPlusOutline  />  <ChevronDownOutline   /></Button>
       <Dropdown    >    
-        <DropdownItem class="flex items-center  gap-2" href="#new"  on:click={(e)=>{ 
-          document.getElementById("start")?.click()
-        }} ><PlusOutline class="w-4 h-4 me-2" /> </DropdownItem>            
+        <DropdownItem     class="flex items-center  gap-2" >
+          <Input type="text"   id="inputR"  bind:value={inputRCode} on:blur={(e)=>{
+            if (!inputRCode)return           
+            if (!inputRCode.startsWith("#")) inputRCode="#"+inputRCode
+            let aTag = document.createElement('a'); 
+            aTag.href = inputRCode;
+            aTag.click();   
+          }}  on:keydown={(e)=>{
+            if (e.code === "Enter" ){
+              document.getElementById("start")?.click()
+            }
+          }} > </Input><Button href="#new" size="sm"  on:click={()=>{
+            document.getElementById("start")?.click()
+          }}><PlusOutline class="w-4 h-4 me-2" /></Button> 
+        </DropdownItem>     
         {#each getStoragelist() as item}
         <DropdownItem   class="flex items-center gap-2" >
           <ButtonGroup  size="sm"  >
