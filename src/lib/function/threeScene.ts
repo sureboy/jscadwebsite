@@ -24,7 +24,7 @@ const group = new Group();
 
 scene.background = null; 
 
-const cameraP = new PerspectiveCamera(50, 1, 0.1, 2000); 
+const cameraP = new PerspectiveCamera(50, 1, 1, 1000); 
 const camerak = new OrthographicCamera()
 let camera:any =cameraP ; 
 let renderer:WebGLRenderer;
@@ -54,7 +54,7 @@ export function onWindowResize(el: HTMLCanvasElement,changeCamera:boolean = true
 	if (!renderer)return;
 	const fobj = new Box3().setFromObject(group)
 	const sceneSize = fobj.getSize(new Vector3())
-	console.log(el.width,el.height)
+	//console.log(el.width,el.height)
 	if (orthographic){
 		const k = el.width/el.height
 		const s = 200

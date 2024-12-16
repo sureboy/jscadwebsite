@@ -1,7 +1,7 @@
-<script context="module" lang="ts" >
-  let editor:EditorView|null;
-  let isOrthographic = false
+<script context="module" lang="ts" > 
+  let editor:EditorView|null; 
   export const getValue = (name?:string) => {
+  
     let val = editor?.state.doc.toString()
     if (val)return val
     if (!name)return ""
@@ -32,7 +32,9 @@
       if (tmpval && $StoreAlertMsg.name){
         window.localStorage.setItem($StoreAlertMsg.name,tmpval)
       }
+      
 			if (element)element.style.visibility = "collapse";
+      setValue("")
 			return;
 		} 
 		//StoreCode3Dview.set({code:t,show:true})
@@ -75,14 +77,14 @@
       if (e.ctrlKey ){
         if (e.code=="KeyS"){
           e.preventDefault();    
-          StoreCode3Dview.set({code:getValue(),show:true,name:$StoreAlertMsg.name,camera:true}) 
+          StoreCode3Dview.set({code:getValue(),show:true ,camera:true}) 
           return
         }else if (e.code=="KeyK"){
           e.preventDefault()
           if ($StoreOrthographic){
-            $StoreAlertMsg.errMsg = "Ctrl+K 透视"
+            $StoreAlertMsg.errMsg = "Ctrl+k 正交"
           }else{
-            $StoreAlertMsg.errMsg = "Ctrl+K 正交"
+            $StoreAlertMsg.errMsg = "Ctrl+k 透视"
           }
           $StoreOrthographic  = !$StoreOrthographic
           return

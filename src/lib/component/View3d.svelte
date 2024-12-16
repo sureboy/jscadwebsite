@@ -23,6 +23,8 @@ import {StoreCode3Dview,saveStorage,initMySolid,StoreAlertMsg,StoreMyClass,Store
 import {onWindowResize,startSceneOBJ,addSceneOBJ} from "$lib/function/threeScene" 
 import { createCanvasElement } from "three";
 import { onMount ,onDestroy} from 'svelte';  
+
+import {regClassName} from '$lib/function/share'
 import type {CodeToWorker,WorkerMsg} from '$lib/function/share' 
 import {  Modal,Spinner ,Button } from 'flowbite-svelte';  
 import   QRCode  from 'qrcode';   
@@ -62,45 +64,39 @@ const workerPostMessage = (v:any)=>{
   }    
 }
 const getRemote = (k:string)=>{
-
+  const n = k.split("__")
+  const l = n.length
+  if (l<2){
+    $StoreAlertMsg.errMsg="found not code"
+    return 
+  }
+  const name = n[l-1]
   fetch(`https://db.solidjscad.com/?url=${encodeURI($page.url.origin)}&k=${k}`).then((r)=>{     
-    waitting =false 
-    formModal=false
+ 
     r.arrayBuffer().then((v)=>{ 
-      const fl = (new TextDecoder('utf-8')).decode(v).split("\n======\n")
-      let codes = fl.slice(1)
-      let titles = fl[0].split(",")
-      const name = k.split("__")
-      titles = titles.map((vn)=>{
-        //vn = vn.split("_")[0]+"_"+name[1]
-        let newName=vn.split("__")[0]+"__"+name[1]
-   
-        if (vn !== newName){
-          codes = codes.map((code_val)=>{
-            return code_val.replaceAll(vn,newName)
-          })
-        } 
-        return newName
-      })
-      titles.forEach((codeN,i)=>{
-        window.localStorage.setItem(codeN,codes[i])
-        //console.log(codeN,codes[i])
-        workerPostMessage({code:codes[i],name:codeN,show:false})
-            
-      })
-      workerPostMessage({code:codes[0],name:titles[0],show:true})
+      const [t,...codes] = (new TextDecoder('utf-8')).decode(v).split("\n======\n") 
+      let titles = t.split(",")  
+      //let mainCode =  {code:codes.shift(),name:k,show:true}
+ 
+      for (let i in titles){  
+        workerPostMessage({code:codes[i],name:titles[i]+"__"+name,show:false})            
+      }     
+      workerPostMessage({code:codes[0],name:titles[0]+"__"+name,show:true})
       //StoreInputCode.set(codes[0]);
   
     }).catch(e=>{
+      $StoreAlertMsg.errMsg=e
       console.log(e)
     })
-  }).catch(()=>{
-
+  }).catch((e)=>{
+    $StoreAlertMsg.errMsg=e
+    return 
   }).finally(()=>{
     waitting=false   
     formModal=false
   })
 }
+
 const getQrcode = (k:string,oldk:string)=>{
   //const k =hashName[1]   
   workerPostMessage({code:window.localStorage.getItem(oldk),name:oldk,show:true})
@@ -281,8 +277,10 @@ const WorkerInit =(el:HTMLCanvasElement)=>{
     }; 
     //worker.port.start();
     initMySolid((v,k)=>{
+      //console.log(k)
       workerPostMessage({code:v,name:k,show:false})
     })
+    console.log(window.location.hash)
     updataCode(window.location.hash)
   }).catch(()=>{
     //$StoreAlertMsg.errMsg = e.toString()

@@ -1,4 +1,4 @@
-import {StringToClass} from '$lib/function/storage'
+import {StringToClass,Console} from '$lib/function/storage'
 //import {serialize} from "@jscad/stl-serializer"   
 import {serializeBinary} from "$lib/function/CSGToStlb"   
 //import { CSG } from 'three-csg-ts';
@@ -116,11 +116,12 @@ const handCode  = (data:CodeToWorker,port:any)=>{
         port.postMessage(<WorkerMsg>{errMsg:"class declare err"})
         return;
     }
-    if (data.name !== vm[1]) data.name = vm[1]
+    if (!data.name) data.name = vm[1]
+    else  if (data.name !== vm[1]){
+        data.code = data.code.replace(vm[0],vm[0].replace(vm[1],data.name))
+    } 
     port.postMessage(<WorkerMsg>{name:data.name,code:data.code})
-    
-    //}
-    //console.log(data)
+ 
     const obj = StringToClass(data.code,data.name,(e:any)=>{
         port.postMessage(<WorkerMsg>{errMsg:handErr(e)})
         //Console(e)
@@ -128,10 +129,11 @@ const handCode  = (data:CodeToWorker,port:any)=>{
     //if(AlertMsg.errMsg){
     //    port.postMessage(<WorkerMsg>{errMsg:AlertMsg.errMsg})
     //}
+    //Console(obj)
     if (!obj){
         return
     }
-    port.postMessage(<WorkerMsg>{Flist:obj.Flist})
+    if (obj.Flist) port.postMessage(<WorkerMsg>{Flist:obj.Flist})
     //console.log(Object.keys(obj))
     //console.log(obj)
 

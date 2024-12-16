@@ -13,6 +13,9 @@ export interface SearchDataCallback {
   }
 
 export const regexpGetClass = /^\s*const\s+([\w\$]+)\s*=\s*class\s*\{/ 
+export const regClassName = (vn:string)=>{
+ return new RegExp(`(?<=this\\.|\\s)${vn}(?=\\.|\\s*\\=)`,'g')
+}
 export const solidNow:{solid:Geometry[]}={
   solid:[]
 }

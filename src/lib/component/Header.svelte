@@ -5,7 +5,7 @@
   import {  Navbar,Alert  ,Dropdown, DropdownItem,Spinner,DropdownDivider,Button, Modal,  Checkbox ,ButtonGroup} from 'flowbite-svelte';   
   import {getStoragelist,removeStorage,StoreHelpHidden,StoreInputCode,StoreAlertMsg,StoreCode3Dview,ClassToString} from "$lib/function/storage"   
   let formModal = false; 
-  let active = false
+  //let active = false
   //let waitting = false
   let QrCodeMap:Map<string,string> 
   
@@ -56,7 +56,7 @@
         //dispatch('viewCode');$page.url
         if ($StoreAlertMsg.name !== $page.url.hash.substring(1)) return
         //console.log(e,$page.url.hash)
-        StoreCode3Dview.set({code:getValue(),show:true,name:$StoreAlertMsg.name,camera:false})   
+        StoreCode3Dview.set({code:getValue(),show:true ,camera:false})   
         StoreInputCode.set("");   
       }}><PlayOutline   /><p class="truncate max-w-20">{$StoreAlertMsg.name}</p></Button>
      

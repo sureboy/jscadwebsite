@@ -13,44 +13,84 @@ export const solidB = new solidLogo() as solidEditStruct
 export const solid =(name?:string )=> {
   return `const ${name?name:"solid"}=class{\n\/\/Input Ctrl+S perview and save this solid\n main(){\n return [this.cube({size:200,center:[0,0,0]})]\n};\n}`
 }
-const Console = console.log
+export const Console = console.log
  
  
  
 export const StringToClass = (data:string,name:string,errMsg:Function)=>{
-  if (!name)return; 
+   
+  //const ns = name.split("__") 
   console.log = function (...message) {
     errMsg(message)
-  }   
+  }  
+  if (!name){
+    errMsg("name err")
+    return;
+  }
+  let ns = name.split("__").reverse()  
+  if (ns.length===0){
+    errMsg("name err")
+    return
+  }
+  let _name= ns.pop()
+  if (!_name){
+    errMsg("name err")
+    return
+  }
+  let sandbox =solidB
+  //let fsandbox = solidB
+  let FlistName = ["this" ]
+  for (let n of ns){
+    if (!n)continue
+    if (Object.hasOwn(sandbox,n)){
+      //fsandbox = sandbox
+      sandbox = sandbox[n]
+    }else{
+      let o = Object.create({})
+      sandbox[n] =o
+      //fsandbox = sandbox
+      sandbox=o
+    }
+    FlistName.push(n)  
+  }
+  FlistName.push(_name)
+      
+  let obj 
   try{     
-    const obj = eval(`(()=>{${data};return ${name} })()`)   
-    obj.prototype.__proto__ = solidB  
-    const obje = new obj as solidEditStruct 
-    let Flist = Object.getOwnPropertyNames(obj.prototype).map((v)=>{
-      //if (v!=="constructor")
-      return [`this.${name}.${v}()`,""]
-    })
-    Object.getOwnPropertyNames(obje).forEach(v=>{
-      Flist.push([`this.${name}.${v}`,obje[v]] )
-    })
-    obje.Flist = Flist 
-    solidB[name] = obje  
-    return obje 
+    obj = eval(`(()=>{${data};return ${name} })()`)      
   }catch(e:any){
-    errMsg(e)
- 
- 
+    errMsg(e) 
     return null
   }
+  const FlistStr =  FlistName.join(".")
+  obj.prototype.__proto__ = Object.assign( solidB,sandbox )
+  const obje = new obj as solidEditStruct 
+  let Flist:any[] = []
+  Object.getOwnPropertyNames(obj.prototype).forEach((v)=>{
+    if (v!=="constructor")
+      Flist.push([`${FlistStr}.${v}()`,""])
+  })
+  Object.getOwnPropertyNames(obje).forEach(v=>{
+    Flist.push([`${FlistStr}.${v}`,obje[v]] )
+  })
+  obje.Flist = Flist 
+  //Console(Flist)
+  //fsandbox[_name] = obje
+  sandbox[_name] = obje  
+  return obje 
 }
 const classToStringEach = (val:string,f:Function)=>{
-  const item = val.matchAll(/(?<=this\.)[\w\$]+/g)
+  const item = val.matchAll(/(?<=this\.)[\w\$\.]+/g)
   if (!item)return
   const li = new Set<string>()
   for (const v of item){
-    if (li.has(v[0]))continue
-    li.add(v[0])
-    f(v[0])
+    let vs = v[0].split(".")
+    //vs.pop()
+    const t = vs.reverse().slice(1).join("__") 
+    console.log(t)
+    if (li.has(t))continue
+    li.add(t)
+    f(t)
   }
 }
 
