@@ -22,9 +22,7 @@ import { page } from '$app/stores';
 import {StoreCode3Dview,saveStorage,initMySolid,StoreAlertMsg,StoreMyClass,StoreInputCode,solid,StoreOrthographic} from "$lib/function/storage"
 import {onWindowResize,startSceneOBJ,addSceneOBJ} from "$lib/function/threeScene" 
 import { createCanvasElement } from "three";
-import { onMount ,onDestroy} from 'svelte';  
-
-import {regClassName} from '$lib/function/share'
+import { onMount ,onDestroy} from 'svelte';   
 import type {CodeToWorker,WorkerMsg} from '$lib/function/share' 
 import {  Modal,Spinner ,Button } from 'flowbite-svelte';  
 import   QRCode  from 'qrcode';   
@@ -159,7 +157,7 @@ onMount(()=>{
   canvas =document.createElement("canvas")  
   el.width = window.innerWidth;
   el.height = window.innerHeight;
-  WorkerInit(el)
+
   window.addEventListener('resize', ()=>{
     el!.width = window.innerWidth;
     el!.height = window.innerHeight; 
@@ -169,9 +167,10 @@ onMount(()=>{
   window.addEventListener("hashchange", (e)=>{ 
     //console.log(e)
     //ischange=true
+    //window.location.hash
     updataCode(new URL(e.newURL).hash)
   });
- 
+  WorkerInit(el)
 })
 
 const downSTL = (stl: BlobPart[],name:string)=>{
@@ -280,7 +279,7 @@ const WorkerInit =(el:HTMLCanvasElement)=>{
       //console.log(k)
       workerPostMessage({code:v,name:k,show:false})
     })
-    console.log(window.location.hash)
+    //console.log(window.location.hash)
     updataCode(window.location.hash)
   }).catch(()=>{
     //$StoreAlertMsg.errMsg = e.toString()
