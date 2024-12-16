@@ -1,9 +1,9 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { createEventDispatcher } from 'svelte';
-  import {PrinterOutline,  PlayOutline, QrCodeOutline, TrashBinOutline,  DownloadOutline ,PlusOutline,ChevronDownOutline , BookOpenOutline, FileCodeOutline ,EditOutline,GridPlusOutline,CloudArrowUpOutline, FileImageOutline} from 'flowbite-svelte-icons';
+  import { GridSolid,WindowsSolid, PrinterOutline,  PlayOutline, QrCodeOutline, TrashBinOutline,  DownloadOutline ,PlusOutline,ChevronDownOutline , BookOpenOutline, FileCodeOutline ,EditOutline,GridPlusOutline,CloudArrowUpOutline, FileImageOutline} from 'flowbite-svelte-icons';
   import { Input, Navbar,Alert  ,Dropdown, DropdownItem,Spinner,DropdownDivider,Button, Modal,  Checkbox ,ButtonGroup} from 'flowbite-svelte';   
-  import {getStoragelist,removeStorage,StoreHelpHidden,StoreInputCode,StoreAlertMsg,StoreCode3Dview,ClassToString} from "$lib/function/storage"   
+  import {StoreOrthographic,getStoragelist,removeStorage,StoreHelpHidden,StoreInputCode,StoreAlertMsg,StoreCode3Dview,ClassToString} from "$lib/function/storage"   
   let formModal = false; 
   //let active = false
   //let waitting = false
@@ -36,7 +36,12 @@
             if (e.code === "Enter" ){
               document.getElementById("start")?.click()
             }
-          }} > </Input><Button href="#new" size="sm"  on:click={()=>{
+          }} > </Input><Button   size="sm"  on:click={()=>{
+            if (!inputRCode)inputRCode="#new"
+            else if (!inputRCode.startsWith("#")) inputRCode="#"+inputRCode
+            let aTag = document.createElement('a'); 
+            aTag.href = inputRCode;
+            aTag.click();   
             document.getElementById("start")?.click()
           }}><PlusOutline class="w-4 h-4 me-2" /></Button> 
         </DropdownItem>     
@@ -116,6 +121,19 @@
  
    {/if}    
     </ButtonGroup>
+
+    <Button color="light"  on:click={()=>{
+       $StoreOrthographic  = !$StoreOrthographic
+ 
+    }}>
+    {#if $StoreOrthographic }
+      <WindowsSolid class="w-4 h-4 me-2"/> 
+      {:else}
+      <GridSolid class="w-4 h-4 me-2" />
+    {/if}
+    Ctrl +k
+     
+    </Button>
   
   {#if  $StoreAlertMsg.waitting} <Spinner color="gray" />{/if}
   {#if  $StoreAlertMsg.errMsg}<Alert color="red">{@html $StoreAlertMsg.errMsg}</Alert>{/if}

@@ -81,11 +81,7 @@
           return
         }else if (e.code=="KeyK"){
           e.preventDefault()
-          if ($StoreOrthographic){
-            $StoreAlertMsg.errMsg = "Ctrl+k 正交"
-          }else{
-            $StoreAlertMsg.errMsg = "Ctrl+k 透视"
-          }
+ 
           $StoreOrthographic  = !$StoreOrthographic
           return
         }
