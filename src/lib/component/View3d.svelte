@@ -154,16 +154,17 @@ const updataCode = (hash:string)=>{
 
 onMount(()=>{    
   el = createCanvasElement() ;
+  container.appendChild(el)
   canvas =document.createElement("canvas")  
   el.width = window.innerWidth;
   el.height = window.innerHeight;
-
+  
   window.addEventListener('resize', ()=>{
     el!.width = window.innerWidth;
     el!.height = window.innerHeight; 
     onWindowResize(el!)				
   });
-  container.appendChild(el)    
+      
   window.addEventListener("hashchange", (e)=>{ 
     //console.log(e)
     //ischange=true
