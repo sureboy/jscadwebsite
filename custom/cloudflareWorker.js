@@ -41,7 +41,7 @@ export default {
       db.forEach((v,k) => { 
         const value = v.toString()
         const vm = value.match(regexpGetClass)
-        if (vm && vm[1] && k===vm[1]){
+        if (vm && vm.length>1 ){
           codePage+=`\n======\n${value}`
           codeHeader.push(k)
         }else{

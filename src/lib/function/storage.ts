@@ -87,7 +87,7 @@ const classToStringEach = (val:string,f:Function)=>{
   for (const v of item){
     let vs = v[0].split(".")
     vs.pop()    
-    if (vs.length===0)return
+    if (vs.length===0)continue
     t = vs.reverse().join("__")
     if (li.has(t))continue
     li.add(t)
@@ -102,8 +102,9 @@ export const  ClassToString = (c:string,n:string)=>{
   codelist.set(n_?n_:n,c)
   const key:Map<string,string> =new Map();
   const title = ns.length>0?ns.join("__"):null
+  //console.log(title,ns)
   getSolidKey(k=> {
-    key.set(k,k)
+    if (!key.has(k))key.set(k,k)
     if (title && k.indexOf(title))
       key.set(k.split("__")[0],k)
   })   
