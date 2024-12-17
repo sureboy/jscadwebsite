@@ -83,11 +83,12 @@ const classToStringEach = (val:string,f:Function)=>{
   const item = val.matchAll(/(?<=this\.)[\w\$\.]+/g)
   if (!item)return
   const li = new Set<string>()
+  let t
   for (const v of item){
     let vs = v[0].split(".")
-    //vs.pop()
-    const t = vs.reverse().slice(1).join("__") 
-    console.log(t)
+    vs.pop()    
+    if (vs.length===0)return
+    t = vs.reverse().join("__")
     if (li.has(t))continue
     li.add(t)
     f(t)
@@ -96,14 +97,22 @@ const classToStringEach = (val:string,f:Function)=>{
 
 export const  ClassToString = (c:string,n:string)=>{
   const codelist:Map<string,string> = new Map<string,string>()
-  codelist.set(n,c)
-  const key:string[] =[];
-  getSolidKey(k=> key.push(k) )   
+  const ns = n.split("__")
+  const n_ = ns.shift()
+  codelist.set(n_?n_:n,c)
+  const key:Map<string,string> =new Map();
+  const title = ns.length>0?ns.join("__"):null
+  getSolidKey(k=> {
+    key.set(k,k)
+    if (title && k.indexOf(title))
+      key.set(k.split("__")[0],k)
+  })   
   if (!key)return codelist;
   const f = (v:string)=>{
-    if (!key.includes(v))return
+    let k = key.get(v)
+    if (!k) return    
     if (codelist.has(v))return
-    const c_ = window.localStorage.getItem(v)
+    const c_ = window.localStorage.getItem(k)
     if (!c_) return
     codelist.set(v,c_ )
     classToStringEach(c_,f)
