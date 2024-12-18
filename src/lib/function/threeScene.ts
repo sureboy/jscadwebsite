@@ -8,7 +8,8 @@ import {
 	Box3,
 	Vector3,
 	Group,
-    Object3D
+    Object3D,
+	AxesHelper
 } from "three"; 
 //import {	
 //  WebGPURenderer
@@ -34,8 +35,8 @@ const directionalLight = new DirectionalLight( 0xffffff, 0.5 );
 directionalLight.position.set(0, 1, 0)  
 const hemisphereLight = new HemisphereLight(0xffffff, 0x444444);
 hemisphereLight.position.set(1, 1, 1);
-
-scene.add(group,hemisphereLight)
+const axes = new AxesHelper(20);
+scene.add(group,hemisphereLight,axes)
 
 let stopAnimate=true;
 const animate = (t:number) => {
@@ -49,28 +50,45 @@ const animate = (t:number) => {
 	//renderer.render(scene, camera);
 	OrbControls.update();
 };
+const getSize = (obj:Object3D)=>{
+	const fobj = new Box3().setFromObject(obj)
+	const sceneSize = fobj.getSize(new Vector3())
+	let size =   sceneSize.length();
+	if (!size) size= getSize(axes)
+	return size
+}
   
 export function onWindowResize(el: HTMLCanvasElement,changeCamera:boolean = true,orthographic:boolean=false) {
 	if (!renderer)return;
-	const fobj = new Box3().setFromObject(group)
-	const sceneSize = fobj.getSize(new Vector3())
-	//console.log(el.width,el.height)
+	//if (group.children.length===0)return;
+	
+ 
+	
+ 
+	
+	//console.log(el.width,el.height,orthographic,changeCamera,group)
 	if (orthographic){
-		const size = sceneSize.length();
-		//console.log(size)
+		if (changeCamera){ 
+		
+			let  size = getSize(group);
 		const k = el.width/el.height
 		const s =size
 		camera = new OrthographicCamera( -s *k,s*k,s,-s,0.1,2000)
-		if (changeCamera){ 
+		
 			camera.position.set(size,size,size); 
 			camera.lookAt(scene.position)			
 		}
 	}else{
-		camera = cameraP
+		
 		if (changeCamera){
-			const size = sceneSize.length();
+			camera = new PerspectiveCamera(40, 1, 0.1, 2000);
+			
+ 
+			const  size = getSize(group);
 			const fov =  camera.fov*(Math.PI /180); 	 
-			camera.position.z = size /2/Math.tan(fov/2); 	
+			camera.position.z = size /2/Math.tan(fov/2); 
+		 
+	
 			camera.aspect = el.width/el.height
 			
 		}
@@ -80,6 +98,7 @@ export function onWindowResize(el: HTMLCanvasElement,changeCamera:boolean = true
 	renderer.setSize(el.width,el.height)	
 	renderer.render(scene, camera)
 }
+ 
 const initRender = (el:HTMLCanvasElement,orthographic:boolean=false)=>{
 	renderer = new WebGLRenderer({ antialias: true,alpha:true, canvas: el,preserveDrawingBuffer:true, });
 	//camera =orthographic?(new OrthographicCamera(el.width/-2,el.width/2,el.height/2,el.height/-2,1,1000)):(new PerspectiveCamera(50, 1, 1, 1000)); 
@@ -94,7 +113,8 @@ const initRender = (el:HTMLCanvasElement,orthographic:boolean=false)=>{
 	OrbControls.addEventListener("end",(e)=>{ 
 		stopAnimate=true
 	})	
-	onWindowResize(el,true,orthographic)
+ 
+	//onWindowResize(el,true,orthographic)
 	
 }
 export const  startSceneOBJ = (el: HTMLCanvasElement)=>{
@@ -102,8 +122,10 @@ export const  startSceneOBJ = (el: HTMLCanvasElement)=>{
 		_el = el
 		initRender(el)
 		 
-	}	
-	group.clear();
+	}	else{
+		group.clear();
+	}
+
 	//group.add(hemisphereLight);
 	//onWindowResize(el)	 
 
@@ -115,6 +137,7 @@ export const  addSceneOBJ = (el: HTMLCanvasElement,...m:Object3D[])=>{
 	}	
  
 	group.add(...m )
+	//group.updateMatrix()
 	return
 
 }

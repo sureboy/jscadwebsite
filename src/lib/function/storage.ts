@@ -53,6 +53,9 @@ export const StringToClass = (data:string,name:string,errMsg:Function)=>{
     }
     FlistName.push(n)  
   }
+  if (FlistName.length>1){
+    Object.assign( solidB,sandbox )
+  }
   FlistName.push(_name)
       
   let obj 
@@ -63,7 +66,7 @@ export const StringToClass = (data:string,name:string,errMsg:Function)=>{
     return null
   }
   const FlistStr =  FlistName.join(".")
-  obj.prototype.__proto__ = Object.assign( solidB,sandbox )
+  obj.prototype.__proto__ = solidB 
   const obje = new obj as solidEditStruct 
   let Flist:any[] = []
   Object.getOwnPropertyNames(obj.prototype).forEach((v)=>{

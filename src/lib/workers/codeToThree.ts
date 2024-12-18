@@ -166,7 +166,7 @@ const handCode  = (data:CodeToWorker,port:any)=>{
             //tmpdb[v.index!] = v.ver
             //v.mesh = CSG2ThreeArray(v.ver)
         //}       
-        v.camera = data.camera
+        v.camera = data.camera?1:2
         port.postMessage(v)
     })    
 }

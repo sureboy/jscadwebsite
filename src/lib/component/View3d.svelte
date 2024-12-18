@@ -22,7 +22,7 @@ import { page } from '$app/stores';
 import {StoreCode3Dview,saveStorage,initMySolid,StoreAlertMsg,StoreMyClass,StoreInputCode,solid,StoreOrthographic} from "$lib/function/storage"
 import {onWindowResize,startSceneOBJ,addSceneOBJ} from "$lib/function/threeScene" 
 import { createCanvasElement } from "three";
-import { onMount ,onDestroy} from 'svelte';   
+import { onMount ,onDestroy,afterUpdate} from 'svelte';   
 import type {CodeToWorker,WorkerMsg} from '$lib/function/share' 
 import {  Modal,Spinner ,Button } from 'flowbite-svelte';  
 import   QRCode  from 'qrcode';   
@@ -42,7 +42,9 @@ StoreOrthographic.subscribe(o=>{
   if (el)  onWindowResize(el,true,o)
 })
 
-
+afterUpdate(()=>{
+  console.log("test")
+})
 onDestroy(()=>{
   if (worker && worker instanceof Worker) {
     worker.terminate();
@@ -154,19 +156,20 @@ const updataCode = (hash:string)=>{
 
 onMount(()=>{    
   el = createCanvasElement() ;
-  container.appendChild(el)
+  
   canvas =document.createElement("canvas")  
   el.width = window.innerWidth;
   el.height = window.innerHeight;
-  
+  container.appendChild(el)
   window.addEventListener('resize', ()=>{
     el!.width = window.innerWidth;
     el!.height = window.innerHeight; 
+    //console.log("z")
     onWindowResize(el!)				
   });
       
   window.addEventListener("hashchange", (e)=>{ 
-    //console.log(e)
+    console.log(e)
     //ischange=true
     //window.location.hash
     updataCode(new URL(e.newURL).hash)
@@ -209,9 +212,14 @@ const workerMessage = (e:MessageEvent<WorkerMsg>)=>{
   if (e.data.ver){
     $StoreAlertMsg.waitting = true; 
     try{
-      if (el){
+      //console.log("ver",e.data)
+      if (el ){
+        //onWindowResize(el,e.data.camera===1?false:true)	
+        //console.log(el.width,el.height)
         addSceneOBJ(el,CSG2Three(e.data.ver, {} )) 
         //console.log("mesh",e.data.mesh)
+      }else{
+        console.log("ver false")
       }
      
     }catch(e:any){
@@ -222,9 +230,10 @@ const workerMessage = (e:MessageEvent<WorkerMsg>)=>{
   //console.log(e.data)
   if (e.data.end){
     $StoreAlertMsg.waitting = false; 
-    if (el   )  {
-      onWindowResize(el,!e.data.camera)	
+    if (el && e.data.camera)  {
+      onWindowResize(el,e.data.camera===1?false:true)	
       //ischange=false
+    //  console.log("ver end",e.data.camera===1?false:true)
       //ischange=false
     } 
    
@@ -277,10 +286,10 @@ const WorkerInit =(el:HTMLCanvasElement)=>{
     }; 
     //worker.port.start();
     initMySolid((v,k)=>{
-      //console.log(k)
+      console.log(k)
       workerPostMessage({code:v,name:k,show:false})
     })
-    //console.log(window.location.hash)
+    console.log("hash",window.location.hash)
     updataCode(window.location.hash)
   }).catch(()=>{
     //$StoreAlertMsg.errMsg = e.toString()
