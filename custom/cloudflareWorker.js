@@ -1,4 +1,4 @@
-const secondsFromNow = 3600*48
+const secondsFromNow = 3600*24*60
 const regexpGetClass = /^\s*const\s+([\w\$]+)\s*=\s*class\s*\{/ 
 const gethtml =(uri)=>{
   return `<!doctype html>

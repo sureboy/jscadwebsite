@@ -69,18 +69,19 @@ export function onWindowResize(el: HTMLCanvasElement,changeCamera:boolean = true
 	//console.log(el.width,el.height,orthographic,changeCamera,group)
 	if (orthographic){
 		if (changeCamera){ 
-		
-			let  size = getSize(group);
+			initOrb(el)
+			//let  size = getSize(group);
 		const k = el.width/el.height
-		const s =size
+		const s = getSize(group)/2;
 		camera = new OrthographicCamera( -s *k,s*k,s,-s,0.1,2000)
 		
-			camera.position.set(size,size,size); 
+			camera.position.set(s,s,s); 
 			camera.lookAt(scene.position)			
 		}
 	}else{
 		
 		if (changeCamera){
+			initOrb(el)
 			camera = new PerspectiveCamera(40, 1, 0.1, 2000);
 			
  
@@ -98,11 +99,7 @@ export function onWindowResize(el: HTMLCanvasElement,changeCamera:boolean = true
 	renderer.setSize(el.width,el.height)	
 	renderer.render(scene, camera)
 }
- 
-const initRender = (el:HTMLCanvasElement,orthographic:boolean=false)=>{
-	renderer = new WebGLRenderer({ antialias: true,alpha:true, canvas: el,preserveDrawingBuffer:true, });
-	//camera =orthographic?(new OrthographicCamera(el.width/-2,el.width/2,el.height/2,el.height/-2,1,1000)):(new PerspectiveCamera(50, 1, 1, 1000)); 
-	
+const initOrb = (el:HTMLCanvasElement)=>{
 	OrbControls = new OrbitControls(camera, el); 
 	OrbControls.addEventListener("start",(e)=>{ 
 		if (stopAnimate){
@@ -113,6 +110,12 @@ const initRender = (el:HTMLCanvasElement,orthographic:boolean=false)=>{
 	OrbControls.addEventListener("end",(e)=>{ 
 		stopAnimate=true
 	})	
+}
+ 
+const initRender = (el:HTMLCanvasElement,orthographic:boolean=false)=>{
+	renderer = new WebGLRenderer({ antialias: true,alpha:true, canvas: el,preserveDrawingBuffer:true, });
+	//camera =orthographic?(new OrthographicCamera(el.width/-2,el.width/2,el.height/2,el.height/-2,1,1000)):(new PerspectiveCamera(50, 1, 1, 1000)); 
+	initOrb(el) 
  
 	//onWindowResize(el,true,orthographic)
 	
