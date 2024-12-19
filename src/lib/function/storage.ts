@@ -53,7 +53,7 @@ export const StringToClass = (data:string,name:string,errMsg:Function)=>{
     }
     FlistName.push(n)  
   }
-  if (FlistName.length>1){
+  if (solidB!==sandbox ){
     Object.assign( solidB,sandbox )
   }
   FlistName.push(_name)
