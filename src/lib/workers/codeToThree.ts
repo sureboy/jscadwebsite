@@ -2,7 +2,7 @@ import {StringToClass,Console} from '$lib/function/storage'
 //import {serialize} from "@jscad/stl-serializer"   
 import {serializeBinary} from "$lib/function/CSGToStlb"   
 //import { CSG } from 'three-csg-ts';
-import {CSG2Vertices,CSGSides2LineSegmentsVertices,CSG2LineVertices,CSG2Three,CSG2ThreeArray} from "$lib/function/csg2Three"  
+import {CSG2Vertices,CSGSides2LineSegmentsVertices,CSG2LineVertices,CSG2Three} from "$lib/function/csg2Three"  
 import {regexpGetClass} from "$lib/function/share"  
 import pkg from '@jscad/modeling';
 import { STLExporter } from 'three/addons/exporters/STLExporter.js';
@@ -120,7 +120,7 @@ const handCode  = (data:CodeToWorker,port:any)=>{
     else  if (data.name !== vm[1]){
         data.code = data.code.replace(vm[0],vm[0].replace(vm[1],data.name))
     } 
-    port.postMessage(<WorkerMsg>{name:data.name,code:data.code})
+    port.postMessage(<WorkerMsg>{name:data.name,code:data.code,show:data.show})
  
     const obj = StringToClass(data.code,data.name,(e:any)=>{
         port.postMessage(<WorkerMsg>{errMsg:handErr(e)})

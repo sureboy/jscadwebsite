@@ -22,7 +22,7 @@ import { page } from '$app/stores';
 import {StoreCode3Dview,saveStorage,initMySolid,StoreAlertMsg,StoreMyClass,StoreInputCode,solid,StoreOrthographic} from "$lib/function/storage"
 import {onWindowResize,startSceneOBJ,addSceneOBJ} from "$lib/function/threeScene" 
 import { createCanvasElement } from "three";
-import { onMount ,onDestroy,afterUpdate} from 'svelte';   
+import { onMount ,onDestroy} from 'svelte';   
 import type {CodeToWorker,WorkerMsg} from '$lib/function/share' 
 import {  Modal,Spinner ,Button } from 'flowbite-svelte';  
 import   QRCode  from 'qrcode';   
@@ -41,10 +41,8 @@ waitting = true
 StoreOrthographic.subscribe(o=>{
   if (el)  onWindowResize(el,true,o)
 })
+ 
 
-afterUpdate(()=>{
-  console.log("test")
-})
 onDestroy(()=>{
   if (worker && worker instanceof Worker) {
     worker.terminate();
@@ -115,8 +113,8 @@ const getQrcode = (k:string,oldk:string)=>{
 const updataCode = (hash:string)=>{ 
   if (hash){
     StoreInputCode.set("");   
-    //console.log(hash)
-    const hashName = hash.substring(1).split(":") 
+    console.log(hash)
+    const hashName = hash.startsWith("#")? hash.substring(1).split(":") :hash.split(":")
     const firstName = hashName[0]
     switch (firstName) {
       case 'new':
@@ -192,7 +190,8 @@ const downSTL = (stl: BlobPart[],name:string)=>{
 }
 StoreCode3Dview.subscribe((t:CodeToWorker)=>{  
   workerPostMessage(t) 
-  $StoreAlertMsg.name = t.name || ""
+  if (t.show)  $StoreAlertMsg.name = t.name || ""
+  else  $StoreAlertMsg.name = ""
   $StoreAlertMsg.errMsg = ""
 })
 const workerMessage = (e:MessageEvent<WorkerMsg>)=>{ 
@@ -239,7 +238,7 @@ const workerMessage = (e:MessageEvent<WorkerMsg>)=>{
    
   } 
   if (e.data.name){
-    $StoreAlertMsg.name = e.data.name     
+    if(e.data.show)$StoreAlertMsg.name = e.data.name     
     if (e.data.code){
 
       saveStorage(e.data.name,e.data.code)
@@ -289,8 +288,9 @@ const WorkerInit =(el:HTMLCanvasElement)=>{
       console.log(k)
       workerPostMessage({code:v,name:k,show:false})
     })
-    console.log("hash",window.location.hash)
-    updataCode(window.location.hash)
+    console.log("hash1",window.location.hash,$StoreAlertMsg.name)
+    
+    updataCode(window.location.hash?window.location.hash:$StoreAlertMsg.name)
   }).catch(()=>{
     //$StoreAlertMsg.errMsg = e.toString()
     import('$workers/codeToThree.ts?worker').then((MyWorker)=>{
@@ -301,7 +301,8 @@ const WorkerInit =(el:HTMLCanvasElement)=>{
       initMySolid((v,k)=>{
         workerPostMessage({code:v,name:k,show:false})
       })
-      updataCode(window.location.hash)
+      updataCode(window.location.hash?window.location.hash:$StoreAlertMsg.name)
+
     }).catch(e=>{
       $StoreAlertMsg.errMsg = e.toString()
     })
