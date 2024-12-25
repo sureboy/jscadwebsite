@@ -94,7 +94,7 @@
       }     
     }><PrinterOutline class="w-4 h-4 me-2" />STL</DropdownItem>
     <DropdownItem class="flex items-center gap-2" on:click={()=>{
-      const file = new File([getValue($StoreAlertMsg.name)], $StoreAlertMsg.name+".solid", {
+      const file = new File([getValue($StoreAlertMsg.name)], $StoreAlertMsg.name+".solidjscad", {
         type: 'text/plain',
       }); 
       let aTag = document.createElement('a'); 
