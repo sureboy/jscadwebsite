@@ -16,15 +16,20 @@
   const dispatch = createEventDispatcher();
 
   function screenHandle() {
-    dispatch('message', {
+    dispatch('screen', {
       name: $StoreAlertMsg.name
+    });
+  }
+  function loaderGcodeHandle(uri:string) {
+    dispatch('gcode', {
+      uri
     });
   }
 </script>
  
 <Navbar color="none" fluid class="pointer-events-auto" >  
     <ButtonGroup  size="sm"  >
-      <Button     color="light" id="start" > <GridPlusOutline  />  <ChevronDownOutline   /></Button>
+      <Button     color="light" id="start" >{#if $StoreAlertMsg.name} {#if window.innerWidth>window.innerHeight}{$StoreAlertMsg.name} {:else}<p class="truncate max-w-20">{$StoreAlertMsg.name.split("__")[0]}</p>{/if} {:else} <GridPlusOutline  /> {/if}<ChevronDownOutline   /> </Button>
       <Dropdown    >    
         <DropdownItem     class="flex items-center  gap-2" >
           <Input type="text"   id="inputR"  bind:value={inputRCode} on:blur={(e)=>{
@@ -38,8 +43,19 @@
               document.getElementById("start")?.click()
             }
           }} > </Input><Button   size="sm"  on:click={()=>{
-            if (!inputRCode)inputRCode="#new"
-            else if (!inputRCode.startsWith("#")) inputRCode="#"+inputRCode
+            if (!inputRCode){
+              //inputRCode="#open"
+              let x = document.createElement("INPUT");
+              x.setAttribute("type", "file");
+              x.addEventListener('change', function() {
+                $StoreAlertMsg.waitting = true
+                if (x.files && x.files.length>0)                 
+                  loaderGcodeHandle(URL.createObjectURL(x.files[0]))       
+                $StoreAlertMsg.waitting = false                 
+              })
+              x.click()
+              return
+            }else if (!inputRCode.startsWith("#")) inputRCode="#"+inputRCode
             let aTag = document.createElement('a'); 
             aTag.href = inputRCode;
             aTag.click();   
@@ -76,13 +92,13 @@
         //console.log(e,$page.url.hash)
         StoreCode3Dview.set({code:getValue(),show:true ,camera:false})   
         StoreInputCode.set("");   
-      }}><PlayOutline   /><p class="truncate max-w-20">{$StoreAlertMsg.name}</p></Button>
+      }}><PlayOutline   /> </Button>
      
     {:else}
       <Button   href="#{$StoreAlertMsg.name}" color="light"   on:click={()=>{
 
         StoreInputCode.set(window.localStorage.getItem($StoreAlertMsg.name)||"");
-      }}><EditOutline   />  <p class="truncate max-w-20">{$StoreAlertMsg.name}</p></Button>
+      }}><EditOutline   /> </Button>
     {/if}
  
 <Button color="light"  ><DownloadOutline  />  <ChevronDownOutline  /></Button>

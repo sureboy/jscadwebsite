@@ -9,7 +9,7 @@ import { STLExporter } from 'three/addons/exporters/STLExporter.js';
 //import {  Group   } from "three"; 
 //const group = new Group()
 //group
-//import { OBJExporter } from 'three/addons/exporters/OBJExporter.js';
+//import { GCodeLoader } from 'three/addons/loaders/GCodeLoader.js';
 const {geometries,booleans,utils} = pkg;
 import type {CodeToWorker,WorkerMsg} from '$lib/function/share'
 //import type {Geometry } from '@jscad/modeling/src/geometries/types';

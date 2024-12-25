@@ -1,4 +1,6 @@
 <script context="module" lang="ts" >
+
+  const loader = new GCodeLoader();
  let el:HTMLCanvasElement|null; 
  let size:any
  export const screenHandle = (e:any)=>{
@@ -14,6 +16,22 @@
         URL.revokeObjectURL(href);  		
       })
   }
+  export const loaderGcode = (e:any)=>{
+ 
+        //const uri = e.detail.uri
+        //console.log(uri);  
+        loader.load(e.detail.uri, function ( object ) { 
+        if (el){
+          //console.log(object)
+          startSceneOBJ(el)
+          addSceneOBJ(el,object) 
+          onWindowResize(el)
+        }
+        //render();
+
+        } );
+      }
+ 
 </script>
 <script lang="ts"> 
 import {mimeType} from "@jscad/stl-serializer"  
@@ -26,6 +44,7 @@ import { onMount ,onDestroy} from 'svelte';
 import type {CodeToWorker,WorkerMsg} from '$lib/function/share' 
 import {  Modal,Spinner ,Button } from 'flowbite-svelte';  
 import   QRCode  from 'qrcode';   
+import { GCodeLoader } from 'three/addons/loaders/GCodeLoader.js';
 let container:HTMLElement; 
 let qrcode:HTMLElement;
 let worker:SharedWorker|Worker|null
@@ -41,7 +60,6 @@ waitting = true
 StoreOrthographic.subscribe(o=>{
   if (el)  onWindowResize(el,true,o)
 })
- 
 
 onDestroy(()=>{
   if (worker && worker instanceof Worker) {
@@ -65,7 +83,12 @@ const getRemote = (k:string)=>{
   const n = k.split("__")
   const l = n.length
   if (l<2){
-    $StoreAlertMsg.errMsg="found not code"
+    //$StoreAlertMsg.errMsg="found not code"
+    //let code_ = solid(k)
+    //StoreInputCode.set(code_);
+    //StoreCode3Dview.set({code:code_,show:true,name:k})
+    StoreCode3Dview.set({code:solid(k),show:true,name:k})
+    //$StoreAlertMsg.name = k
     return 
   }
   const name = n[l-1]
@@ -117,6 +140,7 @@ const updataCode = (hash:string)=>{
     const hashName = hash.startsWith("#")? hash.substring(1).split(":") :hash.split(":")
     const firstName = hashName[0]
     switch (firstName) {
+ 
       case 'new':
         let name = "solid__"+new Date().getTime().toString(36).substring(2)
         let code_ = solid(name)
