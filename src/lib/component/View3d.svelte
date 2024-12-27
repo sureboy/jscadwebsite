@@ -226,6 +226,7 @@ const workerMessage = (e:MessageEvent<WorkerMsg>)=>{
   if(e.data.stl){
     downSTL(e.data.stl,e.data.name!)  
     $StoreAlertMsg.waitting = false;
+    //$StoreAlertMsg.name = e.data.name!  
     return 
   }
   if (e.data.start && el){
