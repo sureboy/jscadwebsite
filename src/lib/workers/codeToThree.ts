@@ -1,4 +1,4 @@
-import {StringToClass,Console} from '$lib/function/storage'
+import {StringToClass,Console,ClassObjToString} from '$lib/function/storage'
 //import {serialize} from "@jscad/stl-serializer"   
 import {serializeBinary} from "$lib/function/CSGToStlb"   
 //import { CSG } from 'three-csg-ts';
@@ -136,9 +136,14 @@ const handCode  = (data:CodeToWorker,port:any)=>{
     if (obj.Flist) port.postMessage(<WorkerMsg>{Flist:obj.Flist})
     //console.log(Object.keys(obj))
     //console.log(obj)
-
-    if (!data.show){
-        port.postMessage(<WorkerMsg>{end:true})
+    if (data.file){
+        //Console(data,obj)
+       
+        port.postMessage(<WorkerMsg>{end:true,file: ClassObjToString(obj),name:data.name})
+        return
+    }
+    if (!data.show){        
+        port.postMessage(<WorkerMsg>{end:true})       
         return
     }
     //tmpdb = []

@@ -2,7 +2,7 @@
 
 
 import EditorJs , {getValue} from '$lib/component/EditorJs.svelte' 
-import View3d ,{screenHandle,loaderGcode} from '$lib/component/View3d.svelte'  
+import View3d ,{screenHandle,loaderSTL,loaderFile} from '$lib/component/View3d.svelte'  
 import Header from '$lib/component/Header.svelte';
 import Help from '$lib/component/Help.svelte'  
 import type { PageData } from './$types'; 
@@ -16,7 +16,7 @@ export let data:PageData;
 </svelte:head>
 <main>
   <div class="z-10 absolute top-0 left-0  w-full  pointer-events-none">
-  <Header on:screen={screenHandle} on:gcode={loaderGcode} {getValue} > 
+  <Header on:screen={screenHandle} on:stl={loaderSTL} on:file={loaderFile} {getValue} > 
   </Header>
   <EditorJs  inputList={data.data} >
   </EditorJs>

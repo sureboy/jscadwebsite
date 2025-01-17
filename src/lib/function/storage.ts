@@ -53,9 +53,11 @@ export const StringToClass = (data:string,name:string,errMsg:Function)=>{
     }
     FlistName.push(n)  
   }
+  /*
   if (solidB!==sandbox ){
     Object.assign( solidB,sandbox )
   }
+    */
   FlistName.push(_name)
       
   let obj 
@@ -66,7 +68,7 @@ export const StringToClass = (data:string,name:string,errMsg:Function)=>{
     return null
   }
   const FlistStr =  FlistName.join(".")
-  obj.prototype.__proto__ = solidB 
+  obj.prototype.__proto__ = Object.assign({},solidB,sandbox) 
   const obje = new obj as solidEditStruct 
   let Flist:any[] = []
   Object.getOwnPropertyNames(obj.prototype).forEach((v)=>{
@@ -77,6 +79,8 @@ export const StringToClass = (data:string,name:string,errMsg:Function)=>{
     Flist.push([`${FlistStr}.${v}`,obje[v]] )
   })
   obje.Flist = Flist 
+  obje.Name = _name
+  obje.CodeFile = data
   //Console(Flist)
   //fsandbox[_name] = obje
   sandbox[_name] = obje  
@@ -96,6 +100,42 @@ const classToStringEach = (val:string,f:Function)=>{
     li.add(t)
     f(t)
   }
+}
+const classObjToStringEach = (obj:solidEditStruct,f:Function)=>{
+   
+  const item = obj.CodeFile.matchAll(/(?<=this\.)[\w\$\.]+/g)
+  if (!item)return
+  //const li = new Set<string>()
+  //let t
+  for (const v of item){
+    let vs = v[0].split(".")
+    vs.pop()    
+    if (!vs.length)continue
+    let _obj = obj
+    for (let s of vs){   
+      _obj  = _obj[s]
+      if (!_obj){
+        break
+        //console.log(s)  
+                
+      }
+    }
+    if (_obj && Object.hasOwn(_obj,"CodeFile"))f(_obj,vs.reverse().join("__")) 
+    //  else console.log(vs)   
+   
+  }
+}
+export const ClassObjToString = (obj:solidEditStruct)=>{
+  let fileList:any[] = [obj]
+  let titleList:string[]=[obj.Name]
+  const f = (o:any,n:string)=>{    
+    if (titleList.includes(n))return
+    titleList.push(n)
+    fileList.push(o)
+    classObjToStringEach(o,f)
+  }
+  classObjToStringEach(obj,f)
+  return titleList.join(",")+"\n======\n"+fileList.map(v=>{return v.CodeFile}).join("\n======\n")
 }
 
 export const  ClassToString = (c:string,n:string)=>{

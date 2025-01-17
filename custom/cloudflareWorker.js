@@ -35,9 +35,13 @@ export default {
       
       let codePage =""
       
-      let codeHeader = []
+      //let codeHeader = []
       const db = await request.formData()
-
+      if (!db.has("name") || db.get("name")!==name)return new Response(null,{status:400}) 
+      //if (!db['file'])return new Response(null,{status:404}) 
+      
+      codePage = db.get('file')
+      /*
       db.forEach((v,k) => { 
         const value = v.toString()
         const vm = value.match(regexpGetClass)
@@ -49,9 +53,10 @@ export default {
         }
      
       }) 
+      */
       if (!codePage)return new Response(gethtml(`${encodeURI(reurl)}#${name}`),{status:404,headers:header }) 
       
-      codePage = codeHeader.join(",")  + codePage
+      //codePage = codeHeader.join(",")  + codePage
       
       //const codePage = JSON.stringify(db)
       const  codeKey =name.split("__")[0]+"__"+new Date().getTime().toString(36).substring(2);// await digestMessage(codePage);

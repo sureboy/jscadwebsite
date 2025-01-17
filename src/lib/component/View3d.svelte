@@ -1,8 +1,40 @@
 <script context="module" lang="ts" >
 
-  const loader = new GCodeLoader();
+  const loader = new STLLoader();
  let el:HTMLCanvasElement|null; 
  let size:any
+ let worker:SharedWorker|Worker|null
+ const material = new MeshStandardMaterial({
+	color: 'gray',
+	metalness: 0.5,
+	roughness: 0.1,
+	transparent: true,  
+});
+const workerPostMessage = (v:any)=>{
+  if (worker){
+    if (worker instanceof Worker)
+      worker.postMessage(v)
+    else
+      worker.port.postMessage(v)
+  }    
+}
+const getStrCode = (str:string,name?:string)=>{
+  if (!name){
+    name = new Date().getTime().toString(36).substring(2);
+  }
+  //console.log(str,name)
+  const decoder = new TextDecoder();
+  const decodedData = atob(str)
+  const decodedString = decoder.decode(new Uint8Array([...decodedData].map(char => char.charCodeAt(0))));
+  const [t,...codes] = decodedString.split("\n======\n") 
+  let titles = t.split(",")  
+  console.log(t)
+  for (let i in titles){  
+    
+    workerPostMessage({code:codes[i],name:titles[i]+"__"+name,show:false})            
+  }     
+  workerPostMessage({code:codes[0],name:titles[0]+"__"+name,show:true})
+}
  export const screenHandle = (e:any)=>{
     //console.log(elCanvas)
     console.log(size)
@@ -16,22 +48,37 @@
         URL.revokeObjectURL(href);  		
       })
   }
-  export const loaderGcode = (e:any)=>{
- 
-        //const uri = e.detail.uri
-        //console.log(uri);  
-        loader.load(e.detail.uri, function ( object ) { 
-        if (el){
-          //console.log(object)
-          startSceneOBJ(el)
-          addSceneOBJ(el,object) 
-          onWindowResize(el)
-        }
-        //render();
-
-        } );
+  export const loaderSTL = (e:any)=>{ 
+    loader.load(e.detail.uri, function ( object ) { 
+      if (el){
+        startSceneOBJ(el)
+        addSceneOBJ(el,new Mesh(object,material) ) 
+        onWindowResize(el)
       }
- 
+    });
+  }
+  export const loaderFile = (e:any)=>{
+
+    //const uri = e.detail.uri
+    const file = new FileReader()
+    file.onload = (event)=>{
+      getStrCode(event.target?.result as string)
+    }
+    file.readAsText(e.detail.data)
+    //console.log(e.detail.data);  
+    return
+    loader.load(e.detail.uri, function ( object ) { 
+    if (el){
+      //console.log(object)
+      startSceneOBJ(el)
+      addSceneOBJ(el,new Mesh(object,material) ) 
+      onWindowResize(el)
+    }
+    //render();
+
+    } );
+  }
+      
 </script>
 <script lang="ts"> 
 import {mimeType} from "@jscad/stl-serializer"  
@@ -39,23 +86,27 @@ import {CSG2Three} from "$lib/function/csg2Three"
 import { page } from '$app/stores';
 import {StoreCode3Dview,saveStorage,initMySolid,StoreAlertMsg,StoreMyClass,StoreInputCode,solid,StoreOrthographic} from "$lib/function/storage"
 import {onWindowResize,startSceneOBJ,addSceneOBJ} from "$lib/function/threeScene" 
-import { createCanvasElement } from "three";
+import { createCanvasElement, Mesh,MeshStandardMaterial } from "three";
 import { onMount ,onDestroy} from 'svelte';   
 import type {CodeToWorker,WorkerMsg} from '$lib/function/share' 
-import {  Modal,Spinner ,Button } from 'flowbite-svelte';  
+import {  Modal,Spinner ,Button, Fileupload } from 'flowbite-svelte';  
 import   QRCode  from 'qrcode';   
-import { GCodeLoader } from 'three/addons/loaders/GCodeLoader.js';
+import { STLLoader } from 'three/addons/loaders/STLLoader.js';
+import { CloudArrowUpOutline,DownloadOutline } from 'flowbite-svelte-icons';
 let container:HTMLElement; 
 let qrcode:HTMLElement;
-let worker:SharedWorker|Worker|null
+
 //let mesh:any[] =  []
 let formModal=false
+let fileModal = false
+let fileUpload = {name:"",file:""}
 let waitting = false
 //let shareUrl = ""
 let canvas:HTMLElement;
 let remoteName = ""
 formModal = true 
 waitting = true
+
 //let ischange = false
 StoreOrthographic.subscribe(o=>{
   if (el)  onWindowResize(el,true,o)
@@ -66,19 +117,8 @@ onDestroy(()=>{
     worker.terminate();
   }
 })
-const workerPostMessage = (v:any)=>{
-  if (worker){
-    
-    //if (el){
-    //  startSceneOBJ(el)
-      //$StoreAlertMsg.waitting = true   
-    //}
-    if (worker instanceof Worker)
-      worker.postMessage(v)
-    else
-      worker.port.postMessage(v)
-  }    
-}
+
+
 const getRemote = (k:string)=>{
   const n = k.split("__")
   const l = n.length
@@ -95,6 +135,8 @@ const getRemote = (k:string)=>{
   fetch(`https://db.solidjscad.com/?url=${encodeURI($page.url.origin)}&k=${k}`).then((r)=>{     
  
     r.arrayBuffer().then((v)=>{ 
+      getStrCode((new TextDecoder('utf-8')).decode(v),name)
+      /*
       const [t,...codes] = (new TextDecoder('utf-8')).decode(v).split("\n======\n") 
       let titles = t.split(",")  
       //let mainCode =  {code:codes.shift(),name:k,show:true}
@@ -104,6 +146,7 @@ const getRemote = (k:string)=>{
       }     
       workerPostMessage({code:codes[0],name:titles[0]+"__"+name,show:true})
       //StoreInputCode.set(codes[0]);
+      */
   
     }).catch(e=>{
       $StoreAlertMsg.errMsg=e
@@ -119,17 +162,12 @@ const getRemote = (k:string)=>{
 }
 
 const getQrcode = (k:string,oldk:string)=>{
-  //const k =hashName[1]   
   workerPostMessage({code:window.localStorage.getItem(oldk),name:oldk,show:true})
-  //StoreInputCode.set(window.localStorage.getItem(oldk)||""); 
-  //$StoreAlertMsg.name = oldk
   remoteName = "#"+k
   QRCode.toCanvas(canvas, `${$page.url.origin}/#${k}`, function (error) {
     if (error) console.error(error)
-    else{      
-      qrcode.appendChild(canvas!)
-      //console.log('success!');
-    }   
+    else
+      qrcode.appendChild(canvas!)    
     waitting=false         
   })
 }
@@ -139,8 +177,7 @@ const updataCode = (hash:string)=>{
     console.log(hash)
     const hashName = hash.startsWith("#")? hash.substring(1).split(":") :hash.split(":")
     const firstName = hashName[0]
-    switch (firstName) {
- 
+    switch (firstName) { 
       case 'new':
         let name = "solid__"+new Date().getTime().toString(36).substring(2)
         let code_ = solid(name)
@@ -164,24 +201,17 @@ const updataCode = (hash:string)=>{
         //StoreInputCode.set(code);
         break
     }
-  
-  //}else{
-    //StoreInputCode.set(window.localStorage.getItem("solid")||solid());
-  }
-
-  
-  
-  
+  }  
   formModal=false
   waitting = false
 }
 
 onMount(()=>{    
-  el = createCanvasElement() ;
-  
+  el = createCanvasElement() ;  
   canvas =document.createElement("canvas")  
   el.width = window.innerWidth;
   el.height = window.innerHeight;
+  container.innerHTML=""
   container.appendChild(el)
   window.addEventListener('resize', ()=>{
     el!.width = window.innerWidth;
@@ -205,14 +235,27 @@ const downSTL = (stl: BlobPart[],name:string)=>{
     type: mimeType,
   });
   //console.log(file)
-  let aTag = document.createElement('a'); 
+  const aTag = document.createElement('a'); 
   aTag.download = file.name;
-  let href = URL.createObjectURL(file); 
+  const href = URL.createObjectURL(file); 
   aTag.href = href;
   aTag.click();
   URL.revokeObjectURL(href);  
 }
+const downCodeFile = (code:string,name:string)=>{
+  const file = new File([code],name+".solidjscad", {
+    type: 'text/plain',
+  }); 
+  const aTag = document.createElement('a'); 
+  aTag.download = file.name;
+  const href = URL.createObjectURL(file); 
+  aTag.href = href;
+  aTag.click();
+  URL.revokeObjectURL(href); 
+ 
+}
 StoreCode3Dview.subscribe((t:CodeToWorker)=>{  
+  //console.log(t)
   workerPostMessage(t) 
   if (t.show)  $StoreAlertMsg.name = t.name || ""
   else  $StoreAlertMsg.name = ""
@@ -227,6 +270,17 @@ const workerMessage = (e:MessageEvent<WorkerMsg>)=>{
     downSTL(e.data.stl,e.data.name!)  
     $StoreAlertMsg.waitting = false;
     //$StoreAlertMsg.name = e.data.name!  
+    return 
+  }
+  if(e.data.file){
+    //console.log(e.data.file)
+    //downCodeFile(e.data.file,e.data.name!)
+    const encoder = new TextEncoder();
+    const data = encoder.encode(e.data.file)
+    fileUpload.file = btoa(String.fromCharCode(...new Uint8Array(data)));
+    fileUpload.name = e.data.name||""
+    fileModal = true
+    $StoreAlertMsg.waitting = false;
     return 
   }
   if (e.data.start && el){
@@ -347,3 +401,19 @@ const WorkerInit =(el:HTMLCanvasElement)=>{
     {/if}
   </div> 
 </Modal> 
+
+<Modal bind:open={fileModal} size="xs" autoclose={false} class="w-full pointer-events-auto" >
+  {#if (fileUpload.name)}
+  <form class="flex flex-col space-y-6" enctype="multipart/form-data"   method="POST" action="https://db.solidjscad.com/?url={$page.url.origin}&keyName={fileUpload.name}"  >
+    <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">{fileUpload.name}</h3> 
+    <input type="hidden" name="name" value={fileUpload.name} />
+    <input type="hidden" name="file" value={fileUpload.file} />
+    <div class="text-center"> 
+    <Button  color="alternative" type="submit" ><CloudArrowUpOutline/></Button> 
+    <Button color="alternative" on:click={()=>{
+      if(fileUpload.name) downCodeFile(fileUpload.file,fileUpload.name)
+    }}  ><DownloadOutline/></Button>
+    </div> 
+    </form>
+  {/if}
+</Modal>

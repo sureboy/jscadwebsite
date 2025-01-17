@@ -36,6 +36,7 @@
 		"@types/qrcode": "^1.5.5",
 		"@types/three": "^0.169.0",
 		"codemirror": "^6.0.1",
+		"gcode-viewer": "^0.6.2",
 		"qrcode": "^1.5.4",
 		"three": "^0.169.0",
 		"three-bvh-csg": "^0.0.16"
