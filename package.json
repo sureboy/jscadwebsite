@@ -1,5 +1,5 @@
 {
-	"name": "jscad",
+	"name": "solidjscad",
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
@@ -29,10 +29,8 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@codemirror/lang-javascript": "^6.2.2",
-		"@jscad/modeling": "^2.12.2",
-		"@jscad/stl-deserializer": "^2.1.24",
-		"@jscad/stl-serializer": "^2.1.17",
+		"@codemirror/lang-javascript": "^6.2.2",	
+		"@jscad/modeling": "^2.12.2",	
 		"@types/qrcode": "^1.5.5",
 		"@types/three": "^0.169.0",
 		"codemirror": "^6.0.1",

@@ -81,7 +81,7 @@ const getStrCode = (str:string,name?:string)=>{
       
 </script>
 <script lang="ts"> 
-import {mimeType} from "@jscad/stl-serializer"  
+//import {mimeType} from "@jscad/stl-serializer"  
 import {CSG2Three} from "$lib/function/csg2Three"   
 import { page } from '$app/stores';
 import {StoreCode3Dview,saveStorage,initMySolid,StoreAlertMsg,StoreMyClass,StoreInputCode,solid,StoreOrthographic} from "$lib/function/storage"
@@ -230,9 +230,8 @@ onMount(()=>{
 })
 
 const downSTL = (stl: BlobPart[],name:string)=>{
- 
   const file = new File( stl,name+".stl", {
-    type: mimeType,
+    type: 'application/sla',
   });
   //console.log(file)
   const aTag = document.createElement('a'); 

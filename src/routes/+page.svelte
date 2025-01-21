@@ -1,5 +1,5 @@
 <script lang="ts">
-
+//export const ssr = false
 
 import EditorJs , {getValue} from '$lib/component/EditorJs.svelte' 
 import View3d ,{screenHandle,loaderSTL,loaderFile} from '$lib/component/View3d.svelte'  

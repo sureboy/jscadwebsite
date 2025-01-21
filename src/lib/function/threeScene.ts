@@ -38,7 +38,12 @@ hemisphereLight.position.set(1, 1, 1);
 const axes = new AxesHelper(20);
 scene.add(group,hemisphereLight,axes)
 
-let stopAnimate=true;
+//let stopAnimate=true;
+const renderhand = ()=>{
+	renderer.render(scene, camera)
+	OrbControls.update();
+}
+/*
 const animate = (t:number) => {
 	if (stopAnimate)return;
 	requestAnimationFrame(animate);
@@ -46,10 +51,13 @@ const animate = (t:number) => {
 	//cube.rotation.x += 0.01;
 	//scene.rotation.y += 0.005;
 	//scene.rotation.x+=0.0025;
-	renderer.render(scene, camera)
+	renderhand()
+	
 	//renderer.render(scene, camera);
-	OrbControls.update();
+	//renderer.render(scene, camera)
+	//OrbControls.update();
 };
+*/
 const getSize = (obj:Object3D)=>{
 	const fobj = new Box3().setFromObject(obj)
 	const sceneSize = fobj.getSize(new Vector3())
@@ -61,37 +69,26 @@ const getSize = (obj:Object3D)=>{
 export function onWindowResize(el: HTMLCanvasElement,changeCamera:boolean = true,orthographic:boolean=false) {
 	if (!renderer)return;
 	//if (group.children.length===0)return;
-	
- 
-	
- 
-	
 	//console.log(el.width,el.height,orthographic,changeCamera,group)
 	if (orthographic){
 		if (changeCamera){ 
 			initOrb(el)
 			//let  size = getSize(group);
-		const k = el.width/el.height
-		const s = getSize(group)/2;
-		camera = new OrthographicCamera( -s *k,s*k,s,-s,0.1,2000)
-		
+			const k = el.width/el.height
+			const s = getSize(group)/2;
+			camera = new OrthographicCamera( -s *k,s*k,s,-s,0.1,2000)
 			camera.position.set(s,s,s); 
-			camera.lookAt(scene.position)			
+			camera.lookAt(scene.position)
 		}
 	}else{
 		
 		if (changeCamera){
 			initOrb(el)
 			camera = new PerspectiveCamera(40, 1, 0.1, 2000);
-			
- 
 			const  size = getSize(group);
 			const fov =  camera.fov*(Math.PI /180); 	 
-			camera.position.z = size /2/Math.tan(fov/2); 
-		 
-	
-			camera.aspect = el.width/el.height
-			
+			camera.position.z = size /2/Math.tan(fov/2); 	 	
+			camera.aspect = el.width/el.height			
 		}
 	}
 	OrbControls.object = camera
@@ -101,6 +98,10 @@ export function onWindowResize(el: HTMLCanvasElement,changeCamera:boolean = true
 }
 const initOrb = (el:HTMLCanvasElement)=>{
 	OrbControls = new OrbitControls(camera, el); 
+	OrbControls.addEventListener("change",()=>{ 
+		requestAnimationFrame(() => renderhand()); 	
+	})
+	/*
 	OrbControls.addEventListener("start",(e)=>{ 
 		if (stopAnimate){
 			stopAnimate=false
@@ -110,6 +111,7 @@ const initOrb = (el:HTMLCanvasElement)=>{
 	OrbControls.addEventListener("end",(e)=>{ 
 		stopAnimate=true
 	})	
+	*/
 }
  
 const initRender = (el:HTMLCanvasElement,orthographic:boolean=false)=>{
