@@ -16,16 +16,17 @@ export const handle: Handle = async ({ event, resolve }) => {
 		return await resStl(event)
 	}
 	console.log(pathname)
-	if (pathname.startsWith("/doc") && pathname.endsWith(".html")) {
+	if (pathname.startsWith("/documents")) {
 		let path = pathname.split("/")
 		path.shift()
 		
 		path[0] = "/* @vite-ignore */../static/doc"
 		
-		const docPath = path.join("/")+"?raw"
+		let docPath = path.join("/")//+"?raw"
+		if (!docPath.indexOf("."))docPath+=".html"
 		 
 		console.log(docPath)
-		const res = await import(docPath)
+		const res = await import(docPath+"?raw")
 		//console.log(res)
 		return new Response(res.default,{headers:header });
 		//return await resStl(event)
