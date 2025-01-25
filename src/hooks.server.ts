@@ -26,7 +26,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 		//if (docPath.indexOf(".",4)===-1)docPath+=".html"
 		 
 		console.log(docPath,docPath.indexOf("."))
-		const res = await import(docPath+".html?raw")
+		const res = await import(docPath+".txt?raw")
 		//console.log(res)
 		return new Response(res.default,{headers:header });
 		}
