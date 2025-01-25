@@ -16,11 +16,12 @@ export const handle: Handle = async ({ event, resolve }) => {
 		return await resStl(event)
 	}
 	console.log(pathname)
-	if (pathname.startsWith("/doc") && pathname.indexOf(".")<0) {
+	if (pathname.startsWith("/doc")){
+		if  (pathname.indexOf(".")<0 ) {
 		let path = pathname.split("/")
 		//path.shift()
 		
-		path[0] = "../static"
+		path[0] = ".."
 		let docPath = path.join("/")//+"?raw"
 		//if (docPath.indexOf(".",4)===-1)docPath+=".html"
 		 
@@ -28,6 +29,20 @@ export const handle: Handle = async ({ event, resolve }) => {
 		const res = await import(docPath+".html?raw")
 		//console.log(res)
 		return new Response(res.default,{headers:header });
+		}
+		if (pathname.endsWith(".html")){
+			let path = pathname.split("/")
+			//path.shift()
+			
+			path[0] = ".."
+			let docPath = path.join("/")//+"?raw"
+			//if (docPath.indexOf(".",4)===-1)docPath+=".html"
+			 
+			console.log(docPath)
+			const res = await import(docPath+"?raw")
+			//console.log(res)
+			return new Response(res.default,{headers:header });
+		}
 		//return await resStl(event)
 	}
  
