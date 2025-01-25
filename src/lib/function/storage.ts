@@ -86,6 +86,7 @@ export const StringToClass = (data:string,name:string,errMsg:Function)=>{
   sandbox[_name] = obje  
   return obje 
 }
+/*
 const classToStringEach = (val:string,f:Function)=>{
   const item = val.matchAll(/(?<=this\.)[\w\$\.]+/g)
   if (!item)return
@@ -101,6 +102,7 @@ const classToStringEach = (val:string,f:Function)=>{
     f(t)
   }
 }
+  */
 const classObjToStringEach = (obj:solidEditStruct,f:Function)=>{
    
   const item = obj.CodeFile.matchAll(/(?<=this\.)[\w\$\.]+/g)
@@ -120,15 +122,16 @@ const classObjToStringEach = (obj:solidEditStruct,f:Function)=>{
                 
       }
     }
+    
     if (_obj && Object.hasOwn(_obj,"CodeFile"))f(_obj,vs.reverse().join("__")) 
-    //  else console.log(vs)   
-   
+
   }
 }
 export const ClassObjToString = (obj:solidEditStruct)=>{
   let fileList:any[] = [obj]
   let titleList:string[]=[obj.Name]
   const f = (o:any,n:string)=>{    
+    console.log(n)
     if (titleList.includes(n))return
     titleList.push(n)
     fileList.push(o)
@@ -137,7 +140,7 @@ export const ClassObjToString = (obj:solidEditStruct)=>{
   classObjToStringEach(obj,f)
   return titleList.join(",")+"\n======\n"+fileList.map(v=>{return v.CodeFile}).join("\n======\n")
 }
-
+/*
 export const  ClassToString = (c:string,n:string)=>{
   const codelist:Map<string,string> = new Map<string,string>()
   const ns = n.split("__")
@@ -165,6 +168,7 @@ export const  ClassToString = (c:string,n:string)=>{
   return codelist
    
 }
+  */
 const getSolidKey = (f:(key:string)=>void)=>{
   const sl = window.localStorage.length
   for (let i=0;i<sl;i++){ 

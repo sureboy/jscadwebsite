@@ -1,8 +1,13 @@
 //import { defaultLocale, loadTranslations, locales, } from '$lib/translations/index';
 import type { Handle,HandleServerError } from '@sveltejs/kit';
-
+import { read } from '$app/server';
 const u = new URL("https://cdn.jsdelivr.net/gh/sureboy/games@master")
 //const u1 = new URL("https://cdn.jsdelivr.net/gh/sureboy/jscadwebsite@master")
+const header = new Headers({
+	'Access-Control-Allow-Origin': '*',
+	'Access-Control-Allow-Headers': '*',
+	"content-type": "text/html",
+  })
 export const handle: Handle = async ({ event, resolve }) => {
 	
 	const { url,request } = event;
@@ -10,6 +15,22 @@ export const handle: Handle = async ({ event, resolve }) => {
 	if ( pathname.endsWith(".stl")) {
 		return await resStl(event)
 	}
+	console.log(pathname)
+	if (pathname.startsWith("/doc") && pathname.endsWith(".html")) {
+		let path = pathname.split("/")
+		path.shift()
+		
+		path[0] = "/* @vite-ignore */../static/doc"
+		
+		const docPath = path.join("/")+"?raw"
+		 
+		console.log(docPath)
+		const res = await import(docPath)
+		//console.log(res)
+		return new Response(res.default,{headers:header });
+		//return await resStl(event)
+	}
+ 
 	 
 	/**
 	if (pathname.startsWith("/docs/")){

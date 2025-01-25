@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: src/primitives/geodesicSphere.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: src/primitives/geodesicSphere.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const mat4 = require('../maths/mat4')
+const vec3 = require('../maths/vec3')
+
+const geom3 = require('../geometries/geom3')
+
+const polyhedron = require('./polyhedron')
+
+const { isGTE } = require('./commonChecks')
+
+/**
+ * Construct a geodesic sphere based on icosahedron symmetry.
+ * @param {Object} [options] - options for construction
+ * @param {Number} [options.radius=1] - target radius of sphere
+ * @param {Number} [options.frequency=6] - subdivision frequency per face, multiples of 6
+ * @returns {geom3} new 3D geometry
+ * @alias module:modeling/primitives.geodesicSphere
+ *
+ * @example
+ * let myshape = geodesicSphere({radius: 15, frequency: 18})
+ */
+const geodesicSphere = (options) => {
+  const defaults = {
+    radius: 1,
+    frequency: 6
+  }
+  let { radius, frequency } = Object.assign({}, defaults, options)
+
+  if (!isGTE(radius, 0)) throw new Error('radius must be positive')
+  if (!isGTE(frequency, 6)) throw new Error('frequency must be six or more')
+
+  // if radius is zero return empty geometry
+  if (radius === 0) return geom3.create()
+
+  // adjust the frequency to base 6
+  frequency = Math.floor(frequency / 6)
+
+  const ci = [ // hard-coded data of icosahedron (20 faces, all triangles)
+    [0.850651, 0.000000, -0.525731],
+    [0.850651, -0.000000, 0.525731],
+    [-0.850651, -0.000000, 0.525731],
+    [-0.850651, 0.000000, -0.525731],
+    [0.000000, -0.525731, 0.850651],
+    [0.000000, 0.525731, 0.850651],
+    [0.000000, 0.525731, -0.850651],
+    [0.000000, -0.525731, -0.850651],
+    [-0.525731, -0.850651, -0.000000],
+    [0.525731, -0.850651, -0.000000],
+    [0.525731, 0.850651, 0.000000],
+    [-0.525731, 0.850651, 0.000000]]
+
+  const ti = [[0, 9, 1], [1, 10, 0], [6, 7, 0], [10, 6, 0], [7, 9, 0], [5, 1, 4], [4, 1, 9], [5, 10, 1], [2, 8, 3], [3, 11, 2], [2, 5, 4],
+    [4, 8, 2], [2, 11, 5], [3, 7, 6], [6, 11, 3], [8, 7, 3], [9, 8, 4], [11, 10, 5], [10, 11, 6], [8, 9, 7]]
+
+  const geodesicSubDivide = (p, frequency, offset) => {
+    const p1 = p[0]
+    const p2 = p[1]
+    const p3 = p[2]
+    let n = offset
+    const c = []
+    const f = []
+
+    //           p3
+    //           /\
+    //          /__\     frequency = 3
+    //      i  /\  /\
+    //        /__\/__\       total triangles = 9 (frequency*frequency)
+    //       /\  /\  /\
+    //     0/__\/__\/__\
+    //    p1 0   j      p2
+
+    for (let i = 0; i &lt; frequency; i++) {
+      for (let j = 0; j &lt; frequency - i; j++) {
+        const t0 = i / frequency
+        const t1 = (i + 1) / frequency
+        const s0 = j / (frequency - i)
+        const s1 = (j + 1) / (frequency - i)
+        const s2 = frequency - i - 1 ? j / (frequency - i - 1) : 1
+        const q = []
+
+        q[0] = mix3(mix3(p1, p2, s0), p3, t0)
+        q[1] = mix3(mix3(p1, p2, s1), p3, t0)
+        q[2] = mix3(mix3(p1, p2, s2), p3, t1)
+
+        // -- normalize
+        for (let k = 0; k &lt; 3; k++) {
+          const r = vec3.length(q[k])
+          for (let l = 0; l &lt; 3; l++) {
+            q[k][l] /= r
+          }
+        }
+        c.push(q[0], q[1], q[2])
+        f.push([n, n + 1, n + 2]); n += 3
+
+        if (j &lt; frequency - i - 1) {
+          const s3 = frequency - i - 1 ? (j + 1) / (frequency - i - 1) : 1
+          q[0] = mix3(mix3(p1, p2, s1), p3, t0)
+          q[1] = mix3(mix3(p1, p2, s3), p3, t1)
+          q[2] = mix3(mix3(p1, p2, s2), p3, t1)
+
+          // -- normalize
+          for (let k = 0; k &lt; 3; k++) {
+            const r = vec3.length(q[k])
+            for (let l = 0; l &lt; 3; l++) {
+              q[k][l] /= r
+            }
+          }
+          c.push(q[0], q[1], q[2])
+          f.push([n, n + 1, n + 2]); n += 3
+        }
+      }
+    }
+    return { points: c, triangles: f, offset: n }
+  }
+
+  const mix3 = (a, b, f) => {
+    const _f = 1 - f
+    const c = []
+    for (let i = 0; i &lt; 3; i++) {
+      c[i] = a[i] * _f + b[i] * f
+    }
+    return c
+  }
+
+  let points = []
+  let faces = []
+  let offset = 0
+
+  for (let i = 0; i &lt; ti.length; i++) {
+    const g = geodesicSubDivide([ci[ti[i][0]], ci[ti[i][1]], ci[ti[i][2]]], frequency, offset)
+    points = points.concat(g.points)
+    faces = faces.concat(g.triangles)
+    offset = g.offset
+  }
+
+  let geometry = polyhedron({ points: points, faces: faces, orientation: 'inward' })
+  if (radius !== 1) geometry = geom3.transform(mat4.fromScaling(mat4.create(), [radius, radius, radius]), geometry)
+  return geometry
+}
+
+module.exports = geodesicSphere
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-modeling_booleans.html">modeling/booleans</a></li><li><a href="module-modeling_colors.html">modeling/colors</a></li><li><a href="module-modeling_connectors.html">modeling/connectors</a></li><li><a href="module-modeling_curves.html">modeling/curves</a></li><li><a href="module-modeling_curves_bezier.html">modeling/curves/bezier</a></li><li><a href="module-modeling_expansions.html">modeling/expansions</a></li><li><a href="module-modeling_extrusions.html">modeling/extrusions</a></li><li><a href="module-modeling_extrusions_slice.html">modeling/extrusions/slice</a></li><li><a href="module-modeling_geometries.html">modeling/geometries</a></li><li><a href="module-modeling_geometries_geom2.html">modeling/geometries/geom2</a></li><li><a href="module-modeling_geometries_geom3.html">modeling/geometries/geom3</a></li><li><a href="module-modeling_geometries_path2.html">modeling/geometries/path2</a></li><li><a href="module-modeling_geometries_poly2.html">modeling/geometries/poly2</a></li><li><a href="module-modeling_geometries_poly3.html">modeling/geometries/poly3</a></li><li><a href="module-modeling_hulls.html">modeling/hulls</a></li><li><a href="module-modeling_maths.html">modeling/maths</a></li><li><a href="module-modeling_maths_line2.html">modeling/maths/line2</a></li><li><a href="module-modeling_maths_line3.html">modeling/maths/line3</a></li><li><a href="module-modeling_maths_mat4.html">modeling/maths/mat4</a></li><li><a href="module-modeling_maths_plane.html">modeling/maths/plane</a></li><li><a href="module-modeling_maths_utils.html">modeling/maths/utils</a></li><li><a href="module-modeling_maths_vec2.html">modeling/maths/vec2</a></li><li><a href="module-modeling_maths_vec3.html">modeling/maths/vec3</a></li><li><a href="module-modeling_maths_vec4.html">modeling/maths/vec4</a></li><li><a href="module-modeling_measurements.html">modeling/measurements</a></li><li><a href="module-modeling_modifiers.html">modeling/modifiers</a></li><li><a href="module-modeling_primitives.html">modeling/primitives</a></li><li><a href="module-modeling_text.html">modeling/text</a></li><li><a href="module-modeling_transforms.html">modeling/transforms</a></li><li><a href="module-modeling_utils.html">modeling/utils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#TAU">TAU</a></li><li><a href="global.html#comparePoints">comparePoints</a></li><li><a href="global.html#comparePolygons">comparePolygons</a></li><li><a href="global.html#comparePolygonsAsPoints">comparePolygonsAsPoints</a></li><li><a href="global.html#compareVectors">compareVectors</a></li><li><a href="global.html#distanceBetween">distanceBetween</a></li><li><a href="global.html#lengths">lengths</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Sat Jan 25 2025 09:49:34 GMT+0800 (中国标准时间)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
