@@ -15,6 +15,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	if ( pathname.endsWith(".stl")) {
 		return await resStl(event)
 	}
+	/*
 	console.log(pathname)
 	if (pathname.startsWith("/doc")){
 		if  (pathname.indexOf(".")<0 ) {
@@ -46,7 +47,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 		//return await resStl(event)
 	}
  
-	 
+	 */
 	/**
 	if (pathname.startsWith("/docs/")){
 		try{
