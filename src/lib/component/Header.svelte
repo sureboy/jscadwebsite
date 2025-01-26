@@ -95,10 +95,8 @@
         </DropdownItem> 
         {/each} 
         <DropdownDivider  />    
-        <DropdownItem  class="flex items-center gap-2"  on:click={(e)=>{
-          StoreHelpHidden.set(false)
-        }}>
-          <BookOpenOutline class="w-4 h-4 me-2 " />
+        <DropdownItem  class="flex items-center gap-2"><a class="w-full h-full" target="_blank" href="https://solidjscad.zaddone.com/" >
+          <BookOpenOutline class="w-4 h-4 me-2 " /></a>
         </DropdownItem>
       </Dropdown>
     {#if $StoreAlertMsg.name}   
