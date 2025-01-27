@@ -83,16 +83,16 @@ const getStrCode = (str:string,name?:string)=>{
 <script lang="ts"> 
 //import {mimeType} from "@jscad/stl-serializer"  
 import {CSG2Three} from "$lib/function/csg2Three"   
-import { page } from '$app/stores';
+import { page } from '$app/state';
 import {StoreCode3Dview,saveStorage,initMySolid,StoreAlertMsg,StoreMyClass,StoreInputCode,solid,StoreOrthographic} from "$lib/function/storage"
 import {onWindowResize,startSceneOBJ,addSceneOBJ} from "$lib/function/threeScene" 
 import { createCanvasElement, Mesh,MeshStandardMaterial } from "three";
 import { onMount ,onDestroy} from 'svelte';   
 import type {CodeToWorker,WorkerMsg} from '$lib/function/share' 
-import {  Modal,Spinner ,Button, Fileupload } from 'flowbite-svelte';  
+import {  Modal,Spinner ,Button,ButtonGroup } from 'flowbite-svelte';  
 import   QRCode  from 'qrcode';   
 import { STLLoader } from 'three/addons/loaders/STLLoader.js';
-import { CloudArrowUpOutline,DownloadOutline } from 'flowbite-svelte-icons';
+import { CloudArrowUpOutline,DownloadOutline,QrCodeOutline,CartOutline,StoreOutline } from 'flowbite-svelte-icons';
 let container:HTMLElement; 
 let qrcode:HTMLElement;
 
@@ -106,6 +106,24 @@ let canvas:HTMLElement;
 let remoteName = ""
 formModal = true 
 waitting = true
+let dbUrl = "https://db.solidjscad.com"
+
+const changeDbUrl = async ()=>{
+  const dbUrls =new Set([dbUrl,"https://db.solidjscad.com","https://stl.miguotuijian.cn"])
+  
+  for (const u of dbUrls){
+    try{
+      await fetch(u+"?p=1") 
+       //console.log(res)
+       //console.log(u)
+       return u
+    }catch(e){
+      //console.log(e)
+    }
+    
+  }
+  return dbUrl
+}
 
 //let ischange = false
 StoreOrthographic.subscribe(o=>{
@@ -132,7 +150,7 @@ const getRemote = (k:string)=>{
     return 
   }
   const name = n[l-1]
-  fetch(`https://db.solidjscad.com/?url=${encodeURI($page.url.origin)}&k=${k}`).then((r)=>{     
+  fetch(`https://db.solidjscad.com/?url=${encodeURI(page.url.origin)}&k=${k}`).then((r)=>{     
  
     r.arrayBuffer().then((v)=>{ 
       getStrCode((new TextDecoder('utf-8')).decode(v),name)
@@ -164,7 +182,7 @@ const getRemote = (k:string)=>{
 const getQrcode = (k:string,oldk:string)=>{
   workerPostMessage({code:window.localStorage.getItem(oldk),name:oldk,show:true})
   remoteName = "#"+k
-  QRCode.toCanvas(canvas, `${$page.url.origin}/#${k}`, function (error) {
+  QRCode.toCanvas(canvas, `${page.url.origin}/#${k}`, function (error) {
     if (error) console.error(error)
     else
       qrcode.appendChild(canvas!)    
@@ -279,6 +297,7 @@ const workerMessage = (e:MessageEvent<WorkerMsg>)=>{
     fileUpload.file = btoa(String.fromCharCode(...new Uint8Array(data)));
     fileUpload.name = e.data.name||""
     fileModal = true
+    changeDbUrl().then(v=>{dbUrl=v})
     $StoreAlertMsg.waitting = false;
     return 
   }
@@ -403,15 +422,21 @@ const WorkerInit =(el:HTMLCanvasElement)=>{
 
 <Modal bind:open={fileModal} size="xs" autoclose={false} class="w-full pointer-events-auto" >
   {#if (fileUpload.name)}
-  <form class="flex flex-col space-y-6" enctype="multipart/form-data"   method="POST" action="https://db.solidjscad.com/?url={$page.url.origin}&keyName={fileUpload.name}"  >
+  <form class="flex flex-col space-y-6" enctype="multipart/form-data"   method="POST" action="{dbUrl}/?url={page.url.origin}&keyName={fileUpload.name}"  >
     <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">{fileUpload.name}</h3> 
     <input type="hidden" name="name" value={fileUpload.name} />
     <input type="hidden" name="file" value={fileUpload.file} />
     <div class="text-center"> 
-    <Button  color="alternative" type="submit" ><CloudArrowUpOutline/></Button> 
+      <ButtonGroup>
     <Button color="alternative" on:click={()=>{
       if(fileUpload.name) downCodeFile(fileUpload.file,fileUpload.name)
     }}  ><DownloadOutline/></Button>
+ 
+  <Button  color="alternative" type="submit" >
+    <CloudArrowUpOutline/>
+  
+  </Button> 
+</ButtonGroup>
     </div> 
     </form>
   {/if}

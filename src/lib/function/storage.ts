@@ -131,7 +131,7 @@ export const ClassObjToString = (obj:solidEditStruct)=>{
   let fileList:any[] = [obj]
   let titleList:string[]=[obj.Name]
   const f = (o:any,n:string)=>{    
-    console.log(n)
+    //console.log(n)
     if (titleList.includes(n))return
     titleList.push(n)
     fileList.push(o)
