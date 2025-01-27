@@ -2,6 +2,7 @@
 
   const loader = new STLLoader();
  let el:HTMLCanvasElement|null; 
+ let screenCanvas:HTMLCanvasElement
  let size:any
  let worker:SharedWorker|Worker|null
  const material = new MeshStandardMaterial({
@@ -36,17 +37,59 @@ const getStrCode = (str:string,name?:string)=>{
   workerPostMessage({code:codes[0],name:titles[0]+"__"+name,show:true})
 }
  export const screenHandle = (e:any)=>{
-    //console.log(elCanvas)
-    console.log(size)
-    el?.toBlob((blob:any)=>{ 
-        let aTag = document.createElement('a'); 
-        aTag.download = e.detail.name+"_screen.png";
-        let href = URL.createObjectURL(blob); 
-        console.log(href)
-        aTag.href = href;
-        aTag.click();
-        URL.revokeObjectURL(href);  		
-      })
+
+    if (!el)return
+    const ctx = screenCanvas.getContext("2d")
+    //console.log(ctx)
+    if (!ctx)return
+    const img = new Image()
+    img.src = el.toDataURL()
+    img.onload = ()=>{
+      screenCanvas.width  = img.width
+      screenCanvas.height = img.height
+      ctx.drawImage(img,0,0)
+      const imagedata = ctx.getImageData(0, 0, img.width, img.height)
+      let imgData = imagedata.data
+      let minX = img.width;
+      let minY = img.height;
+      let maxX = -1;
+      let maxY = -1;
+      for (let y = 0; y < img.height; y++) {
+        for (let x = 0; x < img.width; x++) {
+          const index = (y * img.width + x) * 4; 
+          const red = imgData[index];
+          const green = imgData[index + 1];
+          const blue = imgData[index + 2]; 
+          if (red === 0 && green === 0 && blue === 0) {
+              continue
+          } else {
+               minX = Math.min(minX, x);
+              minY = Math.min(minY, y);
+              maxX = Math.max(maxX, x);
+              maxY = Math.max(maxY, y);
+          }
+        }
+      }
+      const croppedWidth = maxX - minX + 1;
+      const croppedHeight = maxY - minY + 1;
+      screenCanvas.width = croppedWidth;
+      screenCanvas.height = croppedHeight; 
+      console.log(minX, minY, maxX, maxY,croppedWidth,croppedHeight)
+      ctx.drawImage(img, minX, minY, croppedWidth, croppedHeight, 0, 0, croppedWidth, croppedHeight);
+      
+      let aTag = document.createElement('a'); 
+      aTag.download = e.detail.name+"_screen.png";
+      let href =screenCanvas.toDataURL()
+      //console.log(href)
+      aTag.href = href;
+      aTag.click();
+      //URL.revokeObjectURL(href);  	
+ 
+    }
+ 
+ 
+  
+  
   }
   export const loaderSTL = (e:any)=>{ 
     loader.load(e.detail.uri, function ( object ) { 
@@ -95,7 +138,6 @@ import { STLLoader } from 'three/addons/loaders/STLLoader.js';
 import { CloudArrowUpOutline,DownloadOutline,QrCodeOutline,CartOutline,StoreOutline } from 'flowbite-svelte-icons';
 let container:HTMLElement; 
 let qrcode:HTMLElement;
-
 //let mesh:any[] =  []
 let formModal=false
 let fileModal = false
@@ -441,3 +483,4 @@ const WorkerInit =(el:HTMLCanvasElement)=>{
     </form>
   {/if}
 </Modal>
+<canvas bind:this={screenCanvas}   style="display:none;"></canvas>

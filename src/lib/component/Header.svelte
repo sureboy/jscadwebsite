@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import { createEventDispatcher } from 'svelte';
   import { GridSolid,WindowsSolid, PrinterOutline,  PlayOutline,  TrashBinOutline,  DownloadOutline ,PlusOutline,ChevronDownOutline , BookOpenOutline, FileCodeOutline ,EditOutline,GridPlusOutline,CloudArrowUpOutline, FileImageOutline} from 'flowbite-svelte-icons';
   import { Input, Navbar,Alert  ,Dropdown, DropdownItem,Spinner,DropdownDivider,Button, ButtonGroup} from 'flowbite-svelte';   
@@ -103,7 +103,7 @@
     {#if $StoreInputCode} 
       <Button    href="#{$StoreAlertMsg.name}"  color="light" on:click={()=>{
         //dispatch('viewCode');$page.url
-        if ($StoreAlertMsg.name !== $page.url.hash.substring(1)) return
+        if ($StoreAlertMsg.name !== page.url.hash.substring(1)) return
         //console.log(e,$page.url.hash)
         StoreCode3Dview.set({code:getValue(),show:true ,camera:false})   
         StoreInputCode.set("");   
