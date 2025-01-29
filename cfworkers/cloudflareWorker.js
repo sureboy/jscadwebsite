@@ -19,7 +19,11 @@ export default {
     const url = new URL(request.url);
     const p = url.searchParams.get("p")
     if (p){
-      return  new Response("" ,{headers:header });
+      return  new Response(`host:${env.API_HOST}` ,{headers:header });
+    }
+    const upload = url.searchParams.get("upload")
+    if (upload){
+      return await fetch("https://www.zaddone.com/apitoken")
     }
     const k = url.searchParams.get("k")
     if (k){

@@ -3,7 +3,7 @@
   const loader = new STLLoader();
  let el:HTMLCanvasElement|null; 
  let screenCanvas:HTMLCanvasElement
- let size:any
+ let screenImgList:any[] = []
  let worker:SharedWorker|Worker|null
  const material = new MeshStandardMaterial({
 	color: 'gray',
@@ -83,6 +83,7 @@ const getStrCode = (str:string,name?:string)=>{
       //console.log(href)
       aTag.href = href;
       aTag.click();
+      screenImgList.push(href)
       //URL.revokeObjectURL(href);  	
  
     }
@@ -126,7 +127,7 @@ const getStrCode = (str:string,name?:string)=>{
 <script lang="ts"> 
 //import {mimeType} from "@jscad/stl-serializer"  
 import {CSG2Three} from "$lib/function/csg2Three"   
-import { page } from '$app/state';
+//import { page } from '$app/state';
 import {StoreCode3Dview,saveStorage,initMySolid,StoreAlertMsg,StoreMyClass,StoreInputCode,solid,StoreOrthographic} from "$lib/function/storage"
 import {onWindowResize,startSceneOBJ,addSceneOBJ} from "$lib/function/threeScene" 
 import { createCanvasElement, Mesh,MeshStandardMaterial } from "three";
@@ -144,6 +145,7 @@ let fileModal = false
 let fileUpload = {name:"",file:""}
 let waitting = false
 //let shareUrl = ""
+
 let canvas:HTMLElement;
 let remoteName = ""
 formModal = true 
@@ -192,7 +194,8 @@ const getRemote = (k:string)=>{
     return 
   }
   const name = n[l-1]
-  fetch(`https://db.solidjscad.com/?url=${encodeURI(page.url.origin)}&k=${k}`).then((r)=>{     
+  //console.log(new URL(window.location.href).origin)
+  fetch(`https://db.solidjscad.com/?url=${encodeURI(new URL(window.location.href).origin)}&k=${k}`).then((r)=>{     
  
     r.arrayBuffer().then((v)=>{ 
       getStrCode((new TextDecoder('utf-8')).decode(v),name)
@@ -224,7 +227,7 @@ const getRemote = (k:string)=>{
 const getQrcode = (k:string,oldk:string)=>{
   workerPostMessage({code:window.localStorage.getItem(oldk),name:oldk,show:true})
   remoteName = "#"+k
-  QRCode.toCanvas(canvas, `${page.url.origin}/#${k}`, function (error) {
+  QRCode.toCanvas(canvas, `${new URL(window.location.href).origin}/#${k}`, function (error) {
     if (error) console.error(error)
     else
       qrcode.appendChild(canvas!)    
@@ -464,7 +467,7 @@ const WorkerInit =(el:HTMLCanvasElement)=>{
 
 <Modal bind:open={fileModal} size="xs" autoclose={false} class="w-full pointer-events-auto" >
   {#if (fileUpload.name)}
-  <form class="flex flex-col space-y-6" enctype="multipart/form-data"   method="POST" action="{dbUrl}/?url={page.url.origin}&keyName={fileUpload.name}"  >
+  <form class="flex flex-col space-y-6" enctype="multipart/form-data"   method="POST" action="{dbUrl}/?url={new URL(window.location.href).origin}&keyName={fileUpload.name}"  >
     <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">{fileUpload.name}</h3> 
     <input type="hidden" name="name" value={fileUpload.name} />
     <input type="hidden" name="file" value={fileUpload.file} />
