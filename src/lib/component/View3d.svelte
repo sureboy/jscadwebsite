@@ -195,7 +195,7 @@ const getRemote = (k:string)=>{
   }
   const name = n[l-1]
   //console.log(new URL(window.location.href).origin)
-  fetch(`https://db.solidjscad.com/?url=${encodeURI(new URL(window.location.href).origin)}&k=${k}`).then((r)=>{     
+  fetch(`${dbUrl}/?url=${encodeURI(new URL(window.location.href).origin)}&k=${k}`).then((r)=>{     
  
     r.arrayBuffer().then((v)=>{ 
       getStrCode((new TextDecoder('utf-8')).decode(v),name)
@@ -342,7 +342,10 @@ const workerMessage = (e:MessageEvent<WorkerMsg>)=>{
     fileUpload.file = btoa(String.fromCharCode(...new Uint8Array(data)));
     fileUpload.name = e.data.name||""
     fileModal = true
-    changeDbUrl().then(v=>{dbUrl=v})
+    changeDbUrl().then(v=>{
+      dbUrl=v
+      console.log(dbUrl)
+    })
     $StoreAlertMsg.waitting = false;
     return 
   }
