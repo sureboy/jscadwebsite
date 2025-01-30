@@ -21,10 +21,7 @@ export default {
     if (p){
       return  new Response(`host:${env.API_HOST}` ,{headers:header });
     }
-    const upload = url.searchParams.get("upload")
-    if (upload){
-      return await fetch("https://www.zaddone.com/apitoken")
-    }
+
     const k = url.searchParams.get("k")
     if (k){
       const value = await env.solidtmp.get(k);
@@ -34,6 +31,7 @@ export default {
     } 
     const reurl = url.searchParams.get("url")
     if (!reurl)return
+
     const name = url.searchParams.get("keyName")
     if (!name)return new Response(null,{status:404}) 
 
@@ -65,8 +63,9 @@ export default {
       //codePage = codeHeader.join(",")  + codePage
       
       //const codePage = JSON.stringify(db)
+      const imgFiles = db.get("imgFiles")
       const  codeKey =name.split("__")[0]+"__"+new Date().getTime().toString(36).substring(2);// await digestMessage(codePage);
-      await env.solidtmp.put(codeKey,codePage,{
+      await env.solidtmp.put(codeKey,`{"code":"${codePage}","img":"${JSON.stringify(imgFiles)}"}`,{
         expirationTtl: secondsFromNow,
       });   
  

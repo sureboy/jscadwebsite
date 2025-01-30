@@ -1,9 +1,9 @@
 <script context="module" lang="ts" >
 
-  const loader = new STLLoader();
+ const loader = new STLLoader();
  let el:HTMLCanvasElement|null; 
  let screenCanvas:HTMLCanvasElement
- let screenImgList:any[] = []
+ let screenImgList:Set<string> = new Set<string>()
  let worker:SharedWorker|Worker|null
  const material = new MeshStandardMaterial({
 	color: 'gray',
@@ -29,15 +29,13 @@ const getStrCode = (str:string,name?:string)=>{
   const decodedString = decoder.decode(new Uint8Array([...decodedData].map(char => char.charCodeAt(0))));
   const [t,...codes] = decodedString.split("\n======\n") 
   let titles = t.split(",")  
-  console.log(t)
-  for (let i in titles){  
-    
+  //console.log(t)
+  for (let i in titles){      
     workerPostMessage({code:codes[i],name:titles[i]+"__"+name,show:false})            
   }     
   workerPostMessage({code:codes[0],name:titles[0]+"__"+name,show:true})
 }
  export const screenHandle = (e:any)=>{
-
     if (!el)return
     const ctx = screenCanvas.getContext("2d")
     //console.log(ctx)
@@ -63,7 +61,7 @@ const getStrCode = (str:string,name?:string)=>{
           if (red === 0 && green === 0 && blue === 0) {
               continue
           } else {
-               minX = Math.min(minX, x);
+              minX = Math.min(minX, x);
               minY = Math.min(minY, y);
               maxX = Math.max(maxX, x);
               maxY = Math.max(maxY, y);
@@ -74,23 +72,19 @@ const getStrCode = (str:string,name?:string)=>{
       const croppedHeight = maxY - minY + 1;
       screenCanvas.width = croppedWidth;
       screenCanvas.height = croppedHeight; 
-      console.log(minX, minY, maxX, maxY,croppedWidth,croppedHeight)
+      //console.log(minX, minY, maxX, maxY,croppedWidth,croppedHeight)
       ctx.drawImage(img, minX, minY, croppedWidth, croppedHeight, 0, 0, croppedWidth, croppedHeight);
       
       let aTag = document.createElement('a'); 
       aTag.download = e.detail.name+"_screen.png";
       let href =screenCanvas.toDataURL()
       //console.log(href)
+      //screenImgList.push(href)
       aTag.href = href;
       aTag.click();
-      screenImgList.push(href)
-      //URL.revokeObjectURL(href);  	
- 
-    }
- 
- 
-  
-  
+      screenImgList.add(href)
+      //URL.revokeObjectURL(href);  	 
+    } 
   }
   export const loaderSTL = (e:any)=>{ 
     loader.load(e.detail.uri, function ( object ) { 
@@ -133,37 +127,35 @@ import {onWindowResize,startSceneOBJ,addSceneOBJ} from "$lib/function/threeScene
 import { createCanvasElement, Mesh,MeshStandardMaterial } from "three";
 import { onMount ,onDestroy} from 'svelte';   
 import type {CodeToWorker,WorkerMsg} from '$lib/function/share' 
-import {  Modal,Spinner ,Button,ButtonGroup } from 'flowbite-svelte';  
+import {  Modal,Spinner ,Button,ButtonGroup,Fileupload } from 'flowbite-svelte';  
 import   QRCode  from 'qrcode';   
 import { STLLoader } from 'three/addons/loaders/STLLoader.js';
 import { CloudArrowUpOutline,DownloadOutline,QrCodeOutline,CartOutline,StoreOutline } from 'flowbite-svelte-icons';
+ 
 let container:HTMLElement; 
 let qrcode:HTMLElement;
 //let mesh:any[] =  []
-let formModal=false
+let formModal=true
 let fileModal = false
 let fileUpload = {name:"",file:""}
-let waitting = false
+let waitting = true
 //let shareUrl = ""
-
 let canvas:HTMLElement;
 let remoteName = ""
-formModal = true 
-waitting = true
-let dbUrl = "/db/"
-
+let selectedFiles: FileList | undefined;
+//formModal = true 
+//waitting = true
+const dbUrl = "/db/"
+//let fileModalSize = "xs"
 //let ischange = false
 StoreOrthographic.subscribe(o=>{
   if (el)  onWindowResize(el,true,o)
 })
-
 onDestroy(()=>{
   if (worker && worker instanceof Worker) {
     worker.terminate();
   }
 })
-
-
 const getRemote = (k:string)=>{
   const n = k.split("__")
   const l = n.length
@@ -443,28 +435,44 @@ const WorkerInit =(el:HTMLCanvasElement)=>{
     {#if waitting}
     <Spinner  color="green" />
     {:else}
-    <Button color="none" href="/{remoteName}">{remoteName}</Button>
+    <form class="flex flex-col space-y-6"  enctype="multipart/form-data"   method="POST" 
+    action="{dbUrl}?url={new URL(window.location.href).origin}&keyName={remoteName}"  >
+      <input type="file" name="imgFile" multiple accept="image/*" />
+     
+      <Button  color="alternative" type="submit"><CloudArrowUpOutline/> {remoteName} </Button>
+    </form>
     {/if}
   </div> 
 </Modal> 
 
 <Modal bind:open={fileModal} size="xs" autoclose={false} class="w-full pointer-events-auto" >
+
   {#if (fileUpload.name)}
-  <form class="flex flex-col space-y-6" enctype="multipart/form-data"   method="POST" action="{dbUrl}?url={new URL(window.location.href).origin}&keyName={fileUpload.name}"  >
+  <form class="flex flex-col space-y-6"  enctype="multipart/form-data"   method="POST" action="{dbUrl}?url={new URL(window.location.href).origin}&keyName={fileUpload.name}"  >
+   
+ 
+   
     <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">{fileUpload.name}</h3> 
     <input type="hidden" name="name" value={fileUpload.name} />
     <input type="hidden" name="file" value={fileUpload.file} />
+    <Fileupload name="imgFiles" clearable bind:files={selectedFiles} multiple />
     <div class="text-center"> 
-      <ButtonGroup>
+     
+      {#if selectedFiles}
+      <div class="flex flex-row overflow-x-auto">
+      {#each selectedFiles as file}
+     
+      <img src={URL.createObjectURL(file)} alt="" height="20" style="object-fit: contain;" />
+      {/each}
+    </div>
+      {/if}
+      
     <Button color="alternative" on:click={()=>{
       if(fileUpload.name) downCodeFile(fileUpload.file,fileUpload.name)
     }}  ><DownloadOutline/></Button>
- 
-  <Button  color="alternative" type="submit" >
-    <CloudArrowUpOutline/>
-  
-  </Button> 
-</ButtonGroup>
+    <Button  color="alternative" type="submit" >
+      <CloudArrowUpOutline/>  
+    </Button>  
     </div> 
     </form>
   {/if}

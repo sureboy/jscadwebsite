@@ -1,7 +1,7 @@
 <script lang="ts">
   //import { page } from '$app/state';
   import { createEventDispatcher } from 'svelte';
-  import { GridSolid,WindowsSolid, PrinterOutline,  PlayOutline,  TrashBinOutline,  DownloadOutline ,PlusOutline,ChevronDownOutline , BookOpenOutline, FileCodeOutline ,EditOutline,GridPlusOutline,CloudArrowUpOutline, FileImageOutline} from 'flowbite-svelte-icons';
+  import {QrCodeOutline, GridSolid,WindowsSolid, PrinterOutline,  PlayOutline,  TrashBinOutline,  DownloadOutline ,PlusOutline,ChevronDownOutline , BookOpenOutline, FileCodeOutline ,EditOutline,GridPlusOutline,CloudArrowUpOutline, FileImageOutline,CameraPhotoOutline} from 'flowbite-svelte-icons';
   import { Input, Navbar,Alert  ,Dropdown, DropdownItem,Spinner,DropdownDivider,Button, ButtonGroup} from 'flowbite-svelte';   
   import {StoreOrthographic,getStoragelist,removeStorage,StoreHelpHidden,StoreInputCode,StoreAlertMsg,StoreCode3Dview} from "$lib/function/storage"   
  
@@ -143,7 +143,7 @@
     <DropdownItem class="flex items-center gap-2" on:click={()=>{
       screenHandle()
     }}>
-    <FileImageOutline class="w-4 h-4 me-2" />
+    <CameraPhotoOutline class="w-4 h-4 me-2" />
     PNG
     </DropdownItem>
  
