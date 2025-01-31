@@ -63,9 +63,9 @@ export default {
       //codePage = codeHeader.join(",")  + codePage
       
       //const codePage = JSON.stringify(db)
-      const imgFiles = db.get("imgFiles")
+      //const imgFiles = db.getall("imgFiles")
       const  codeKey =name.split("__")[0]+"__"+new Date().getTime().toString(36).substring(2);// await digestMessage(codePage);
-      await env.solidtmp.put(codeKey,`{"code":"${codePage}","img":"${JSON.stringify(imgFiles)}"}`,{
+      await env.solidtmp.put(codeKey, codePage ,{
         expirationTtl: secondsFromNow,
       });   
  

@@ -142,7 +142,7 @@ let waitting = true
 //let shareUrl = ""
 let canvas:HTMLElement;
 let remoteName = ""
-let selectedFiles: FileList | undefined;
+//let selectedFiles: FileList | undefined;
 //formModal = true 
 //waitting = true
 const dbUrl = "/db/"
@@ -435,12 +435,7 @@ const WorkerInit =(el:HTMLCanvasElement)=>{
     {#if waitting}
     <Spinner  color="green" />
     {:else}
-    <form class="flex flex-col space-y-6"  enctype="multipart/form-data"   method="POST" 
-    action="{dbUrl}?url={new URL(window.location.href).origin}&keyName={remoteName}"  >
-      <input type="file" name="imgFile" multiple accept="image/*" />
-     
-      <Button  color="alternative" type="submit"><CloudArrowUpOutline/> {remoteName} </Button>
-    </form>
+      <Button  color="none" href="/#{remoteName}" ><CloudArrowUpOutline/> {remoteName} </Button>
     {/if}
   </div> 
 </Modal> 
@@ -454,19 +449,8 @@ const WorkerInit =(el:HTMLCanvasElement)=>{
    
     <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">{fileUpload.name}</h3> 
     <input type="hidden" name="name" value={fileUpload.name} />
-    <input type="hidden" name="file" value={fileUpload.file} />
-    <Fileupload name="imgFiles" clearable bind:files={selectedFiles} multiple />
+    <input type="hidden" name="file" value={fileUpload.file} /> 
     <div class="text-center"> 
-     
-      {#if selectedFiles}
-      <div class="flex flex-row overflow-x-auto">
-      {#each selectedFiles as file}
-     
-      <img src={URL.createObjectURL(file)} alt="" height="20" style="object-fit: contain;" />
-      {/each}
-    </div>
-      {/if}
-      
     <Button color="alternative" on:click={()=>{
       if(fileUpload.name) downCodeFile(fileUpload.file,fileUpload.name)
     }}  ><DownloadOutline/></Button>
