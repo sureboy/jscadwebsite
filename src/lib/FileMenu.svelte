@@ -1,0 +1,61 @@
+<script lang="ts">
+    import type {windowConfigType,sConfig} from "$lib/function/utils"
+    import LoadGzFile    from "$lib/LoadGzFile.svelte";
+    import {currentMap}  from "$lib/function/ImportParser"
+    const { myConfig,solidConfig }: { myConfig: windowConfigType,solidConfig:sConfig } = $props(); 
+     
+</script>
+{#if solidConfig.showMenu!==0}
+<details    >
+    <summary  style="cursor: pointer;height:48px;text-align: left;line-height: 48px;"  >
+        {myConfig.in}
+    </summary>
+    <div  style="color:white;text-align: center;" id="module_list"> 
+        {#each currentMap as [f] }
+        <a class="btn"  href="/edit#{f}" target="_blank"   >  {f}</a>  
+        {/each}
+    </div> 
+    <div  style="color:white;text-align: center;" id="module_list"> 
+        
+        <LoadGzFile {myConfig} {solidConfig}></LoadGzFile>
+ 
+        <button onclick={()=>{
+            let fileName = prompt("input file name")
+            if (!fileName.startsWith("./")){
+                fileName = "./"+fileName
+            }
+            if (!fileName.endsWith(".js")){
+                fileName += ".js"
+            }
+            const link = document.createElement('a');
+            link.href = "/edit#"+fileName
+            link.target="_blank"
+            link.click()
+
+        }}>+</button>
+    </div> 
+</details>
+
+{:else}
+<LoadGzFile {myConfig} {solidConfig}></LoadGzFile>
+{/if}
+ <style>
+ 
+.btn {
+    cursor: pointer;
+    padding-left: 10px;
+    padding-right: 10px;
+    color: white;
+    display: inline-block;
+}
+
+.btn:active {
+    color:gray;
+    transform: translateY(-1px);
+    transition: all 0.1s;
+}
+ 
+.btn:hover {
+    color:whitesmoke; 
+}
+ </style>

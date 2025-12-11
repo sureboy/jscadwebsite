@@ -1,54 +1,22 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
 
-.hljs-comment,
-.hljs-quote {
-  color: #616161;
-}
-.hljs-variable,
-.hljs-template-variable,
-.hljs-attribute,
-.hljs-tag,
-.hljs-name,
-.hljs-regexp,
-.hljs-link,
-.hljs-name,
-.hljs-selector-id,
-.hljs-selector-class {
-  color: #04154d;
-}
-.hljs-number,
-.hljs-meta,
-.hljs-built_in,
-.hljs-builtin-name,
-.hljs-literal,
-.hljs-type,
-.hljs-params { 
-  font-weight: bold;
-  font-style: italic;
-}
-.hljs-string,
-.hljs-symbol,
-.hljs-bullet {
-  color: #1d3d04;
-}
-.hljs-title,
-.hljs-section {
-  color: #161f27;
-}
-.hljs-keyword,
-.hljs-selector-tag {
-  
-  font-weight: bold;
-}
-.hljs-emphasis {
-  font-style: italic;
-}
-.hljs-strong {
-  font-weight: 700;
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 body {
-  /* Disables pull-to-refresh but allows overscroll glow effects. */
-  overscroll-behavior-y: contain;
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
 }
+ 
