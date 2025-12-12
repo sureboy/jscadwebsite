@@ -19,7 +19,7 @@ let editorContainer:HTMLDivElement;
 
 
 
-export let codeFile:{title:string,value:string} = {title:"edit",value:"console.log('Hello, CodeMirror!')"}
+export const codeFile:{title:string,value:string} = {title:"edit",value:"console.log('Hello, CodeMirror!')"}
 //let {codeFile}:{codeFile:{title:string,value:string}} = $props()
  
 

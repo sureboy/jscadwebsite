@@ -1,9 +1,10 @@
 <script lang="ts">
     import type {windowConfigType,sConfig} from "$lib/function/utils"
-    import LoadGzFile    from "$lib/LoadGzFile.svelte";
+    import LoadGzFile ,{myConfigFileName}  from "$lib/LoadGzFile.svelte";
     import {currentMap}  from "$lib/function/ImportParser"
+    //import { onMount } from 'svelte';
     const { myConfig,solidConfig }: { myConfig: windowConfigType,solidConfig:sConfig } = $props(); 
-     
+    
 </script>
 {#if solidConfig.showMenu!==0}
 <details    >
@@ -14,25 +15,10 @@
         {#each currentMap as [f] }
         <a class="btn"  href="/edit#{f}" target="_blank"   >  {f}</a>  
         {/each}
+        <a class="btn"  href="/edit#{myConfigFileName}" target="_blank"   >  {myConfigFileName}</a>
     </div> 
     <div  style="color:white;text-align: center;" id="module_list"> 
-        
         <LoadGzFile {myConfig} {solidConfig}></LoadGzFile>
- 
-        <button onclick={()=>{
-            let fileName = prompt("input file name")
-            if (!fileName.startsWith("./")){
-                fileName = "./"+fileName
-            }
-            if (!fileName.endsWith(".js")){
-                fileName += ".js"
-            }
-            const link = document.createElement('a');
-            link.href = "/edit#"+fileName
-            link.target="_blank"
-            link.click()
-
-        }}>+</button>
     </div> 
 </details>
 

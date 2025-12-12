@@ -8,7 +8,7 @@ import { handleCurrentMsg }  from "$lib/function/ImportParser"
 import FileMenu from "$lib/FileMenu.svelte";
 import Menu ,{initMenu} from '$lib/Menu.svelte'
 import { runWorker } from "$lib/function/worker";
-import { loadMyConfig } from "$lib/LoadGzFile.svelte";
+import { loadMyConfig,showMenu } from "$lib/LoadGzFile.svelte";
 import { onMount } from 'svelte';
 
 //let { data }: { data: windowConfigType } = $props();
@@ -23,11 +23,10 @@ const myConfig:windowConfigType  =$state({
 const solidConfig:sConfig= $state({ showMenu:0,
     postMessage:(e:{type:string,path?:string})=>{
         console.log("listen",e)
-        if (e.path){
-            setTimeout(()=>{
+        if (e.path){ 
+            requestAnimationFrame(()=>{
                 handleCurrentMsg({name:e.path,db:window.localStorage.getItem(e.path)},solidConfig.postMessage)
-            },1)
-            
+            }) 
         }
     },
 })
@@ -41,6 +40,7 @@ onMount(()=>{
         console.log(e)
         if (e.key.startsWith(".")){
             handleCurrentMsg({name:e.key,db:e.newValue})
+            solidConfig.showMenu=showMenu
             runWorker(solidConfig)
         }
         

@@ -7,6 +7,7 @@ import {MenuType} from "$lib/function/utils"
 let { myConfig,solidConfig }: { myConfig: windowConfigType,solidConfig:sConfig  } = $props(); 
 const reader = new FileReader();
 const textDecoder = new TextDecoder();
+
 const readfile = (file:File)=>{
     solidConfig.showMenu=0
     reader.onload = (e) => {
@@ -18,7 +19,7 @@ const readfile = (file:File)=>{
             //console.log("js",msg)
             window.localStorage.setItem(msg.name,msg.db)
             handleCurrentMsg(msg)
-            if (window.localStorage.getItem("myconfig")){
+            if (window.localStorage.getItem(myConfigFileName)){
                 solidConfig.showMenu=showMenu
                 runWorker(solidConfig );
             }
@@ -31,7 +32,7 @@ const readfile = (file:File)=>{
         gzipToString(e.target.result as (ArrayBuffer)).then(v=>{
         //    fileList.length = 0
         window.localStorage.clear();
-        window.localStorage.setItem("myconfig",JSON.stringify(myConfig))
+        window.localStorage.setItem(myConfigFileName,JSON.stringify(myConfig))
         srcStringToJsFile(v,(msg)=>{
             //console.log(msg.name)
             window.localStorage.setItem(msg.name,msg.db)
@@ -51,9 +52,16 @@ const readfile = (file:File)=>{
 <script lang="ts" module> 
 //export const fileList:string[] = $state([])
 //let show =$state(false)
-const showMenu = MenuType.MainMenu | MenuType.Camera | MenuType.Gzip | MenuType.Stl | MenuType.Png
+export let newPackageCode:string = `import modeling from './lib/modeling.esm.js';
+export const main=(opt)=>{
+    const option = Object.assign({size:10},opt)
+    return [modeling.primitives.cube(option),option]
+}`
+ 
+export const myConfigFileName:string = "solidjscad.json"
+export const showMenu = MenuType.MainMenu | MenuType.Camera | MenuType.Gzip | MenuType.Stl | MenuType.Png
 export const loadMyConfig = (solidConfig:sConfig)=>{
-    const myConf = window.localStorage.getItem("myconfig")
+    const myConf = window.localStorage.getItem(myConfigFileName)
     if (myConf) {
         Object.assign(solidConfig.workermsg,JSON.parse(myConf))
          
@@ -83,6 +91,31 @@ type="file" onchange={(event)=>{
     
 }} />
  
- 
+ <button onclick={()=>{
+    let fileName = prompt("input file name")
+    if (!fileName){
+        if (!myConfig.in){
+            fileName = "./index.js"
+            myConfig.in = fileName;
+            myConfig.name="SolidJSCAD"
+            myConfig.func="main"
+            window.localStorage.setItem(myConfigFileName,JSON.stringify(myConfig))
+            window.localStorage.setItem(fileName,newPackageCode)
+        }else{
+            return
+        }
+    }
+    if (!fileName.startsWith("./")){
+        fileName = "./"+fileName
+    }
+    if (!fileName.endsWith(".js")){
+        fileName += ".js"
+    }
+    const link = document.createElement('a');
+    link.href = "/edit#"+fileName
+    link.target="_blank"
+    link.click()
+
+}}>+</button>
 
  
