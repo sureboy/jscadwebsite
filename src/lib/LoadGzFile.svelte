@@ -4,6 +4,7 @@ import type {windowConfigType,sConfig} from "$lib/function/utils"
 import {handleCurrentMsg}  from "$lib/function/ImportParser"
 import { runWorker } from "$lib/function/worker";
 import {MenuType} from "$lib/function/utils"
+    import { getOutputFileNames } from "typescript";
 let { myConfig,solidConfig }: { myConfig: windowConfigType,solidConfig:sConfig  } = $props(); 
 const reader = new FileReader();
 const textDecoder = new TextDecoder();
@@ -92,19 +93,22 @@ type="file" onchange={(event)=>{
 }} />
  
  <button onclick={()=>{
-    let fileName = prompt("input file name")
-    if (!fileName){
-        if (!myConfig.in){
-            fileName = "./index.js"
-            myConfig.in = fileName;
-            myConfig.name="SolidJSCAD"
-            myConfig.func="main"
-            window.localStorage.setItem(myConfigFileName,JSON.stringify(myConfig))
-            window.localStorage.setItem(fileName,newPackageCode)
-        }else{
-            return
-        }
+    let fileName=""
+    if (!myConfig.in){
+        fileName="./index.js"    
     }
+    fileName= prompt("input file name",fileName)
+    if (!fileName){
+        return
+    }
+    if (!myConfig.in){
+        myConfig.in = fileName;
+        myConfig.name="SolidJSCAD"
+        myConfig.func="main"
+        window.localStorage.setItem(myConfigFileName,JSON.stringify(myConfig))
+        window.localStorage.setItem(fileName,newPackageCode)
+    }
+     
     if (!fileName.startsWith("./")){
         fileName = "./"+fileName
     }
