@@ -1,4 +1,4 @@
-import {regexExec} from "./ImportParser";
+ 
 export type menuConfigType = {
   cameraType: 'Perspective' |'Orthographic';
   module: (modulelist: {
@@ -71,7 +71,16 @@ export const gzipToString= async (data: ArrayBuffer )=>{
     //return resultText;
   };
 
-
+export const regexExec = (code:string,
+    regex:RegExp 
+    ,back:(r:RegExpExecArray,lastIndex:number)=>void
+)=>{
+    let match:RegExpExecArray|null;
+    while ((match = regex.exec(code)) !== null) {
+        
+        back(match,regex.lastIndex);
+    }
+};
   export  const srcStringToJsFile = (src:string,back:(msg:{name:string,db:string})=>void)=>{
     let name = "";
     let codeStart = 0;

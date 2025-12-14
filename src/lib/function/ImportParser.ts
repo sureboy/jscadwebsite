@@ -1,3 +1,5 @@
+import type { sConfig } from './utils';
+import {regexExec} from './utils';
 export type messageObj = {
     name:string,
     db?:ArrayBuffer | string
@@ -34,16 +36,7 @@ Object.keys(includeImport).forEach(k=>{
 });
  */
 //console.log(includeImportKeys);
-export const regexExec = (code:string,
-    regex:RegExp 
-    ,back:(r:RegExpExecArray,lastIndex:number)=>void
-)=>{
-    let match:RegExpExecArray|null;
-    while ((match = regex.exec(code)) !== null) {
-        
-        back(match,regex.lastIndex);
-    }
-};
+
 const  importParser = (code:string)=> {
     const regex = /import\s*(?:(?:(?:\w+|\*\s*as\s*\w+|\{[^}]*\})\s+from\s+)?['"]([^'"]+)['"]|['"]([^'"]+)['"])/g;
     const imports:importType[] = [];
@@ -68,16 +61,101 @@ const  importParser = (code:string)=> {
     //console.log(imports);
     return imports;
 };
+/*
+const fetchCurrent =async (name:string,src:string,children:Map<string,currentObj>)=>{
+    
+    if (children.has(name)){
+        return children.get(name)
+    }
+    
+    const cur = InitCurrentMap({name})
+    children.set(name,cur)
+    const srcFile = await fetch( name.replace(/^\.\//,`./${src}/`) )
+    reloadCurrent(cur,{
+                name ,
+                db:await srcFile.text()},
+                (e:{type:string,path?:string})=>{
+                    fetchCurrent(e.path,src,children)
+                    if (e.path){
+                        if (!children.has(e.path)) {
+                            getCurrentCodeSrc(solidConfig,InitCurrentMap({name:e.path}),back,children)
+                        }
+                        
+                    }
+                    
+                }
+            ) 
+}
+*/
+export const getCurrentCodeSrc =async ( solidConfig:sConfig,src:currentObj,back:(name:string,code:string)=>void,children = new Map<string,currentObj>()) => {
+    let code = ""; 
+    const waitList = []
+    
+    if (!src.srcList){
+        
+
+        try{
+        
+            const srcFile = await fetch( src.name.replace(/^\.\//,`./${solidConfig.workermsg.src}/`) )
+            reloadCurrent(src,{
+                name:src.name,
+                db:await srcFile.text()},
+                (e:{type:string,path?:string})=>{
+                    if (e.path){
+                        if (!children.has(e.path)) {
+                            waitList.push(getCurrentCodeSrc(solidConfig,InitCurrentMap({name:e.path}),back,children))
+                        }
+                        
+                    }
+                    
+                }
+            ) 
+            //console.log("srclist",src.srcList)
+            //await getCurrentCodeSrc(solidConfig,src,back,children)
+
+        }catch(e){
+            console.error(e)
+            return
+        }
+        //return;
+    }
+    console.log("getSrc",src.name) 
+    children.set(src.name,src);
+    for (const _src of src.srcList){
  
+        if (typeof _src ==="string"){
+            code+=_src;
+            continue;
+        }
+        const ___src =await _src(); 
+        //if (!___src.name)console.log(___src);
+        if (___src.db){ 
+            if (!children.has(___src.name)) {
+                waitList.push(getCurrentCodeSrc(solidConfig,___src,back,children));
+            }
+            //code+= "./" + ___src.name;   
+        }//else{
+            code+=  ___src.name;      
+        //}    
+        
+        
+    };
+    if (code){
+        //console.log(code);
+        back(src.name,code);
+    }
+    await Promise.all(waitList)
+    return
+};
 //const encoder = new TextEncoder();
+ 
 export const getCurrentCode =async ( src:currentObj,back:(name:string,code:string)=>void,children = new Set<currentObj>()) => {
     let code = "";    
     children.add(src);
     if (!src.srcList){
         return;
     }
-    for (const _src of src.srcList){
- 
+    for (const _src of src.srcList){ 
         if (typeof _src ==="string"){
             code+=_src;
             continue;
@@ -104,6 +182,7 @@ export const getCurrentCode =async ( src:currentObj,back:(name:string,code:strin
         back(src.name,code);
     }
 };
+ 
 export const getCurrent = (name:string,reqMessage?:(e:{type:"req",path:string})=>void )=>{
     return new Promise<currentObj>((resolve, reject)=>{
         /*
@@ -183,17 +262,11 @@ const reloadCurrent = (c:currentObj,msg:messageObj,postMessage?:(e:any)=>void)=>
 
     //let indexPos = 0;
     importParser(src).forEach(p=>{
-   
         c.srcList!.push( src.slice(tmpEndPos,p.startPosition) );
         c.srcList!.push( ()=>getCurrent(p.moduleName,postMessage) );
         tmpEndPos = p.endPosition;
- 
     });
-    c.srcList.push( src.slice(tmpEndPos) );
-    //console.log(this.toString());
-    
-    //if (this.persons)
-
+    c.srcList.push( src.slice(tmpEndPos) ); 
 };
 const toStringCurrent =async (c:currentObj)=>{
     //console.log(new URL(import.meta.url).origin);
@@ -209,7 +282,7 @@ const toStringCurrent =async (c:currentObj)=>{
             code+=src;
         }else{
             const obj =await src();
-            code+= await obj.getUri();
+            code += await obj.getUri();
             if (typeof obj !=="string" && obj.persons){
                 obj.persons.add(c);
             }

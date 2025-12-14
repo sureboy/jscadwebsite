@@ -1,6 +1,6 @@
 <script lang="ts" >
     import { Exporter} from "./function/threeScene" 
-    import {getCurrent,getCurrentCode} from "./function/ImportParser"  
+    import {getCurrent,getCurrentCodeSrc} from "./function/ImportParser"  
     import { MenuType } from "./function/utils";
     import type { sConfig } from './function/utils';
     const { solidConfig }:{ solidConfig:sConfig} = $props();
@@ -80,7 +80,7 @@
         console.log("down code err")
         return
       }
-      //const res = Exporter() 
+      //const res = Exporter()  
       let indexName = solidConfig.workermsg.in;
       if (!indexName.startsWith("./")){
         indexName = "./"+indexName;
@@ -89,17 +89,18 @@
       const current =await getCurrent(indexName)  
       //console.log(current)
       let codeSrc = ""
-      await getCurrentCode(csgObj,(name:string,code:string)=>{
+      await getCurrentCodeSrc(solidConfig,csgObj,(name:string,code:string)=>{
         codeSrc +=`
 /**${name}*/
 ${code}
 `        //codeList.push(code)
       })
-      await getCurrentCode(current,(name:string,code:string)=>{
+      await getCurrentCodeSrc(solidConfig,current,(name:string,code:string)=>{
         codeSrc +=`
 /**${name}*/
 ${code}
 `        //codeList.push(code)
+console.log(name)
       })
       //console.log("codeSrc",codeSrc)
       const chunks = await stringToGzip(codeSrc)
