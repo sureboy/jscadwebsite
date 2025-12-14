@@ -4,7 +4,7 @@ import type {windowConfigType,sConfig} from "$lib/function/utils"
 import {handleCurrentMsg}  from "$lib/function/ImportParser"
 import { runWorker } from "$lib/function/worker";
 import {MenuType} from "$lib/function/utils"
-    import { getOutputFileNames } from "typescript";
+//    import { getOutputFileNames } from "typescript";
 let { myConfig,solidConfig }: { myConfig: windowConfigType,solidConfig:sConfig  } = $props(); 
 const reader = new FileReader();
 const textDecoder = new TextDecoder();
@@ -91,8 +91,7 @@ type="file" onchange={(event)=>{
     readfile(input.files[0])
     
 }} />
- 
- <button onclick={()=>{
+<button onclick={()=>{
     let fileName=""
     if (!myConfig.in){
         fileName="./index.js"    

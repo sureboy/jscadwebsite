@@ -1,6 +1,6 @@
 <script lang="ts" module >
 import ShowSolid  from './ShowSolid.svelte';
-import Menu  from './Menu.svelte'
+import Menu,{initMenu}  from './Menu.svelte'
 
 import { runWorker } from "./function/worker";
 import {delCurrentMsg,handleCurrentMsg,getCurrent,getCurrentCode}  from "./function/ImportParser"
@@ -15,6 +15,13 @@ export const solidConfig:sConfig=$state( { showMenu:1,setWorkerMsg:(w:workerConf
   solidConfig.workermsg = {...w}
  }}
 )
+const myConfig = (window as any).myConfig as {
+    pageType:'run'|'gzData'|'stlData',
+    src:string,
+    name:string,
+    in:string,
+    func:string}
+initMenu(solidConfig,myConfig)
 type  handlePostMsg = (msg:any,postMessage?: (e: {name:string,db:string|ArrayBuffer,open:boolean}) => void)=>void
 const del:{name:string,fn:handlePostMsg} = {
   name:"del",
