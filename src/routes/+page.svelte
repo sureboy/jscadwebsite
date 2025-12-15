@@ -37,12 +37,18 @@ onMount(()=>{
     initMenu(solidConfig,myConfig)
     loadMyConfig(solidConfig)
     window.addEventListener("storage",(e)=>{
-        console.log(e)
-        if (e.key.startsWith(".")){
+        console.log("storage",e)
+        
+        if (e.newValue){
             handleCurrentMsg({name:e.key,db:e.newValue})
             solidConfig.showMenu=showMenu
             runWorker(solidConfig)
+        }else{
+            window.location.reload()
         }
+
+            
+        
         
     })
    

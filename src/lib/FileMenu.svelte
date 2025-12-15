@@ -1,7 +1,7 @@
 <script lang="ts">
-    import type {windowConfigType,sConfig} from "$lib/function/utils"
-    import LoadGzFile ,{myConfigFileName}  from "$lib/LoadGzFile.svelte";
-    import {currentMap}  from "$lib/function/ImportParser"
+    import type {windowConfigType,sConfig} from "./function/utils"
+    import LoadGzFile ,{myConfigFileName}  from "./LoadGzFile.svelte";
+    import {currentMap}  from "./function/ImportParser"
     //import { onMount } from 'svelte';
     const { myConfig,solidConfig }: { myConfig: windowConfigType,solidConfig:sConfig } = $props(); 
     
@@ -18,7 +18,11 @@
         <a class="btn"  href="/edit#{myConfigFileName}" target="_blank"   >  {myConfigFileName}</a>
     </div> 
     <div  style="color:white;text-align: center;" id="module_list"> 
-        <LoadGzFile {myConfig} {solidConfig}></LoadGzFile>
+     <button onclick={()=>{
+    if (window.prompt(`Input '${myConfig.name}' clear all data?`)===myConfig.name){
+        window.localStorage.clear()
+        window.location.reload();
+    }}}>↻</button>   <LoadGzFile {myConfig} {solidConfig}></LoadGzFile>
     </div> 
 </details>
 

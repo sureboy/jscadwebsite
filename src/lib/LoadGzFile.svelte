@@ -1,9 +1,11 @@
 <script lang="ts">
-import {gzipToString,srcStringToJsFile} from "$lib/function/utils"
-import type {windowConfigType,sConfig} from "$lib/function/utils"
-import {handleCurrentMsg}  from "$lib/function/ImportParser"
-import { runWorker } from "$lib/function/worker";
-import {MenuType} from "$lib/function/utils"
+import {gzipToString,srcStringToJsFile} from "./function/utils"
+import type {windowConfigType,sConfig} from "./function/utils"
+import {handleCurrentMsg}  from "./function/ImportParser"
+import { runWorker } from "./function/worker";
+import {MenuType} from "./function/utils"
+import { addSceneSTL,startSceneOBJ} from "./function/threeScene" 
+import {STLLoader} from "three/addons/loaders/STLLoader.js" 
 //    import { getOutputFileNames } from "typescript";
 let { myConfig,solidConfig }: { myConfig: windowConfigType,solidConfig:sConfig  } = $props(); 
 const reader = new FileReader();
@@ -11,41 +13,49 @@ const textDecoder = new TextDecoder();
 
 const readfile = (file:File)=>{
     solidConfig.showMenu=0
+    console.log(file.type )
     reader.onload = (e) => {
-        if (file.name.endsWith(".js")){
-            //const textDecoder = new TextDecoder();
-            //const resultText = textDecoder.decode(e.target.result as ArrayBuffer);
-            
-            const msg = {db:textDecoder.decode(e.target.result as ArrayBuffer),name:file.name}
-            //console.log("js",msg)
-            window.localStorage.setItem(msg.name,msg.db)
-            handleCurrentMsg(msg)
-            if (window.localStorage.getItem(myConfigFileName)){
-                solidConfig.showMenu=showMenu
-                runWorker(solidConfig );
-            }
-            return
-        }
-        //console.log(e,e.target.result);
-        const [func,in_,name] =file.name.split(".")[0].split("_") 
-        Object.assign(myConfig,{func,in:in_,name})
-        //console.log(myConfig)
-        gzipToString(e.target.result as (ArrayBuffer)).then(v=>{
-        //    fileList.length = 0
-        window.localStorage.clear();
-        window.localStorage.setItem(myConfigFileName,JSON.stringify(myConfig))
-        srcStringToJsFile(v,(msg)=>{
-            //console.log(msg.name)
-            window.localStorage.setItem(msg.name,msg.db)
-            //fileList.push(msg.name)
+        switch (file.type){
+            case "application/gzip":
+                const [func,in_,name] =file.name.split(".")[0].split("_")  
+                gzipToString(e.target.result as (ArrayBuffer)).then(v=>{ 
+                    const myConfigStr = JSON.stringify(Object.assign(myConfig,{func,in:in_,name}))
+                    window.localStorage.clear();
+                    window.localStorage.setItem(myConfigFileName,myConfigStr)
+                    srcStringToJsFile(v,(msg)=>{
+                        //console.log(msg.name)
+                        window.localStorage.setItem(msg.name,msg.db)
+                        //fileList.push(msg.name)
 
-            handleCurrentMsg(msg)
-        })
-        //console.log(fileList) 
-        //show=true
-        solidConfig.showMenu=showMenu
-        runWorker(solidConfig );
-        })
+                        handleCurrentMsg(msg)
+                    })
+                    //console.log(fileList) 
+                    //show=true
+                    solidConfig.showMenu=showMenu
+                    runWorker(solidConfig );
+                })
+                return
+            case "text/javascript":
+                const msg = {db:textDecoder.decode(e.target.result as ArrayBuffer),name:file.name}
+                //console.log("js",msg)
+                window.localStorage.setItem(msg.name,msg.db)
+                handleCurrentMsg(msg)
+                if (window.localStorage.getItem(myConfigFileName)){
+                    solidConfig.showMenu=showMenu
+                    runWorker(solidConfig );
+                }
+                return
+            case "model/stl":
+                startSceneOBJ(solidConfig.el);
+                  addSceneSTL(solidConfig.el,new STLLoader().parse(e.target.result as ArrayBuffer));
+                  solidConfig.showMenu=1<<2
+                  solidConfig.workermsg.options  = undefined
+            default:
+                console.log(file.type)
+                return
+        }
+ 
+
     } 
     reader.readAsArrayBuffer(file);
 }
@@ -69,7 +79,7 @@ export const loadMyConfig = (solidConfig:sConfig)=>{
         for (let i=0;i<window.localStorage.length;i++){
             const name = window.localStorage.key(i)
             console.log(name,i)
-            if (name && name.startsWith(".") ){
+            if (name && myConfigFileName !== name ){
                 //fileList.push(name)
                 handleCurrentMsg({name,db:window.localStorage.getItem(name)})
             }
@@ -80,8 +90,9 @@ export const loadMyConfig = (solidConfig:sConfig)=>{
 }
 
 </script>
+
 <input style="height:48:px;line-height:48px;cursor: pointer;"
-accept=".solidjscad.gz,.js"
+ 
 type="file" onchange={(event)=>{
     const input = event.target as HTMLInputElement;
     console.log(input.files)
@@ -118,7 +129,8 @@ type="file" onchange={(event)=>{
     link.href = "/edit#"+fileName
     link.target="_blank"
     link.click()
-
 }}>+</button>
+
+
 
  

@@ -86,7 +86,7 @@ const fetchCurrent =async (name:string,src:string,children:Map<string,currentObj
                 }
             ) 
 }
-*/
+
 export const getCurrentCodeSrc =async ( solidConfig:sConfig,src:currentObj,back:(name:string,code:string)=>void,children = new Map<string,currentObj>()) => {
     let code = ""; 
     const waitList = []
@@ -96,20 +96,25 @@ export const getCurrentCodeSrc =async ( solidConfig:sConfig,src:currentObj,back:
 
         try{
         
-            const srcFile = await fetch( src.name.replace(/^\.\//,`./${solidConfig.workermsg.src}/`) )
-            reloadCurrent(src,{
-                name:src.name,
-                db:await srcFile.text()},
-                (e:{type:string,path?:string})=>{
-                    if (e.path){
-                        if (!children.has(e.path)) {
-                            waitList.push(getCurrentCodeSrc(solidConfig,InitCurrentMap({name:e.path}),back,children))
+            
+             //const   reloadCur =  async(cur:currentObj) => {
+                const srcFile = await fetch( src.name.replace(/^\.\//,`./${solidConfig.workermsg.src}/`) )
+                reloadCurrent(src,{
+                    name:src.name,
+                    db:await srcFile.text()},
+                    (e:{type:string,path?:string})=>{
+                        if (e.path){
+                            if (!children.has(e.path)) {
+                             // reloadCur(InitCurrentMap({name:e.path}))
+                             waitList.push(getCurrentCodeSrc(solidConfig,InitCurrentMap({name:e.path}),back,children))
+                            }
+                            
                         }
                         
                     }
-                    
-                }
-            ) 
+                ) 
+            //}
+            //await reloadCur(src)
             //console.log("srclist",src.srcList)
             //await getCurrentCodeSrc(solidConfig,src,back,children)
 
@@ -131,7 +136,7 @@ export const getCurrentCodeSrc =async ( solidConfig:sConfig,src:currentObj,back:
         //if (!___src.name)console.log(___src);
         if (___src.db){ 
             if (!children.has(___src.name)) {
-                waitList.push(getCurrentCodeSrc(solidConfig,___src,back,children));
+                await getCurrentCodeSrc(solidConfig,___src,back,children);
             }
             //code+= "./" + ___src.name;   
         }//else{
@@ -140,15 +145,16 @@ export const getCurrentCodeSrc =async ( solidConfig:sConfig,src:currentObj,back:
         
         
     };
+    await Promise.all(waitList)
     if (code){
         //console.log(code);
         back(src.name,code);
     }
-    await Promise.all(waitList)
+    
     return
 };
 //const encoder = new TextEncoder();
- 
+ */
 export const getCurrentCode =async ( src:currentObj,back:(name:string,code:string)=>void,children = new Set<currentObj>()) => {
     let code = "";    
     children.add(src);

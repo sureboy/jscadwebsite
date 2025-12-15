@@ -97,6 +97,7 @@ export const initEdit =() => {
         } 
     }
     window.addEventListener('resize', handleResize);
+    /*
     window.addEventListener("beforeunload",saveFileCode);
     window.addEventListener("unload",saveFileCode);
     window.addEventListener("pagehile",saveFileCode);
@@ -105,6 +106,7 @@ export const initEdit =() => {
             saveFileCode()
         }        
     });
+    */
     onDestroy(() => {
         //destroyEditor();
         editorView.destroy()
@@ -114,6 +116,9 @@ export const initEdit =() => {
   
 const saveFileCode = ()=>{
     if (!codeFile.value ){
+        window.localStorage.removeItem(codeFile.title)
+        //showSave=false
+        window.close()
         return;
     }
     console.log("save code")

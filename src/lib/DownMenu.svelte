@@ -1,6 +1,6 @@
 <script lang="ts" >
     import { Exporter} from "./function/threeScene" 
-    import {getCurrent,getCurrentCodeSrc} from "./function/ImportParser"  
+    import {handleCurrentMsg,getCurrent,getCurrentCode} from "./function/ImportParser"  
     import { MenuType } from "./function/utils";
     import type { sConfig } from './function/utils';
     const { solidConfig }:{ solidConfig:sConfig} = $props();
@@ -75,6 +75,17 @@
       link.click();
       URL.revokeObjectURL(link.href); 
     } 
+    const postSrcMsg = (e:{ path?:string})=>{
+        if (e.path){
+          fetch( 
+            e.path.replace(/^\.\//,`./${solidConfig.workermsg.src}/`) )
+            .then(f=>{
+              f.text().then(db=>{
+                handleCurrentMsg({name:e.path,db},postSrcMsg)
+              })
+            })
+        }
+    }
     const downCodeclick = async ()=>{
       if (!window.CompressionStream || !window.DecompressionStream) {
         console.log("down code err")
@@ -85,24 +96,27 @@
       if (!indexName.startsWith("./")){
         indexName = "./"+indexName;
       }
-      const csgObj = await getCurrent("./lib/csgChange.js");
-      const current =await getCurrent(indexName)  
+      //handleCurrentMsg({name:"./lib/csgChange.js"},postSrcMsg)
+      const csgObj = await getCurrent("./lib/csgChange.js",postSrcMsg);
+      console.log("csg",csgObj)
+      //handleCurrentMsg({name:indexName},postSrcMsg)
+      const current =await getCurrent(indexName,postSrcMsg)  
       //console.log(current)
       let codeSrc = ""
-      await getCurrentCodeSrc(solidConfig,csgObj,(name:string,code:string)=>{
+      await getCurrentCode( csgObj,(name:string,code:string)=>{
         codeSrc +=`
 /**${name}*/
 ${code}
 `        //codeList.push(code)
       })
-      await getCurrentCodeSrc(solidConfig,current,(name:string,code:string)=>{
+      await getCurrentCode( current,(name:string,code:string)=>{
         codeSrc +=`
 /**${name}*/
 ${code}
 `        //codeList.push(code)
-console.log(name)
+//console.log(name)
       })
-      //console.log("codeSrc",codeSrc)
+      console.log("codeSrc",codeSrc)
       const chunks = await stringToGzip(codeSrc)
       const compressedBlob = new Blob(chunks, { type: 'application/gzip' });
       const link = document.createElement('a');
