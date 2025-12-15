@@ -12,11 +12,15 @@ const reader = new FileReader();
 const textDecoder = new TextDecoder();
 
 const readfile = (file:File)=>{
-    solidConfig.showMenu=0
+    
     console.log(file.type )
     reader.onload = (e) => {
         switch (file.type){
             case "application/gzip":
+                if (!window.confirm(`The data will be overwritten!!`)){
+                    return;
+                }
+                solidConfig.showMenu=0
                 const [func,in_,name] =file.name.split(".")[0].split("_")  
                 gzipToString(e.target.result as (ArrayBuffer)).then(v=>{ 
                     const myConfigStr = JSON.stringify(Object.assign(myConfig,{func,in:in_,name}))
@@ -38,6 +42,7 @@ const readfile = (file:File)=>{
             case "text/javascript":
                 const msg = {db:textDecoder.decode(e.target.result as ArrayBuffer),name:file.name}
                 //console.log("js",msg)
+                //solidConfig.showMenu=0
                 window.localStorage.setItem(msg.name,msg.db)
                 handleCurrentMsg(msg)
                 if (window.localStorage.getItem(myConfigFileName)){
@@ -46,11 +51,13 @@ const readfile = (file:File)=>{
                 }
                 return
             case "model/stl":
+                solidConfig.showMenu=0
                 startSceneOBJ(solidConfig.el);
                   addSceneSTL(solidConfig.el,new STLLoader().parse(e.target.result as ArrayBuffer));
-                  solidConfig.showMenu=1<<2
+                  solidConfig.showMenu=MenuType.Camera //| MenuType.Stl
                   solidConfig.workermsg.options  = undefined
             default:
+                window.alert(`Not supporting file format '${file.type}'  `)
                 console.log(file.type)
                 return
         }
@@ -92,7 +99,7 @@ export const loadMyConfig = (solidConfig:sConfig)=>{
 </script>
 
 <input style="height:48:px;line-height:48px;cursor: pointer;"
- 
+
 type="file" onchange={(event)=>{
     const input = event.target as HTMLInputElement;
     console.log(input.files)

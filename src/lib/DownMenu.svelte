@@ -96,6 +96,9 @@
       if (!indexName.startsWith("./")){
         indexName = "./"+indexName;
       }
+      if (!indexName.endsWith(".js")){
+        indexName += ".js"
+      }
       //handleCurrentMsg({name:"./lib/csgChange.js"},postSrcMsg)
       const csgObj = await getCurrent("./lib/csgChange.js",postSrcMsg);
       console.log("csg",csgObj)

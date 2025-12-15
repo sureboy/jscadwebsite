@@ -5,13 +5,13 @@ import Menu,{initMenu}  from './Menu.svelte'
 import { runWorker } from "./function/worker";
 import {delCurrentMsg,handleCurrentMsg,getCurrent,getCurrentCode}  from "./function/ImportParser"
 import type {messageObj} from "./function/ImportParser"
-import {gzipToString,srcStringToJsFile} from "./function/utils"
+import {gzipToString,srcStringToJsFile,MenuType} from "./function/utils"
 import { addSceneSTL} from "./function/threeScene" 
 import {STLLoader} from "three/addons/loaders/STLLoader.js" 
 import type { sConfig,workerConfigType } from './function/utils';
 
 //export const solidConfig:sConfig=$state({ showMenu:1})
-export const solidConfig:sConfig=$state( { showMenu:1,setWorkerMsg:(w:workerConfigType)=>{
+export const solidConfig:sConfig=$state( { showMenu:0,setWorkerMsg:(w:workerConfigType)=>{
   solidConfig.workermsg = {...w}
  }}
 )
@@ -99,7 +99,8 @@ const gzData:{name:string,fn:handlePostMsg} = {
 const stlData:{name:string,fn:handlePostMsg} = {
   fn:(message:{db:ArrayBuffer},)=>{
   addSceneSTL(solidConfig.el,new STLLoader().parse(message.db));
-    solidConfig.showMenu=1<<2
+  
+    solidConfig.showMenu=MenuType.Camera // | MenuType.Stl
   },
 name:"stlData"
 }
