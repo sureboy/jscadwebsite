@@ -14,7 +14,7 @@ import Options from "./OptionsMenu.svelte"
   {@const v = options[k]}
   {@const t = typeof v}
   <div style="padding-left:10px;">
-  {#if (t==="object")}
+  {#if (t==="object" && !Array.isArray(v))}
     <Options options={v} name={k}></Options>
   {:else}
   <label  >
@@ -25,6 +25,14 @@ import Options from "./OptionsMenu.svelte"
      <input name={k} type="number"  bind:value={options[k]} >
      {:else if  (t ==="boolean")}
      <input name={k} type="checkbox"   bind:checked={options[k]}   >
+     {:else if  (Array.isArray(v) )}
+     <select bind:value={options[k]} name={k} id={k}> 
+      {#each v as tv,i }
+        <option value={tv}>{JSON.stringify(tv)}</option>
+      {/each}
+      
+
+     </select>
      {/if}
   </label> 
 
