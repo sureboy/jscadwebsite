@@ -12,6 +12,7 @@ export type windowConfigType = {
   func: string;
   name:string;
   src:string;
+  date?:string;
 }
 export type workerConfigType = {
  

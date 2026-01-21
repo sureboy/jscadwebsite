@@ -5,7 +5,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev --host",
-		"build": "vite build", 
+		"build": "vite build",
 		"build:webview": "vite build --config vite.webview.config.js",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",

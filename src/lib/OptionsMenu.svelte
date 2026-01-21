@@ -41,6 +41,6 @@ import Options from "./OptionsMenu.svelte"
   {/each}
  
 </div> 
-{@render children()}
+{@render children?.()}
  
 </details>

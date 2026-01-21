@@ -8,7 +8,7 @@ import { handleCurrentMsg }  from "$lib/function/ImportParser"
 import FileMenu from "$lib/FileMenu.svelte";
 import Menu ,{initMenu} from '$lib/Menu.svelte'
 import { runWorker } from "$lib/function/worker";
-import { loadMyConfig,showMenu } from "$lib/LoadGzFile.svelte";
+import { loadSolidConfig,showMenu,mySolidConfig } from "$lib/LoadGzFile.svelte";
 import { onMount } from 'svelte';
 
 //let { data }: { data: windowConfigType } = $props();
@@ -24,7 +24,8 @@ const solidConfig:sConfig= $state({ showMenu:0,
     postMessage:(e:{type:string,path?:string})=>{
         console.log("listen",e)
         if (e.path){ 
-            requestAnimationFrame(()=>{
+            //requestAnimationFrame(()=>{
+            setTimeout(()=>{
                 handleCurrentMsg({name:e.path,db:window.localStorage.getItem(e.path)},solidConfig.postMessage)
             }) 
         }
@@ -33,23 +34,22 @@ const solidConfig:sConfig= $state({ showMenu:0,
  
 onMount(()=>{
     initSolidPage(solidConfig)
-    window.localStorage.getItem("")
+    //window.localStorage.getItem("")
     initMenu(solidConfig,myConfig)
-    loadMyConfig(solidConfig)
+    loadSolidConfig(solidConfig)
     window.addEventListener("storage",(e)=>{
         console.log("storage",e)
         
-        if (e.newValue){
-            handleCurrentMsg({name:e.key,db:e.newValue})
+        if (e.newValue && e.key.startsWith(mySolidConfig.getPath()) && !e.key.endsWith(mySolidConfig.name)){
+            //if (e.key.startsWith(mySolidConfig.getPath()))
+            //const name = e.key.split("*")[1]
+            handleCurrentMsg({name:e.key.split("*")[1] ,db:e.newValue})
             solidConfig.showMenu=showMenu
             runWorker(solidConfig)
         }else{
             window.location.reload()
         }
 
-            
-        
-        
     })
    
     

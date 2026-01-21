@@ -1,6 +1,6 @@
 <script lang="ts">
     import type {windowConfigType,sConfig} from "./function/utils"
-    import LoadGzFile ,{myConfigFileName}  from "./LoadGzFile.svelte";
+    import LoadGzFile ,{mySolidConfig}  from "./LoadGzFile.svelte";
     import {currentMap}  from "./function/ImportParser"
     //import { onMount } from 'svelte';
     const { myConfig,solidConfig }: { myConfig: windowConfigType,solidConfig:sConfig } = $props(); 
@@ -13,9 +13,9 @@
     </summary>
     <div  style="color:white;text-align: center;" id="module_list"> 
         {#each currentMap as [f] }
-        <a class="btn"  href="/edit#{f}" target="_blank"   >  {f}</a>  
+        <a class="btn"  href="/edit#{mySolidConfig.getPath()+f}" target="_blank"   >  {f}</a>  
         {/each}
-        <a class="btn"  href="/edit#{myConfigFileName}" target="_blank"   >  {myConfigFileName}</a>
+        <a class="btn"  href="/edit#{mySolidConfig.configName()}" target="_blank"   >  {mySolidConfig.name}</a>
     </div> 
     <div  style="color:white;text-align: center;" id="module_list"> 
      <button onclick={()=>{
