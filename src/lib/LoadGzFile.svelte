@@ -14,26 +14,26 @@ const textDecoder = new TextDecoder();
 const analysisGzip = (file:File,data: ArrayBuffer)=>{
     if (!file.name.endsWith(".solidjscad.gz")){
         return
-    }
-    
+    }    
     if (!window.confirm(`The current data will be overwritten!!`)){
         return;
-    }
-    
+    }    
     solidConfig.showMenu=0
-    mySolidConfig.path = file.name.split(".")[0]
-    const [func,in_,name,date] = mySolidConfig.path.split("_")  
+    const p = file.name.split(".")[0]
+    mySolidConfig.setPath(p)
+    const [func,in_,name,date] = p.split("_")  
     gzipToString(data).then(v=>{ 
         const myConfigStr = JSON.stringify(Object.assign(myConfig,{func,in:in_,name,date}))
         //window.localStorage.clear();
         window.localStorage.setItem(mySolidConfig.configName(),myConfigStr)
         cleanCurrentMsg()
         srcStringToJsFile(v,(msg)=>{ 
-            window.localStorage.setItem(mySolidConfig.getPath()+msg.name,msg.db) 
+            window.localStorage.setItem(mySolidConfig.getPathX()+msg.name,msg.db) 
             //window.localStorage.setItem( msg.name,msg.db) 
             handleCurrentMsg(msg)
         }) 
-        window.localStorage.setItem(currentSolidConfigKey,mySolidConfig.path)
+        mySolidConfig.update()
+       
         solidConfig.showMenu=showMenu
         runWorker(solidConfig );
     })
@@ -44,12 +44,11 @@ const readfile = (file:File)=>{
     console.log(file )
     reader.onload = (e) => {
         switch (file.type){
-             
             case "text/javascript":
                 const msg = {db:textDecoder.decode(e.target.result as ArrayBuffer),name:file.name}
                 //console.log("js",msg)
                 //solidConfig.showMenu=0
-                window.localStorage.setItem(mySolidConfig.getPath()+msg.name,msg.db)
+                window.localStorage.setItem(mySolidConfig.getPathX()+msg.name,msg.db)
                 handleCurrentMsg(msg)
                 if (window.localStorage.getItem(mySolidConfig.configName())){
                     solidConfig.showMenu=showMenu
@@ -83,41 +82,99 @@ export const main=(opt)=>{
     const option = Object.assign({size:10},opt)
     return [modeling.primitives.cube(option),option]
 }`
+let solidConfig_:sConfig
 const  currentSolidConfigKey = "currentSolidConfig"
-export const mySolidConfig:{name:string ,path:string,configName:()=>string,getPath:()=>string} = {
+export const mySolidConfig:{
+    name:string ,
+    path:string[],
+    index?:number,
+    update():void,
+    configName():string,
+    setPath(p:string):void,
+    getPathX():string,
+    getP():string} = {
     name:"solidjscad.json",
-    path:"",
+    path:[],
     configName:function(){
-        return this.getPath()+this.name
+        return this.getPathX()+this.name
     },
-    getPath:function(){
-        return this.path+"*"
+    getP:function(){
+        if (this.index!==undefined)
+            return this.path[this.index]
+        else  if (this.path.length>0){
+            this.index = this.path.length-1
+            return this.getP()
+        }else{
+            return ""
+        }
+            
+    },
+    getPathX:function(){
+        const p = this.getP()
+        if (p){
+            return p+"*"
+        }else{
+            return ""
+        }
+  
+            
+    },
+    setPath:function(p:string){
+        if (this.path.length===0){
+            this.path.push(p)
+            this.index = 0
+            return
+        }
+        const i = this.path.indexOf(p)
+        if (i<0){
+            this.index = this.path.length
+            this.path.push(p)
+
+        }else{ 
+            this.index = i 
+        }
+    },
+    update:function(){
+        window.localStorage.setItem(
+            currentSolidConfigKey,
+            JSON.stringify(this),
+        )
+    }
+}
+const reloadSolidConfig = (SolidPath:string)=>{
+    for (let i=0;i<window.localStorage.length;i++){
+        const name = window.localStorage.key(i)
+        if (!name || !name.startsWith(SolidPath)){
+            continue
+        }         
+        handleCurrentMsg({
+            name:name.split("*")[1],
+            db:window.localStorage.getItem(name)})
     }
 }
 export const loadSolidConfig = (solidConfig:sConfig)=>{
-    mySolidConfig.path = window.localStorage.getItem(currentSolidConfigKey) ||""
+    solidConfig_ = solidConfig
+    Object.assign(
+        mySolidConfig,
+        JSON.parse(
+            window.localStorage.getItem(currentSolidConfigKey) ||"{}"
+        )
+    )
     if (!mySolidConfig.path){
         return
     } 
+    changeSolidConfig(solidConfig)
+    
+
+}
+const changeSolidConfig = (solidConfig:sConfig)=>{
     const myConf = window.localStorage.getItem(mySolidConfig.configName())
     if (!myConf)return;
     Object.assign(solidConfig.workermsg,JSON.parse(myConf))
-    for (let i=0;i<window.localStorage.length;i++){
-        const name = window.localStorage.key(i)
-        if (!name || !name.startsWith(mySolidConfig.getPath())){
-            continue
-        }
-         
-        handleCurrentMsg({name:name.split("*")[1],db:window.localStorage.getItem(name)})
-        //console.log(name,i)
-        //if (name && myConfigFileName !== name ){
-            //fileList.push(name)
-            
-        //}
-    }
-    solidConfig.showMenu=showMenu
+    reloadSolidConfig(mySolidConfig.getPathX())
+    
+    solidConfig.showMenu=showMenu 
     runWorker(solidConfig)
-
 }
 export const showMenu = MenuType.MainMenu | MenuType.Camera | MenuType.Gzip | MenuType.Stl | MenuType.Png
 /*
@@ -140,7 +197,26 @@ export const loadSolidConfig_bak = (solidConfig:sConfig)=>{
 }
 */
 </script>
-
+<select name="cars" id="cars" bind:value={mySolidConfig.index} onchange={(e)=>{
+    const select = e.target as HTMLSelectElement
+    //console.log(select.value)
+    if (select.value ==="more"){
+        window.open("/templates");
+        return 
+    }
+    mySolidConfig.index = Number(select.value)
+    mySolidConfig.update()
+    window.location.reload()
+    //cleanCurrentMsg()
+    //changeSolidConfig(solidConfig_!)
+   
+}}>
+    {#each mySolidConfig.path as p,i}
+        <option value={i} >{p}</option>
+    {/each}
+    <option value="more">...more</option>
+    
+</select>
 <input style="height:48:px;line-height:48px;cursor: pointer;"
 accept=".stl,.solidjscad.gz"
 type="file" onchange={(event)=>{
@@ -167,9 +243,15 @@ type="file" onchange={(event)=>{
         myConfig.func="main"
         myConfig.date = Date.now().toString()
         //[func,in_,name,date]
-        mySolidConfig.path = [myConfig.func,myConfig.in,myConfig.name,myConfig.date].join("_")
+        mySolidConfig.setPath(
+            [
+                myConfig.func,
+                myConfig.in,
+                myConfig.name,
+                myConfig.date].join("_")
+            )
         window.localStorage.setItem(mySolidConfig.configName(),JSON.stringify(myConfig))
-        window.localStorage.setItem(mySolidConfig.getPath()+fileName,newPackageCode)
+        window.localStorage.setItem(mySolidConfig.getPathX()+fileName,newPackageCode)
     }
      
     if (!fileName.startsWith("./")){
@@ -178,13 +260,10 @@ type="file" onchange={(event)=>{
     if (!fileName.endsWith(".js")){
         fileName += ".js"
     }
-    const link = document.createElement('a');
-    link.href = "/edit#"+fileName
-    link.target="_blank"
-    link.click()
-}}>+</button>
+    console.log(fileName)
+    window.open("/edit#"+mySolidConfig.getPathX()+fileName)
 
-<button onclick={(e)=>{
-    console.log(e)
-    window.open("/templates");
-}}>...</button>
+ 
+}}>+</button>
+ 
+ 

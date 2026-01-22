@@ -55,12 +55,12 @@ export const codeFile:{title:string,value:string} = {title:"edit",value:"console
         // 自动更新value
         EditorView.updateListener.of((update) => {
             if (update.docChanged) {
-            const newValue = update.state.doc.toString();
-            if (newValue !== codeFile.value) {
-                codeFile.value = newValue;
-                showSave=true
-                //console.log("update")
-            }
+                const newValue = update.state.doc.toString();
+                if (newValue !== codeFile.value) {
+                    codeFile.value = newValue;
+                    showSave=true
+                    //console.log("update")
+                }
             }
         })
         ]

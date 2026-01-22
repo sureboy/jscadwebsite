@@ -40,7 +40,7 @@ onMount(()=>{
     window.addEventListener("storage",(e)=>{
         console.log("storage",e)
         
-        if (e.newValue && e.key.startsWith(mySolidConfig.getPath()) && !e.key.endsWith(mySolidConfig.name)){
+        if (e.newValue && e.key.startsWith(mySolidConfig.getPathX()) && !e.key.endsWith(mySolidConfig.name)){
             //if (e.key.startsWith(mySolidConfig.getPath()))
             //const name = e.key.split("*")[1]
             handleCurrentMsg({name:e.key.split("*")[1] ,db:e.newValue})

@@ -9,20 +9,18 @@
 {#if solidConfig.showMenu!==0}
 <details    >
     <summary  style="cursor: pointer;height:48px;text-align: left;line-height: 48px;"  >
-        {myConfig.in}
+        {mySolidConfig.getP()}
     </summary>
     <div  style="color:white;text-align: center;" id="module_list"> 
         {#each currentMap as [f] }
-        <a class="btn"  href="/edit#{mySolidConfig.getPath()+f}" target="_blank"   >  {f}</a>  
+        <a class="btn"  href="/edit#{mySolidConfig.getPathX()+f}" target="_blank"   >  {f}</a>  
         {/each}
         <a class="btn"  href="/edit#{mySolidConfig.configName()}" target="_blank"   >  {mySolidConfig.name}</a>
     </div> 
     <div  style="color:white;text-align: center;" id="module_list"> 
-     <button onclick={()=>{
-    if (window.prompt(`Input '${myConfig.name}' clear all data?`)===myConfig.name){
-        window.localStorage.clear()
-        window.location.reload();
-    }}}>↻</button>   <LoadGzFile {myConfig} {solidConfig}></LoadGzFile>
+        
+       <LoadGzFile {myConfig} {solidConfig}></LoadGzFile>
+
     </div> 
 </details>
 
