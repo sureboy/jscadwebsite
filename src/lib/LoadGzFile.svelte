@@ -25,21 +25,25 @@ const analysisGzip = (file:File,data: ArrayBuffer)=>{
     gzipToString(data).then(v=>{ 
         
         cleanCurrentMsg()
-        Object.assign(myConfig,{func,in:in_,name,date})
-        myConfig.files=[]
+        const files:string[] = []
+        
+        //myConfig.files=[]
         srcStringToJsFile(v,(msg)=>{ 
             window.localStorage.setItem(mySolidConfig.getPathX()+msg.name,msg.db) 
             //window.localStorage.setItem( msg.name,msg.db) 
            
-            myConfig.files.push(msg.name)
+            files.push(msg.name)
              
              
             handleCurrentMsg(msg)
         }) 
+        const obj =  {func,in:in_,name,date,files}
+        //Object.assign(myConfig,obj)
         mySolidConfig.update()
-        //const myConfigStr = 
+        //const myConfigStr = JSON.stringify(obj)
+        //console.log("----",myConfig.func,myConfig.date)
         //window.localStorage.clear();
-        window.localStorage.setItem(mySolidConfig.configName(),JSON.stringify(myConfig))
+        window.localStorage.setItem(mySolidConfig.configName(),JSON.stringify(obj))
         solidConfig.showMenu=showMenu
         runWorker(solidConfig );
     })
