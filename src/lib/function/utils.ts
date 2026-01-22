@@ -13,6 +13,7 @@ export type windowConfigType = {
   name:string;
   src:string;
   date?:string;
+  files?:string[];
 }
 export type workerConfigType = {
  

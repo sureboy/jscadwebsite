@@ -16,11 +16,13 @@
         <a class="btn"  href="/edit#{mySolidConfig.getPathX()+f}" target="_blank"   >  {f}</a>  
         {/each}
         <a class="btn"  href="/edit#{mySolidConfig.configName()}" target="_blank"   >  {mySolidConfig.name}</a>
+        <button onclick={(e)=>{
+            console.log(e)
+        }}> ✖</button>
     </div> 
     <div  style="color:white;text-align: center;" id="module_list"> 
         
        <LoadGzFile {myConfig} {solidConfig}></LoadGzFile>
-
     </div> 
 </details>
 
