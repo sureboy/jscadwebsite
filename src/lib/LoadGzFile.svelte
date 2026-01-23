@@ -15,9 +15,9 @@ const analysisGzip = (file:File,data: ArrayBuffer)=>{
     if (!file.name.endsWith(".solidjscad.gz")){
         return
     }    
-    if (!window.confirm(`The current data will be overwritten!!`)){
-        return;
-    }    
+    //if (!window.confirm(`The current data will be overwritten!!`)){
+    //    return;
+    //}    
     solidConfig.showMenu=0
     const p = file.name.split(".")[0]
     mySolidConfig.setPath(p)
@@ -33,12 +33,10 @@ const analysisGzip = (file:File,data: ArrayBuffer)=>{
             //window.localStorage.setItem( msg.name,msg.db) 
            
             files.push(msg.name)
-             
-             
             handleCurrentMsg(msg)
         }) 
         const obj =  {func,in:in_,name,date,files}
-        //Object.assign(myConfig,obj)
+        Object.assign(myConfig,obj)
         mySolidConfig.update()
         //const myConfigStr = JSON.stringify(obj)
         //console.log("----",myConfig.func,myConfig.date)
@@ -215,7 +213,7 @@ const changeSolidConfig = (solidConfig:sConfig)=>{
 export const showMenu = MenuType.MainMenu | MenuType.Camera | MenuType.Gzip | MenuType.Stl | MenuType.Png
 
 </script>
-<select name="cars" id="cars" bind:value={mySolidConfig.index} onchange={(e)=>{
+<select name="cars" id="cars" bind:value={mySolidConfig.index  } onchange={(e)=>{
     const select = e.target as HTMLSelectElement
     //console.log(select.value)
     switch (select.value) {

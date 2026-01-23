@@ -66,7 +66,7 @@ const getBaseUrl =async (config:{in:string,func:string,src:string },postMessage?
   self.postMessage(msg)
 }) 
 ${consoleLogEnd} `; 
-console.log(src);
+//console.log(src);
   return URL.createObjectURL(
     new Blob([src],{type:'application/javascript'}));
 };

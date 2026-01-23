@@ -18,6 +18,9 @@
         <a class="btn"  href="/edit#{mySolidConfig.configName()}" target="_blank"   >  {mySolidConfig.name}</a>
         <button onclick={(e)=>{
             console.log(e)
+            if (!window.confirm(`The current data will be clean!!`)){
+                return;
+            } 
             cleanSolidConfig(myConfig.files)
         }}> ✖</button>
     </div> 

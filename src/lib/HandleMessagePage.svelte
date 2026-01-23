@@ -99,10 +99,9 @@ const gzData:{name:string,fn:handlePostMsg} = {
 const stlData:{name:string,fn:handlePostMsg} = {
   fn:(message:{db:ArrayBuffer},)=>{
   addSceneSTL(solidConfig.el,new STLLoader().parse(message.db));
-  
     solidConfig.showMenu=MenuType.Camera // | MenuType.Stl
   },
-name:"stlData"
+  name:"stlData"
 }
 export const Direction:{name:string,fn:handlePostMsg}[] =[ init, del,run,getSrc,gzData,stlData ] 
 const getMsgHandle = (type:number )=>{
