@@ -187,12 +187,17 @@ const reloadSolidConfig = (files:string[])=>{
 }
 export const loadSolidConfig = (solidConfig:sConfig)=>{
     //solidConfig_ = solidConfig
-    Object.assign(
-        mySolidConfig,
-        JSON.parse(
-            window.localStorage.getItem(currentSolidConfigKey) ||"{}"
+    try{
+        Object.assign(
+            mySolidConfig,
+            JSON.parse(
+                window.localStorage.getItem(currentSolidConfigKey) 
+            )
         )
-    )
+    }catch(e){
+        return
+    }
+    
     if (!mySolidConfig.path){
         return
     }
