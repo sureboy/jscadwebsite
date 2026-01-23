@@ -150,6 +150,23 @@ export const mySolidConfig:{
         )
     }
 }
+export const cleanSolidConfig = (files?:string[])=>{
+    if (!files)return;
+    
+    window.localStorage.removeItem(mySolidConfig.configName())
+    const p = mySolidConfig.getPathX()
+    files.forEach((name)=>{
+        window.localStorage.removeItem(p+name)
+    })
+    mySolidConfig.path.splice(mySolidConfig.index,1)
+    if (mySolidConfig.path.length===0){
+        mySolidConfig.index = undefined
+    }else{
+        mySolidConfig.index = mySolidConfig.path.length-1
+    }
+    mySolidConfig.update()
+    window.location.reload()
+}
 const reloadSolidConfig = (files:string[])=>{
     const SolidPath = mySolidConfig.getPathX()
     files.forEach((name)=>{
@@ -178,7 +195,7 @@ export const loadSolidConfig = (solidConfig:sConfig)=>{
     )
     if (!mySolidConfig.path){
         return
-    } 
+    }
     changeSolidConfig(solidConfig) 
 }
 const changeSolidConfig = (solidConfig:sConfig)=>{
@@ -209,7 +226,7 @@ export const showMenu = MenuType.MainMenu | MenuType.Camera | MenuType.Gzip | Me
             return
     }   
 }}>
-<option value="">--</option>
+    <option value="">--</option>
     {#each mySolidConfig.path as p,i}
         <option value={i} >{p}</option>
     {/each}

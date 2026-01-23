@@ -1,6 +1,6 @@
 <script lang="ts">
     import type {windowConfigType,sConfig} from "./function/utils"
-    import LoadGzFile ,{mySolidConfig}  from "./LoadGzFile.svelte";
+    import LoadGzFile ,{mySolidConfig,cleanSolidConfig}  from "./LoadGzFile.svelte";
     import {currentMap}  from "./function/ImportParser"
     //import { onMount } from 'svelte';
     const { myConfig,solidConfig }: { myConfig: windowConfigType,solidConfig:sConfig } = $props(); 
@@ -18,10 +18,10 @@
         <a class="btn"  href="/edit#{mySolidConfig.configName()}" target="_blank"   >  {mySolidConfig.name}</a>
         <button onclick={(e)=>{
             console.log(e)
+            cleanSolidConfig(myConfig.files)
         }}> ✖</button>
     </div> 
     <div  style="color:white;text-align: center;" id="module_list"> 
-        
        <LoadGzFile {myConfig} {solidConfig}></LoadGzFile>
     </div> 
 </details>
