@@ -22,12 +22,19 @@
                 return;
             } 
             cleanSolidConfig(myConfig.files)
-        }}> ✖</button>
+        }}>✖</button>
         <button onclick={()=>{
             if (!confirm(`⬆️📁 Publicize ${mySolidConfig.getP()}?`))return
-            fetch("/code?k=test").then(r=>{
+            //console.log(window.location.host)
+            let url = "db.solidjscad.cn"
+            if (window.location.host.startsWith("solidjscad")){
+                url = "db."+window.location.host
+            }
+            console.log(url)
+            fetch(`//${url}?k=test`).then(r=>{
                 //console.log(v)
                 if (!r.ok)return
+                console.log(r.headers)
                 r.json().then(db=>{
                     console.log(db)
                     const code = prompt("输入验证码")
