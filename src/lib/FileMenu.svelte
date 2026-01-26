@@ -23,6 +23,22 @@
             } 
             cleanSolidConfig(myConfig.files)
         }}> ✖</button>
+        <button onclick={()=>{
+            if (!confirm(`⬆️📁 Publicize ${mySolidConfig.getP()}?`))return
+            fetch("/code?k=test").then(r=>{
+                //console.log(v)
+                if (!r.ok)return
+                r.json().then(db=>{
+                    console.log(db)
+                    const code = prompt("输入验证码")
+                    if (!code)return
+                    console.log(code)
+                })
+                
+            })
+
+            
+        }}>⬆️📁</button>
     </div> 
     <div  style="color:white;text-align: center;" id="module_list"> 
        <LoadGzFile {myConfig} {solidConfig}></LoadGzFile>
