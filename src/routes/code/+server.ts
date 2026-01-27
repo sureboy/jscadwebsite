@@ -56,6 +56,6 @@ function char(c:string ){
 export const GET: RequestHandler =async (req) => {
  
     const code = generateRandomString(8)  
-    return json({code:char(code),key:sha256(API_SECRET_KEY+code + parseInt((Date.now()/100000).toString()))}) 
+    return json({code:char(code),key:await sha256(API_SECRET_KEY+code + parseInt((Date.now()/100000).toString()))}) 
 };
  
