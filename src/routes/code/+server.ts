@@ -1,10 +1,15 @@
 import { error,json } from '@sveltejs/kit';
+
+import * as crypto  from 'crypto';
 import modeling from '@jscad/modeling';
 import { API_SECRET_KEY } from '$env/static/private';
 import type { RequestHandler } from './$types';
 const align:("right" | "center" | "left" | undefined) [] = ["right","center","left",undefined]
 function getRandom(min:number, max:number) {
     return Math.random() * (max - min) + min;
+}
+function sha256(data:string) {
+  return crypto.createHash('sha256').update(data).digest('hex');
 }
 function generateRandomString(length: number): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -34,22 +39,10 @@ function char(c:string ){
     return shuffle(modeling.text.vectorText({xOffset:-h*4,height:h,align:a,input:c}))
  
 }
-const tmpCode = new Map<string,string>()
-export const GET: RequestHandler =async ({url, request, platform }) => {
-    const k = url.searchParams.get("k")
-    let code = tmpCode.get(k)
-    if (code){
-        return json({code,test:API_SECRET_KEY})
-    }
-    code = generateRandomString(8) 
-    tmpCode.set(k,code)
-    return json({code,test:API_SECRET_KEY})
-    //return json({code:char(code)}) 
-};
-export const POST:RequestHandler=async (e) => {
-    console.log(e)
-    //await e.platform?.env.KV.put("test","1231")
-    return json({msg:"true"}) 
-
+//const tmpCode = new Map<string,string>()
+export const GET: RequestHandler =async (req) => {
+ 
+    const code = generateRandomString(8)  
+    return json({code:char(code),key:sha256(API_SECRET_KEY+code + parseInt((Date.now()/100000).toString()))}) 
 };
  

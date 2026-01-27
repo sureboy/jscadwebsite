@@ -54,11 +54,16 @@ const getBaseUrl =async (config:{in:string,func:string,src:string },postMessage?
   const list = Object.keys(src)
   const module = {list,basename:main?main:list[0]}
   self.onmessage = (e)=>{
-    const {func,options} = e.data
+    const {func,options,code} = e.data
     if ( func){ 
       csg.getCsgObjArray(src[e.data.func](options),(msg)=>{
         self.postMessage(msg)
       }) 
+    }
+    if (code){
+      csg.getCsgObjArray(code,(msg)=>{
+        self.postMessage(msg)
+      })
     }
   }
   self.postMessage({module})
@@ -101,7 +106,20 @@ export const changeWorker = (conf:sConfig  )=>{
     conf.worker.postMessage({func:conf.workermsg.func});
   }
 };
- 
+
+export const CodeWorker = (conf:sConfig,code:any  )=>{
+  if (!conf.worker){
+    //runWorker(conf);
+    return;
+  }
+  if (conf.postMessage){
+    conf.postMessage({
+      type:'start'
+    });
+  }
+  console.log("code worker")
+  conf.worker.postMessage({code});
+};
 export const runWorker =async ( conf:sConfig  )=>{
   if (conf.worker){
     conf.worker.terminate();
@@ -180,6 +198,7 @@ export const runWorker =async ( conf:sConfig  )=>{
         type:'end'
       });}
       conf.showMenu =conf.oldMenu;// 1 | (1<<1) | (1<<2) | (1<<3);
+
     }
     if (msg.options){
       console.log("options",msg.options)

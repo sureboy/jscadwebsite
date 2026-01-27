@@ -35,6 +35,7 @@ export type sConfig = {
   el?:HTMLCanvasElement,
   workermsg?:workerConfigType,showMenu:number,
   postMessage?:(m:any)=>void,
+  //endBack?:()=>void,
   //setWorkerMsg:(db:workerConfigType)=>void
 }  
 export const gzipToString= async (data: ArrayBuffer )=>{
