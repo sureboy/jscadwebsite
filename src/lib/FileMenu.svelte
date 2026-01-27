@@ -24,7 +24,7 @@
             cleanSolidConfig(myConfig.files)
         }}>✖</button>
         <button onclick={()=>{
-            if (!confirm(`⬆️📁 Publicize ${mySolidConfig.getP()}?`))return
+            if (!confirm(`Publicize ${mySolidConfig.getP()}?`))return
             //console.log(window.location.host)
             let url = "db.solidjscad.cn"
             if (window.location.host.startsWith("solidjscad")){
@@ -48,7 +48,7 @@
         }}>⬆️📁</button>
     </div> 
     <div  style="color:white;text-align: center;" id="module_list"> 
-       <LoadGzFile {myConfig} {solidConfig}></LoadGzFile>
+        <LoadGzFile {myConfig} {solidConfig}></LoadGzFile>
     </div> 
 </details>
 

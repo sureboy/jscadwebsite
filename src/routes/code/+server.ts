@@ -1,5 +1,6 @@
 import { error,json } from '@sveltejs/kit';
 import modeling from '@jscad/modeling';
+import { API_SECRET_KEY } from '$env/static/private';
 import type { RequestHandler } from './$types';
 const align:("right" | "center" | "left" | undefined) [] = ["right","center","left",undefined]
 function getRandom(min:number, max:number) {
@@ -38,11 +39,11 @@ export const GET: RequestHandler =async ({url, request, platform }) => {
     const k = url.searchParams.get("k")
     let code = tmpCode.get(k)
     if (code){
-        return json({code})
+        return json({code,test:API_SECRET_KEY})
     }
     code = generateRandomString(8) 
     tmpCode.set(k,code)
-    return json({code})
+    return json({code,test:API_SECRET_KEY})
     //return json({code:char(code)}) 
 };
 export const POST:RequestHandler=async (e) => {
