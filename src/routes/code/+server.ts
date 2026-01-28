@@ -25,7 +25,8 @@ async function sha256(message:string) {
 //  return crypto.createHash('sha256').update(data).digest('hex');
 //}
 function generateRandomString(length: number): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  //const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
   let result = '';
   
   for (let i = 0; i < length; i++) {
@@ -55,7 +56,10 @@ function char(c:string ){
 //const tmpCode = new Map<string,string>()
 export const GET: RequestHandler =async (req) => {
  
-    const code = generateRandomString(8)  
-    return json({code:char(code),key:await sha256(API_SECRET_KEY+code + parseInt((Date.now()/100000).toString()))}) 
+    const code = generateRandomString(8)   
+    return json({ 
+      code:char(code),
+      key:await sha256(API_SECRET_KEY+code.toLocaleLowerCase() + Date.now().toString().slice(0,8))
+    }) 
 };
  
