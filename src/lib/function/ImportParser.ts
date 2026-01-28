@@ -1,4 +1,4 @@
-import type { sConfig } from './utils';
+//import type { sConfig } from './utils';
 import {regexExec} from './utils';
 export type messageObj = {
     name:string,
