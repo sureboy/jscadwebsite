@@ -1,8 +1,9 @@
 <script lang="ts" >
+  import QRCode from 'qrcode';
   import modeling from '@jscad/modeling';
   import { Exporter} from "./function/threeScene" 
   import {handleCurrentMsg,getCurrent,getCurrentCode} from "./function/ImportParser"  
-  import  {mySolidConfig}  from "./LoadGzFile.svelte";
+  //import  {mySolidConfig}  from "./LoadGzFile.svelte";
   import { MenuType } from "./function/utils";
   import type { sConfig } from './function/utils';
   import {CodeWorker} from "./function/worker"
@@ -100,7 +101,9 @@
       }
   }
   const getCodeGz =async ()=>{
-
+    if (!window.CompressionStream || !window.DecompressionStream) {
+      return
+    }
       //const res = Exporter()  
       let indexName = solidConfig.workermsg.in;
       if (!indexName.startsWith("./")){
@@ -133,56 +136,57 @@ ${code}
       const chunks = await stringToGzip(codeSrc)
       return new Blob(chunks, { type: 'application/gzip' });
   }
-  const uploadCodeClick = async ()=>{
-      if (!window.CompressionStream || !window.DecompressionStream) {
-        console.log("down code err")
-        return
-      }
-    if (!confirm(`Publicize ${mySolidConfig.getP()}?`))return
-      fetch("/code").then(r=>{
-          if (!r.ok)return
-          r.json().then(db=>{
-              console.log(db)
-              CodeWorker(solidConfig,showCaptchaCode(db.code))
-              setTimeout(async() => {
-                  const code = prompt("输入验证码")
-                  if (!code)return
-                  const body = await getCodeGz()
-                  console.log(code)
-                  let url = "db.solidjscad.cn"
-                  if (window.location.host.endsWith("com")){
-                      url = "db.solidjscad.com"
-                  }
-
-                    
-                  fetch(`//${url}?code=${code}&key=${db.key}`,{
-                  method: "POST",body}).then(r=>{
-                      if (!r.ok)return
-                      r.json().then(db=>{
-                          console.log(db)
-                      })
-                  })
-              }, 1000);
-              
-              
-          })
-      }) 
+  let showInputCode:{key?:string,QRUrl?:string,value?:string,url?:string } = $state({})
+  const checkInputCode =async ( )=>{
+    let url = "db.solidjscad.cn"
+    if (window.location.host.endsWith("com")){
+      url = "db.solidjscad.com"
+    } 
+    fetch(`https://${url}?code=${showInputCode.value}&key=${showInputCode.key}`,{
+    method: "POST",body:await getCodeGz() }).then(r=>{
+      if (!r.ok)return
+      r.json().then(db=>{
+        showInputCode.url =`https://${window.location.host}#${db.k}`
+        QRCode.toDataURL(showInputCode.url, {
+          width: 200, 
+          color: {
+            dark: '#3b82f6',
+            light: '#ffffff'
+          }
+        }).then(qrDataUrl=>{
+          showInputCode.QRUrl = qrDataUrl
+          showInputCode.key = undefined
+        });
+        console.log(db)
+      })
+    })
   }
-    const downCodeclick = async ()=>{
-       if (!window.CompressionStream || !window.DecompressionStream) {
-        console.log("down code err")
-        return
-      }
-      const compressedBlob = await getCodeGz()
-       
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(compressedBlob);
-      link.download = `${solidConfig.workermsg.func}_${solidConfig.workermsg.in.split(".").shift()}_${solidConfig.workermsg.name}_${Date.now()}.solidjscad.gz`; 
-      link.click();
-      URL.revokeObjectURL(link.href); 
-    }   
+  const uploadCodeClick = ()=>{
+    console.log(Date.now().toString(36))
+    //if (!confirm(`Publicize ${mySolidConfig.getP()}?`))return
+    fetch("/code").then(r=>{
+      if (!r.ok)return
+      r.json().then(db=>{
+        //console.log(db)
+        CodeWorker(solidConfig,showCaptchaCode(db.code))
+        showInputCode.key = db.key 
+      })
+    }) 
+  }
+  const downCodeclick = async ()=>{
 
-    const stringToGzip= async (src:string)=>{
+    const compressedBlob = await getCodeGz()
+    if (!compressedBlob){
+      console.log("down code err")
+      return
+    }
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(compressedBlob);
+    link.download = `${solidConfig.workermsg.func}_${solidConfig.workermsg.in.split(".").shift()}_${solidConfig.workermsg.name}_${Date.now()}.solidjscad.gz`; 
+    link.click();
+    URL.revokeObjectURL(link.href); 
+  }
+  const stringToGzip= async (src:string)=>{
     const originalBytes = new TextEncoder().encode(src);
     const readableStream = new ReadableStream({
       start(controller) {
@@ -203,6 +207,7 @@ ${code}
     }
     return chunks 
   } 
+ 
 </script>
 <details    >
     <summary style="cursor:pointer;height:48px;text-align:left;line-height: 48px;" >
@@ -222,8 +227,23 @@ ${code}
       <button style="height:48:px;line-height:48px;cursor: pointer;" onclick={downPngClick} >Png</button>      
       {/if}
       {#if (solidConfig.showMenu & MenuType.Gzip )}
-       <button style="height:48:px;line-height:48px;cursor: pointer;" onclick={uploadCodeClick}>Share</button> 
+      <button  style="height:48:px;line-height:48px;cursor: pointer;" onclick={uploadCodeClick}>Share</button> 
+        {#if showInputCode.key}
+        <input type="text" bind:value={showInputCode.value} placeholder="Input Code" onkeydown={(e)=>{
+          if (e.key==="Enter" && showInputCode.value.length===8){
+            checkInputCode()
+          }
+        }}>
+        {/if}
+        {#if showInputCode.url}
+        <p><a style="color:white" href={showInputCode.url} target="_blank" >{showInputCode.url}</a></p>
+        {/if}
+        {#if showInputCode.QRUrl}
+        <p><img src="{showInputCode.QRUrl}" alt="qr" /></p>
+        {/if}
       {/if}
     </div>
 </details>
+
+
  
