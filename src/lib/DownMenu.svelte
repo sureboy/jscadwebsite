@@ -3,8 +3,8 @@
   import modeling from '@jscad/modeling';
   import { Exporter} from "./function/threeScene" 
   import {handleCurrentMsg,getCurrent,getCurrentCode} from "./function/ImportParser"  
-  //import  {mySolidConfig}  from "./LoadGzFile.svelte";
-  import { MenuType } from "./function/utils";
+  import  {mySolidConfig}  from "./LoadGzFile.svelte";
+  import { MenuType,getDBUrl } from "./function/utils";
   import type { sConfig } from './function/utils';
   import {CodeWorker} from "./function/worker"
   const { solidConfig }:{ solidConfig:sConfig} = $props();
@@ -132,21 +132,28 @@ ${code}
 `        //codeList.push(code)
 //console.log(name)
       })
+      codeSrc +=`
+/**${mySolidConfig.name}*/
+${window.localStorage.getItem(mySolidConfig.configName())}
+`
+
+      
       console.log("codeSrc",codeSrc)
       const chunks = await stringToGzip(codeSrc)
       return new Blob(chunks, { type: 'application/gzip' });
   }
   let showInputCode:{key?:string,QRUrl?:string,value?:string,url?:string } = $state({})
   const checkInputCode =async ( )=>{
-    let url = "db.solidjscad.cn"
-    if (window.location.host.endsWith("com")){
-      url = "db.solidjscad.com"
-    } 
-    fetch(`https://${url}?code=${showInputCode.value}&key=${showInputCode.key}`,{
+  
+    fetch(`${getDBUrl()}?code=${showInputCode.value}&key=${showInputCode.key}`,{
     method: "POST",body:await getCodeGz() }).then(r=>{
       if (!r.ok)return
       r.json().then(db=>{
-        showInputCode.url =`https://${window.location.host}#${db.k}`
+        if (!db.k){
+          alert(JSON.stringify(db))
+          return
+        }
+        showInputCode.url =`${window.location.protocol}//${window.location.host}#${db.k}`
         QRCode.toDataURL(showInputCode.url, {
           width: 200, 
           color: {
@@ -159,11 +166,15 @@ ${code}
         });
         console.log(db)
       })
+    }).finally(()=>{
+      showInputCode.value=""
+      showInputCode.key=""
     })
   }
   const uploadCodeClick = ()=>{
-    console.log(Date.now().toString(36))
-    //if (!confirm(`Publicize ${mySolidConfig.getP()}?`))return
+    //console.log(Date.now().toString(36))
+    if (!confirm(`warning!!!
+    Are you sure to upload the ${mySolidConfig.getP()} to the cloud?`))return
     fetch("/code").then(r=>{
       if (!r.ok)return
       r.json().then(db=>{
@@ -229,7 +240,7 @@ ${code}
       {#if (solidConfig.showMenu & MenuType.Gzip )}
       <button  style="height:48:px;line-height:48px;cursor: pointer;" onclick={uploadCodeClick}>Share</button> 
         {#if showInputCode.key}
-        <input type="text" bind:value={showInputCode.value} placeholder="Input Code" onkeydown={(e)=>{
+        <input maxlength="8" type="text" bind:value={showInputCode.value} placeholder="Input Code" onkeydown={(e)=>{
           if (e.key==="Enter" && showInputCode.value.length===8){
             checkInputCode()
           }

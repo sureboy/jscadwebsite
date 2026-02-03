@@ -1,9 +1,9 @@
 <script lang="ts">
-import {gzipToString,srcStringToJsFile} from "./function/utils"
+import {gzipToString,srcStringToFile} from "./function/utils"
 import type {windowConfigType,sConfig} from "./function/utils"
 import {handleCurrentMsg,cleanCurrentMsg}  from "./function/ImportParser"
 import { runWorker } from "./function/worker";
-import {MenuType} from "./function/utils"
+import {MenuType,getDBUrl,clearHash} from "./function/utils"
 import { addSceneSTL,startSceneOBJ} from "./function/threeScene" 
 import {STLLoader} from "three/addons/loaders/STLLoader.js" 
 //    import { getOutputFileNames } from "typescript";
@@ -11,40 +11,21 @@ const { myConfig,solidConfig }: { myConfig: windowConfigType,solidConfig:sConfig
 const reader = new FileReader();
 const textDecoder = new TextDecoder();
 
-const analysisGzip = (file:File,data: ArrayBuffer)=>{
-    if (!file.name.endsWith(".solidjscad.gz")){
-        return
-    }    
+const analysisGzip =async ( fileName:string,data: ArrayBuffer)=>{
+      
     //if (!window.confirm(`The current data will be overwritten!!`)){
     //    return;
     //}    
     solidConfig.showMenu=0
-    const p = file.name.split(".")[0]
-    mySolidConfig.setPath(p)
-    const [func,in_,name,date] = p.split("_")  
-    gzipToString(data).then(v=>{ 
-        
-        cleanCurrentMsg()
-        const files:string[] = []
-        
-        //myConfig.files=[]
-        srcStringToJsFile(v,(msg)=>{ 
-            window.localStorage.setItem(mySolidConfig.getPathX()+msg.name,msg.db) 
-            //window.localStorage.setItem( msg.name,msg.db) 
-           
-            files.push(msg.name)
-            handleCurrentMsg(msg)
-        }) 
-        const obj =  {func,in:in_,name,date,files}
-        Object.assign(myConfig,obj)
-        mySolidConfig.update()
-        //const myConfigStr = JSON.stringify(obj)
-        //console.log("----",myConfig.func,myConfig.date)
-        //window.localStorage.clear();
-        window.localStorage.setItem(mySolidConfig.configName(),JSON.stringify(obj))
-        solidConfig.showMenu=showMenu
-        runWorker(solidConfig );
-    })
+    const p = fileName.split(".")[0]
+    //mySolidConfig.setPath(p) 
+    //const v = await gzipToString(data)  
+    //if (!v)return 
+    let obj =await analysisGzipDB(p,data) 
+    if (!obj)return 
+    Object.assign(myConfig,obj) 
+    solidConfig.showMenu=showMenu
+    runWorker(solidConfig ); 
 }
 
 const readfile = (file:File)=>{
@@ -70,7 +51,10 @@ const readfile = (file:File)=>{
                 solidConfig.workermsg.options  = undefined
                 return
             default:
-                analysisGzip(file,e.target.result as ArrayBuffer)
+                if (!file.name.endsWith(".solidjscad.gz")){
+                    return
+                } 
+                analysisGzip(file.name,e.target.result as ArrayBuffer)
                 //window.alert(`Not supporting file format '${file.type}'  `)
                 //console.log(file.type)
                 return
@@ -195,13 +179,77 @@ export const loadSolidConfig = (solidConfig:sConfig)=>{
     }catch(e){
         return
     }
+    //if (window.location.hash){
+
+    //}
     
+    
+    //changeSolidConfig(solidConfig) 
+}
+const analysisGzipDB =async (name:string,data:ArrayBuffer )=>{
+    let obj:windowConfigType|undefined = undefined
+    const v = await gzipToString(data)  
+    
+    if (!v){
+        throw new Error('data err'); 
+    }
+    mySolidConfig.setPath(name) 
+    cleanCurrentMsg()
+    const files:string[] = []     
+    srcStringToFile(v,(msg)=>{ 
+        window.localStorage.setItem(mySolidConfig.getPathX()+msg.name,msg.db) 
+        //window.localStorage.setItem( msg.name,msg.db) 
+        if (msg.name===mySolidConfig.name){
+            obj = JSON.parse(msg.db) as windowConfigType
+            return
+        }
+        files.push(msg.name)
+        handleCurrentMsg(msg)
+    }) 
+    if (obj){        
+        obj.files=files
+    }else{
+        const plist = name.split("_")
+        if (plist.length>=4){
+            const [func,in_,name,date] = plist
+            obj =  {func,in:in_,name,date,files}
+            window.localStorage.setItem(mySolidConfig.configName(),JSON.stringify(obj))
+        }else{
+            throw new Error('config err'); 
+        }
+    }
+    mySolidConfig.update()
+    return obj
+}
+export const changeSolidConfig = (solidConfig:sConfig)=>{
+    if (window.location.hash){
+        const p = window.location.hash.slice(1)
+        window.location.hash=""
+        clearHash()
+        if (p){
+            const index =  mySolidConfig.path.indexOf(p)
+            if (index>=0){
+                mySolidConfig.index = index
+            }else{
+                fetch(`${getDBUrl()}?k=${p}`).then(v=>{
+                    v.arrayBuffer().then(db=>{ 
+                        analysisGzipDB(p,db).then(obj=>{ 
+                            Object.assign(solidConfig.workermsg,obj) 
+                            solidConfig.showMenu=showMenu 
+                            runWorker(solidConfig)
+                            
+                        })
+                    })
+                })
+                return
+            }
+        }
+        
+    }
+
     if (!mySolidConfig.path){
         return
     }
-    changeSolidConfig(solidConfig) 
-}
-const changeSolidConfig = (solidConfig:sConfig)=>{
     const myConf = window.localStorage.getItem(mySolidConfig.configName())
     if (!myConf)return;
     Object.assign(solidConfig.workermsg,JSON.parse(myConf))

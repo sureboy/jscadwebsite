@@ -7,11 +7,11 @@ export type menuConfigType = {
   }) => void;
 }
 export type windowConfigType = {
-  pageType:'run'|'gzData'|'stlData', 
+  pageType?:'run'|'gzData'|'stlData', 
   in: string;
   func: string;
   name:string;
-  src:string;
+  src?:string;
   date?:string;
   files?:string[];
 }
@@ -73,7 +73,19 @@ export const gzipToString= async (data: ArrayBuffer )=>{
     
     //return resultText;
   };
-
+export const getDBUrl = ()=>{
+    //  let url = "db.solidjscad.cn"
+    if (window.location.host.endsWith("com")){
+      return "https://db.solidjscad.com"
+    } else{
+      return "https://db.solidjscad.cn"
+    }
+}
+export function clearHash() {
+    // 获取当前URL的pathname和search部分
+    var url = window.location.pathname + window.location.search;
+    history.replaceState(null, null, url);
+}
 export const regexExec = (code:string,
     regex:RegExp 
     ,back:(r:RegExpExecArray,lastIndex:number)=>void
@@ -84,7 +96,7 @@ export const regexExec = (code:string,
         back(match,regex.lastIndex);
     }
 };
-  export  const srcStringToJsFile = (src:string,back:(msg:{name:string,db:string})=>void)=>{
+  export  const srcStringToFile = (src:string,back:(msg:{name:string,db:string})=>void)=>{
     let name = "";
     let codeStart = 0;
     //let codeEnd  = 0
