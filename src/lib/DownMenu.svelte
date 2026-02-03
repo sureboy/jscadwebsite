@@ -175,7 +175,7 @@ ${window.localStorage.getItem(mySolidConfig.configName())}
     //console.log(Date.now().toString(36))
     if (!confirm(`warning!!!
     Are you sure to upload the ${mySolidConfig.getP()} to the cloud?`))return
-    fetch("/code").then(r=>{
+    fetch(`/code?${Date.now().toString()}`).then(r=>{
       if (!r.ok)return
       r.json().then(db=>{
         //console.log(db)
