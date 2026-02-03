@@ -298,11 +298,17 @@ type="file" onchange={(event)=>{
 <button onclick={()=>{
     let fileName=""
     if (!myConfig.in){
-        fileName="./index.js"    
+        fileName="index"    
     }
     fileName= prompt("input file name",fileName)
     if (!fileName){
         return
+    }
+    if (!fileName.startsWith("./")){
+        fileName = "./"+fileName
+    }
+    if (!fileName.endsWith(".js")){
+        fileName += ".js"
     }
     if (!myConfig.in){
         myConfig.in = fileName;
@@ -323,14 +329,10 @@ type="file" onchange={(event)=>{
         mySolidConfig.update()
     }
      
-    if (!fileName.startsWith("./")){
-        fileName = "./"+fileName
-    }
-    if (!fileName.endsWith(".js")){
-        fileName += ".js"
-    }
-    console.log(fileName)
-    window.open("/edit#"+mySolidConfig.getPathX()+fileName)
+
+    //console.log(fileName)
+    window.location.href = "/edit#"+mySolidConfig.getPathX()+fileName
+    //window.open("/edit#"+mySolidConfig.getPathX()+fileName)
 
  
 }}>+</button>
