@@ -5,7 +5,7 @@ declare global {
 	namespace App {
 		interface Platform {
             env: {
-                KV: KVNamespace;
+                solidtmp: KVNamespace;
             }
         }
 		// interface Error {}

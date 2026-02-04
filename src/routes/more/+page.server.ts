@@ -5,7 +5,7 @@ import db from '$lib/assets/data.json' assert { type: 'json' };
 export const load: PageServerLoad = async ({ params,url,platform }) => {
    
     
-    const _db  = await platform.env.KV.list()
+    const _db  = await platform.env.solidtmp.list()
     /*
     let uri = "https://db.solidjscad.cn?list=1"
     const cursor = url.searchParams.get("cursor")
