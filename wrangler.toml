@@ -1,0 +1,3 @@
+name = "jscadwebsite"
+compatibility_flags = ["nodejs_compat"]
+compatibility_date = "2026-02-04"
