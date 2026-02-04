@@ -145,7 +145,7 @@ ${window.localStorage.getItem(mySolidConfig.configName())}
   let showInputCode:{key?:string,QRUrl?:string,value?:string,url?:string } = $state({})
   const checkInputCode =async ( )=>{
   
-    fetch(`${getDBUrl()}?code=${showInputCode.value}&key=${showInputCode.key}`,{
+    fetch(`/code?code=${showInputCode.value}&key=${showInputCode.key}`,{
     method: "POST",body:await getCodeGz() }).then(r=>{
       if (!r.ok)return
       r.json().then(db=>{

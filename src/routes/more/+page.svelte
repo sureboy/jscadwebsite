@@ -1,8 +1,9 @@
 <script lang="ts">
+
 //import libdata from '/assets/data.json' assert { type: 'json' };
 import type { PageProps } from './$types';
 let { data }: PageProps = $props();
-    console.log(data)
+ 
  
 </script>
 <svelte:head>

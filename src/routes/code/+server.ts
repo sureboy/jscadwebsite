@@ -1,6 +1,6 @@
 import { error,json } from '@sveltejs/kit';
 
-//import * as crypto  from 'crypto';
+import {put} from '$lib/function/kvdb'
 import modeling from '@jscad/modeling';
 import { API_SECRET_KEY } from '$env/static/private';
 import type { RequestHandler } from './$types';
@@ -62,4 +62,33 @@ export const GET: RequestHandler =async (req) => {
       key:await sha256(API_SECRET_KEY+code.toLocaleLowerCase() + Date.now().toString().slice(0,8))
     }) 
 };
- 
+export const POST:RequestHandler=async (e) => { 
+    const code = e.url.searchParams.get("code")
+    const key = e.url.searchParams.get("key") 
+    if (!code 
+      || !key       
+      || key != await sha256(API_SECRET_KEY+code.toLocaleLowerCase() + Date.now().toString().slice(0,8))){ 
+      return json({msg :"err"}) 
+    }
+    const arrayBuffer = await e.request.arrayBuffer();
+    if (!arrayBuffer)
+      return json({msg :"not db"}) 
+    //return json({msg:"ok"})
+    const k = Date.now().toString(32)
+    const opt:{metadata?:any,expiration?:number,expirationTtl?:number} = { }
+    const metadata =  e.url.searchParams.get("metadata")
+    if (metadata){
+      opt.metadata = JSON.parse(metadata)
+    }
+    const expiration =  e.url.searchParams.get("expiration")
+    if (expiration){
+      opt.expiration =parseInt(expiration)
+    }
+    const expirationTtl =  e.url.searchParams.get("expirationttl")
+    if (expirationTtl){
+      opt.expirationTtl =parseInt(expirationTtl)
+    } 
+    await e.platform?.env.solidtmp.put(k,arrayBuffer,opt)
+    //await put(k,arrayBuffer,opt)
+    return json({msg:"ok",k})
+};
