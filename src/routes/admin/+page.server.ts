@@ -2,10 +2,10 @@ import type { PageServerLoad } from './$types';
 import db from '$lib/assets/data.json' assert { type: 'json' }; 
 export const prerender = false;
  
-export const load: PageServerLoad = async ({ params,url }) => {
+export const load: PageServerLoad = async ({ params,url,Platform }) => {
    
     
-    
+    //Platform.env.KV
     let uri = "https://db.solidjscad.cn?list=1"
     const cursor = url.searchParams.get("cursor")
     if (cursor){
