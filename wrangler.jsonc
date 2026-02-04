@@ -1,0 +1,16 @@
+/**
+ * For more details on how to configure Wrangler, refer to:
+ * https://developers.cloudflare.com/workers/wrangler/configuration/
+ */
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "jscadwebsite",
+
+	"kv_namespaces": [
+		{
+		"binding": "KV",
+		"id": "3aea256e2c5c477a8e0318224ce35e3f"
+		}
+  	],
+	 
+}
