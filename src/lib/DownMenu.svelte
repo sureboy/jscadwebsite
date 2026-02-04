@@ -173,8 +173,7 @@ ${window.localStorage.getItem(mySolidConfig.configName())}
   }
   const uploadCodeClick = ()=>{
     //console.log(Date.now().toString(36))
-    if (!confirm(`warning!!!
-    Are you sure to upload the ${mySolidConfig.getP()} to the cloud?`))return
+    if (!confirm(`warning!!! The [${mySolidConfig.getP()}] will be uploaded to the server cloud.`))return
     fetch(`/code?${Date.now().toString()}`).then(r=>{
       if (!r.ok)return
       r.json().then(db=>{
