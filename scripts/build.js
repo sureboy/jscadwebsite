@@ -7,7 +7,7 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // 要排除的路由（可以从命令行参数获取）
-const excludedRoutes = process.argv.slice(2) || ['admin'];
+const excludedRoutes =   ['admin'];
 const srcRoutesDir = path.join(__dirname, '..', 'src/routes');
 const tempBackupDir = path.join(__dirname, '..', '.routes-backup');
 
@@ -25,6 +25,7 @@ function backupAndExcludeRoutes() {
   // 2. 删除要排除的路由
   for (const route of excludedRoutes) {
     const routePath = path.join(srcRoutesDir, route);
+    console.log(routePath)
     if (fs.existsSync(routePath)) {
       fs.rmSync(routePath,{recursive:true});
       console.log(`❌ 已排除路由: ${route}`);
