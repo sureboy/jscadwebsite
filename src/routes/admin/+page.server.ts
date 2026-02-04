@@ -1,6 +1,6 @@
 import type { PageServerLoad } from './$types'; 
 import db from '$lib/assets/data.json' assert { type: 'json' }; 
-
+export const prerender = false;
  
 export const load: PageServerLoad = async ({ params,url }) => {
    

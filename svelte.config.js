@@ -22,8 +22,9 @@ const config = {
 				include: ['/*'],
 				exclude: ['<all>']
 			}
-		})
-	}
+		}) 
+		 
+	},
 };
 
 export default config;
