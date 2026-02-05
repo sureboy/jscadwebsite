@@ -1,5 +1,5 @@
 import type { PageServerLoad } from './$types'; 
-import {list} from '$lib/function/kvdb'
+import {kvdblist} from '$lib/function/kvdb'
 import db from '$lib/assets/data.json' assert { type: 'json' }; 
  
 export const load: PageServerLoad = async ({ params,url,platform }) => {
@@ -21,7 +21,7 @@ export const load: PageServerLoad = async ({ params,url,platform }) => {
     const items = db.list.map(l=>l.title)
    //const req = list()
    //(await req).getNextPage
-    for await (const key of list() ) {
+    for await (const key of kvdblist() ) {
         //console.log(key.name);
         if (!items.includes(key.name)){
             db.list.push({title:key.name,img:""})

@@ -7,9 +7,9 @@ const client = new Cloudflare({
 function arrayBufferToBase64(buffer: ArrayBuffer): string {
   return btoa(String.fromCharCode(...new Uint8Array(buffer)));
 }
-export const list = ()=>{
+export const kvdblist = ()=>{
     return client.kv.namespaces.keys.list(KV_NAMESPACE_ID,{ account_id:  ACCOUNT_ID  })
 }
-export const put=(k:string,v:ArrayBuffer,opt:{metadata?:any,expiration?:number,expirationTtl?:number})=>{
+export const kvdbput=(k:string,v:ArrayBuffer,opt:{metadata?:any,expiration?:number,expirationTtl?:number})=>{
     return client.kv.namespaces.values.update(KV_NAMESPACE_ID,k,Object.assign({ account_id:  ACCOUNT_ID ,value:"test" },opt),{stream:true,headers:{'ContentType': 'application/octet-stream'},body:v})
 }
