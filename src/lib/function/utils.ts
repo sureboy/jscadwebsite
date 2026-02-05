@@ -35,9 +35,85 @@ export type sConfig = {
   el?:HTMLCanvasElement,
   workermsg?:workerConfigType,showMenu:number,
   postMessage?:(m:any)=>void,
+
   //endBack?:()=>void,
   //setWorkerMsg:(db:workerConfigType)=>void
 }  
+export const  currentSolidConfigKey = "currentSolidConfig"
+export const mySolidConfig:{
+    name:string ,
+    path:string[],
+    index?:number,
+    update():void,
+    configName():string,
+    setPath(p:string):void,
+    getPathX():string,
+    getP():string} = {
+    name:"solidjscad.json",
+    path:[],
+    configName:function(){
+        return this.getPathX()+this.name
+    },
+    getP:function(){
+        if (this.index!==undefined)
+            return this.path[this.index]
+        else  if (this.path.length>0){
+            this.index = this.path.length-1
+            return this.getP()
+        }else{
+            return ""
+        }
+            
+    },
+    getPathX:function(){
+        const p = this.getP()
+        if (p){
+            return p+"*"
+        }else{
+            return ""
+        }
+  
+            
+    },
+    setPath:function(p:string){
+        if (this.path.length===0){
+            this.path.push(p)
+            this.index = 0
+            return
+        }
+        const i = this.path.indexOf(p)
+        if (i<0){
+            this.index = this.path.length
+            this.path.push(p)
+
+        }else{ 
+            this.index = i 
+        }
+    },
+    update:function(){
+        window.localStorage.setItem(
+            currentSolidConfigKey,
+            JSON.stringify(this),
+        )
+    }
+}
+export const cleanSolidConfig = (files?:string[])=>{
+    if (!files)return;
+    
+    window.localStorage.removeItem(mySolidConfig.configName())
+    const p = mySolidConfig.getPathX()
+    files.forEach((name)=>{
+        window.localStorage.removeItem(p+name)
+    })
+    mySolidConfig.path.splice(mySolidConfig.index,1)
+    if (mySolidConfig.path.length===0){
+        mySolidConfig.index = undefined
+    }else{
+        mySolidConfig.index = mySolidConfig.path.length-1
+    }
+    mySolidConfig.update()
+    window.location.reload()
+}
 export const gzipToString= async (data: ArrayBuffer )=>{
   
   if (!window.CompressionStream || !window.DecompressionStream) {
@@ -131,3 +207,24 @@ export const regexExec = (code:string,
      */
   }  ;
 
+export const stringToGzip= async (src:string)=>{
+    const originalBytes = new TextEncoder().encode(src);
+    const readableStream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(originalBytes);
+        controller.close();
+      }
+    });
+    const compressionStream = new CompressionStream('gzip');
+    const compressedStream = readableStream.pipeThrough(compressionStream);
+
+    // 4. 从压缩流中读取数据块
+    const reader = compressedStream.getReader();
+    const chunks = [];
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value); // value 是 Uint8Array 类型的数据块
+    }
+    return chunks 
+} 

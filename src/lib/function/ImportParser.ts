@@ -1,5 +1,5 @@
-//import type { sConfig } from './utils';
-import {regexExec} from './utils';
+import type { sConfig } from './utils'; 
+import { stringToGzip,mySolidConfig,regexExec } from "./utils";
 export type messageObj = {
     name:string,
     db?:ArrayBuffer | string
@@ -25,17 +25,6 @@ type importType = {
 }
 export const currentMap = new Map<string,currentObj>();
 const waitGetMap = new Map<string,(c:currentObj)=>void>();
-//const includeImport = (window as any).includeImport;
-/*
-Object.keys(includeImport).forEach(k=>{
-    currentMap.set(k,{
-         
-        persons:new Set<currentObj>(),
-        name:k,
-        getUri:async ()=>{return includeImport[k];}});
-});
- */
-//console.log(includeImportKeys);
 
 const  importParser = (code:string)=> {
     const regex = /import\s*(?:(?:(?:\w+|\*\s*as\s*\w+|\{[^}]*\})\s+from\s+)?['"]([^'"]+)['"]|['"]([^'"]+)['"])/g;
@@ -61,100 +50,7 @@ const  importParser = (code:string)=> {
     //console.log(imports);
     return imports;
 };
-/*
-const fetchCurrent =async (name:string,src:string,children:Map<string,currentObj>)=>{
-    
-    if (children.has(name)){
-        return children.get(name)
-    }
-    
-    const cur = InitCurrentMap({name})
-    children.set(name,cur)
-    const srcFile = await fetch( name.replace(/^\.\//,`./${src}/`) )
-    reloadCurrent(cur,{
-                name ,
-                db:await srcFile.text()},
-                (e:{type:string,path?:string})=>{
-                    fetchCurrent(e.path,src,children)
-                    if (e.path){
-                        if (!children.has(e.path)) {
-                            getCurrentCodeSrc(solidConfig,InitCurrentMap({name:e.path}),back,children)
-                        }
-                        
-                    }
-                    
-                }
-            ) 
-}
-
-export const getCurrentCodeSrc =async ( solidConfig:sConfig,src:currentObj,back:(name:string,code:string)=>void,children = new Map<string,currentObj>()) => {
-    let code = ""; 
-    const waitList = []
-    
-    if (!src.srcList){
-        
-
-        try{
-        
-            
-             //const   reloadCur =  async(cur:currentObj) => {
-                const srcFile = await fetch( src.name.replace(/^\.\//,`./${solidConfig.workermsg.src}/`) )
-                reloadCurrent(src,{
-                    name:src.name,
-                    db:await srcFile.text()},
-                    (e:{type:string,path?:string})=>{
-                        if (e.path){
-                            if (!children.has(e.path)) {
-                             // reloadCur(InitCurrentMap({name:e.path}))
-                             waitList.push(getCurrentCodeSrc(solidConfig,InitCurrentMap({name:e.path}),back,children))
-                            }
-                            
-                        }
-                        
-                    }
-                ) 
-            //}
-            //await reloadCur(src)
-            //console.log("srclist",src.srcList)
-            //await getCurrentCodeSrc(solidConfig,src,back,children)
-
-        }catch(e){
-            console.error(e)
-            return
-        }
-        //return;
-    }
-    console.log("getSrc",src.name) 
-    children.set(src.name,src);
-    for (const _src of src.srcList){
  
-        if (typeof _src ==="string"){
-            code+=_src;
-            continue;
-        }
-        const ___src =await _src(); 
-        //if (!___src.name)console.log(___src);
-        if (___src.db){ 
-            if (!children.has(___src.name)) {
-                await getCurrentCodeSrc(solidConfig,___src,back,children);
-            }
-            //code+= "./" + ___src.name;   
-        }//else{
-            code+=  ___src.name;      
-        //}    
-        
-        
-    };
-    await Promise.all(waitList)
-    if (code){
-        //console.log(code);
-        back(src.name,code);
-    }
-    
-    return
-};
-//const encoder = new TextEncoder();
- */
 export const getCurrentCode =async ( src:currentObj,back:(name:string,code:string)=>void,children = new Set<currentObj>()) => {
     let code = "";    
     children.add(src);
@@ -338,3 +234,59 @@ export const handleCurrentMsg =(message:messageObj,postMessage?:(e:any)=>void)=>
         waitGetMap.get(message.name)!(cur);  
     }
 };
+  const postSrcMsg = (solidConfig:sConfig,e:{ path?:string})=>{
+      if (e.path){
+        fetch( 
+          e.path.replace(/^\.\//,`./${solidConfig.workermsg.src}/`) )
+          .then(f=>{
+            f.text().then(db=>{
+              handleCurrentMsg({name:e.path,db},(e)=>{
+                postSrcMsg(solidConfig,e)
+            })
+            })
+          })
+      }
+  }
+export const getCodeGz =async (solidConfig:sConfig)=>{
+    if (!window.CompressionStream || !window.DecompressionStream) {
+        return
+    }
+    //const res = Exporter()  
+    let indexName = solidConfig.workermsg.in;
+    if (!indexName.startsWith("./")){
+    indexName = "./"+indexName;
+    }
+    if (!indexName.endsWith(".js")){
+    indexName += ".js"
+    }
+    //handleCurrentMsg({name:"./lib/csgChange.js"},postSrcMsg)
+    const csgObj = await getCurrent("./lib/csgChange.js",(e)=>{
+            postSrcMsg(solidConfig,e)
+        });
+    console.log("csg",csgObj)
+    //handleCurrentMsg({name:indexName},postSrcMsg)
+    const current =await getCurrent(indexName,(e)=>{
+            postSrcMsg(solidConfig,e)
+        })  
+    //console.log(current)
+    let codeSrc = ""
+    await getCurrentCode( csgObj,(name:string,code:string)=>{
+    codeSrc +=`
+/**${name}*/
+${code}
+`        //codeList.push(code)
+    })
+    await getCurrentCode( current,(name:string,code:string)=>{
+    codeSrc +=`
+/**${name}*/
+${code}
+`        //codeList.push(code)
+//console.log(name)
+    })
+    codeSrc +=`
+/**${mySolidConfig.name}*/
+${window.localStorage.getItem(mySolidConfig.configName())}
+` 
+    const chunks = await stringToGzip(codeSrc)
+    return new Blob(chunks, { type: 'application/gzip' });
+}

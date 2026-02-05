@@ -1,7 +1,8 @@
 <script lang="ts">
     //import modeling from '@jscad/modeling';
     import type {windowConfigType,sConfig} from "./function/utils"
-    import LoadGzFile ,{mySolidConfig,cleanSolidConfig}  from "./LoadGzFile.svelte";
+    import {mySolidConfig,cleanSolidConfig} from "./function/utils"
+    import LoadGzFile   from "./LoadGzFile.svelte";
     import {currentMap}  from "./function/ImportParser"
     //import { onMount } from 'svelte';
     //import {CodeWorker} from "./function/worker"

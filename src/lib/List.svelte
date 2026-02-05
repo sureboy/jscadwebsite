@@ -13,7 +13,9 @@ let { list }: { list:{img:string,title:string}[]}  = $props();
 <div class="gallery"> 
 {#each  list as item,k }
  <figure  >
+    {#if item.img}
     <img src={item.img} alt="{item.title}" width="800" height="600"/>
+    {/if}
     <figcaption>
         <h3>{item.title}</h3>
         <p>{item.title}</p>

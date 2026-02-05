@@ -72,13 +72,12 @@ export const POST:RequestHandler=async (e) => {
     }
     const arrayBuffer = await e.request.arrayBuffer();
     if (!arrayBuffer)
-      return json({msg :"not db"}) 
-    //return json({msg:"ok"})
+      return json({msg :"not db"})  
     const k = Date.now().toString(32)
-    const opt:{metadata?:any,expiration?:number,expirationTtl?:number} = { }
-    const metadata =  e.url.searchParams.get("metadata")
-    if (metadata){
-      opt.metadata = JSON.parse(metadata)
+    const opt:{metadata?:any,expiration?:number,expirationTtl?:number} = {} 
+    const email =  e.url.searchParams.get("email")
+    if (email){
+      opt.metadata = {email}
     }
     const expiration =  e.url.searchParams.get("expiration")
     if (expiration){
@@ -88,7 +87,7 @@ export const POST:RequestHandler=async (e) => {
     if (expirationTtl){
       opt.expirationTtl =parseInt(expirationTtl)
     } 
-    await e.platform?.env.solidtmp.put(k,arrayBuffer,opt)
-    //await put(k,arrayBuffer,opt)
+    console.log(opt,Math.floor(Date.now()/1000))
+    await e.platform?.env.solidtmp.put(k,arrayBuffer,opt) 
     return json({msg:"ok",k})
 };
