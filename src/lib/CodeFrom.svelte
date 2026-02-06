@@ -1,10 +1,9 @@
 <script lang="ts">
 import QRCode from 'qrcode';
 import modeling from '@jscad/modeling'; 
-import { mySolidConfig } from "./function/utils";
+import { mySolidConfig,getCodeGz } from "./function/localdb";
 import type { sConfig } from './function/utils';
-import {CodeWorker} from "./function/worker"
-import {getCodeGz} from "./function/ImportParser"  
+import {CodeWorker} from "./function/worker" 
 const { solidConfig }:{ solidConfig:sConfig} = $props();
 let showInputCode:{
     key?:string,
@@ -52,7 +51,9 @@ const checkInputCode =async ( )=>{
         expiration:ISOToTimestamp(showInputCode.expiration ) ,
         key:showInputCode.key,
         email:showInputCode.email||"",
+        title:`${solidConfig.workermsg.func}_${solidConfig.workermsg.in}_${solidConfig.workermsg.name}`
     })
+    showInputCode.key=""
     fetch(`/code?${u}`,{
     method: "POST",body:await getCodeGz(solidConfig) }).then(r=>{
         if (!r.ok)return
@@ -70,7 +71,7 @@ const checkInputCode =async ( )=>{
           }
         }).then(qrDataUrl=>{
           showInputCode.QRUrl = qrDataUrl
-          showInputCode.key = undefined
+          //showInputCode.key = ""
         });
         console.log(db)
       })
@@ -78,33 +79,42 @@ const checkInputCode =async ( )=>{
       showInputCode.code=""
       showInputCode.email=""
       showInputCode.expiration=""
-      showInputCode.key=""
+      
     })
   }
 </script>
  <button  style="height:48:px;line-height:48px;cursor: pointer;" onclick={uploadCodeClick}>Share</button> 
  {#if showInputCode.key}
-<p><label>Code:
-<input maxlength="8" 
-    type="text"
-    bind:value={showInputCode.code}   
-    placeholder="Input Code"    onkeydown={(e)=>{
-if (e.key==="Enter" && showInputCode.code.length===8){
+ <!-- A11y: <div> with click handler must have an ARIA role -->
+ <div role="button" tabindex="0" 
+  aria-label="code check"  onkeydown={(e)=>{
+  if (e.key==="Enter" && showInputCode.code && showInputCode.code.length===8){
     checkInputCode()
 }
-}}></label>
-</p>
-<p>
-<label>Email: <input type="email" bind:value={showInputCode.email} placeholder="dimon@solidjscad.com" /> </label>
-</p>
-<p> 
-<label>expiration: 
-<input bind:value={showInputCode.expiration}   type="datetime-local"  min="{getMinDateTime()}" /> </label>
-</p>
+ }}>
+  <p><label>Code:
+  <input maxlength="8" 
+      type="text"
+      bind:value={showInputCode.code}   
+      placeholder="Input Code"     ></label>
+  </p>
+  <p>
+    <label>Email: <input type="email" bind:value={showInputCode.email} placeholder="dimon@solidjscad.com" /> </label>
+  </p>
+  <p> 
+    <label>expiration: 
+    <input bind:value={showInputCode.expiration}   type="datetime-local"  min="{getMinDateTime()}" /> </label>
+  </p>
+  <p><button onclick={(e)=>{
+    if (showInputCode.code && showInputCode.code.length===8)
+      checkInputCode()
+  }} >submit</button></p>
+</div>
  {/if}
 {#if showInputCode.url}
 <p><a style="color:white" href={showInputCode.url} target="_blank" >{showInputCode.url}</a></p>
 {/if}
 {#if showInputCode.QRUrl}
 <p><img src="{showInputCode.QRUrl}" alt="qr" /></p>
+
 {/if}

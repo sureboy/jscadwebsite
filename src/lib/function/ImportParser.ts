@@ -1,5 +1,5 @@
 import type { sConfig } from './utils'; 
-import { stringToGzip,mySolidConfig,regexExec } from "./utils";
+import { stringToGzip,regexExec } from "./utils";
 export type messageObj = {
     name:string,
     db?:ArrayBuffer | string
@@ -234,59 +234,3 @@ export const handleCurrentMsg =(message:messageObj,postMessage?:(e:any)=>void)=>
         waitGetMap.get(message.name)!(cur);  
     }
 };
-  const postSrcMsg = (solidConfig:sConfig,e:{ path?:string})=>{
-      if (e.path){
-        fetch( 
-          e.path.replace(/^\.\//,`./${solidConfig.workermsg.src}/`) )
-          .then(f=>{
-            f.text().then(db=>{
-              handleCurrentMsg({name:e.path,db},(e)=>{
-                postSrcMsg(solidConfig,e)
-            })
-            })
-          })
-      }
-  }
-export const getCodeGz =async (solidConfig:sConfig)=>{
-    if (!window.CompressionStream || !window.DecompressionStream) {
-        return
-    }
-    //const res = Exporter()  
-    let indexName = solidConfig.workermsg.in;
-    if (!indexName.startsWith("./")){
-    indexName = "./"+indexName;
-    }
-    if (!indexName.endsWith(".js")){
-    indexName += ".js"
-    }
-    //handleCurrentMsg({name:"./lib/csgChange.js"},postSrcMsg)
-    const csgObj = await getCurrent("./lib/csgChange.js",(e)=>{
-            postSrcMsg(solidConfig,e)
-        });
-    console.log("csg",csgObj)
-    //handleCurrentMsg({name:indexName},postSrcMsg)
-    const current =await getCurrent(indexName,(e)=>{
-            postSrcMsg(solidConfig,e)
-        })  
-    //console.log(current)
-    let codeSrc = ""
-    await getCurrentCode( csgObj,(name:string,code:string)=>{
-    codeSrc +=`
-/**${name}*/
-${code}
-`        //codeList.push(code)
-    })
-    await getCurrentCode( current,(name:string,code:string)=>{
-    codeSrc +=`
-/**${name}*/
-${code}
-`        //codeList.push(code)
-//console.log(name)
-    })
-    codeSrc +=`
-/**${mySolidConfig.name}*/
-${window.localStorage.getItem(mySolidConfig.configName())}
-` 
-    const chunks = await stringToGzip(codeSrc)
-    return new Blob(chunks, { type: 'application/gzip' });
-}

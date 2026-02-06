@@ -2,7 +2,7 @@
 
 //import libdata from '/assets/data.json' assert { type: 'json' };
 //import type { PageProps } from './$types';
-let { list }: { list:{img:string,title:string}[]}  = $props();
+let { list }: { list:{img?:string,title:string,metadata:string,save?:boolean}[]}  = $props();
  
 
 </script>
@@ -18,8 +18,13 @@ let { list }: { list:{img:string,title:string}[]}  = $props();
     {/if}
     <figcaption>
         <h3>{item.title}</h3>
-        <p>{item.title}</p>
-        <button  >查看</button>
+        <p>{item.metadata}</p>
+        <a href="/#{item.title}" target="_blank" >查看</a>
+        {#if item.save}
+            <button  onclick={(e)=>{
+
+            }}>save</button>
+        {/if}
     </figcaption>
 </figure>
 {/each} 

@@ -1,6 +1,6 @@
 <script lang="ts" >
   import { Exporter} from "./function/threeScene" 
-  import {getCodeGz} from "./function/ImportParser"  
+  import {getCodeGz} from "./function/localdb"  
   import { MenuType} from "./function/utils";
   import type { sConfig } from './function/utils';
   import CodeFrom from './CodeFrom.svelte'

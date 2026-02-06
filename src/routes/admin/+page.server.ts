@@ -24,7 +24,10 @@ export const load: PageServerLoad = async ({ params,url,platform }) => {
     for await (const key of kvdblist() ) {
         //console.log(key.name);
         if (!items.includes(key.name)){
-            db.list.push({title:key.name,img:""})
+            const metadata =key.metadata? Object.keys(key.metadata).map(k=>{
+                return k+":"+key.metadata[k] 
+            }).join("\n") :""
+            db.list.push({title:key.name, save:true,metadata,})
         }
     }
     //(await req).hasNextPage()

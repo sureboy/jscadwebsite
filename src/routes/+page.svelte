@@ -8,9 +8,9 @@ import { handleCurrentMsg }  from "$lib/function/ImportParser"
 import FileMenu from "$lib/FileMenu.svelte";
 import Menu ,{initMenu} from '$lib/Menu.svelte'
 import { runWorker } from "$lib/function/worker";
-import { loadSolidConfig,showMenu,changeSolidConfig } from "$lib/LoadGzFile.svelte";
-import { onMount } from 'svelte';
-import {mySolidConfig} from "$lib/function/utils"
+import { showMenu } from "$lib/LoadGzFile.svelte";
+import { onMount } from 'svelte'; 
+import {changeSolidConfig,loadSolidConfig,mySolidConfig} from "$lib/function/localdb"
 
 //let { data }: { data: windowConfigType } = $props();
 const myConfig:windowConfigType  =$state({
@@ -38,7 +38,7 @@ onMount(()=>{
     //window.localStorage.getItem("")
     initMenu(solidConfig,myConfig)
     loadSolidConfig(solidConfig)
-    changeSolidConfig(solidConfig) 
+    changeSolidConfig(solidConfig,showMenu) 
     window.addEventListener("storage",(e)=>{
         console.log("storage",e)
         

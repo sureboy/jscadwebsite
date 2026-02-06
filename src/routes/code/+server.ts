@@ -75,10 +75,12 @@ export const POST:RequestHandler=async (e) => {
       return json({msg :"not db"})  
     const k = Date.now().toString(32)
     const opt:{metadata?:any,expiration?:number,expirationTtl?:number} = {} 
-    const email =  e.url.searchParams.get("email")
-    if (email){
-      opt.metadata = {email}
-    }
+    const email =  e.url.searchParams.get("email") || ""
+  
+    const title =  e.url.searchParams.get("title")||""
+    
+    opt.metadata = {title,email}
+    
     const expiration =  e.url.searchParams.get("expiration")
     if (expiration){
       opt.expiration =parseInt(expiration)
