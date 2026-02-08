@@ -146,7 +146,7 @@ export const stringToGzip= async (src:string)=>{
 
     // 4. 从压缩流中读取数据块
     const reader = compressedStream.getReader();
-    const chunks = [];
+    const chunks  = [];
     while (true) {
         const { done, value } = await reader.read();
         if (done) break;

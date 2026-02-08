@@ -10,7 +10,7 @@ import Menu ,{initMenu} from '$lib/Menu.svelte'
 import { runWorker } from "$lib/function/worker";
 import { showMenu } from "$lib/LoadGzFile.svelte";
 import { onMount } from 'svelte'; 
-import {changeSolidConfig,loadSolidConfig,mySolidConfig} from "$lib/function/localdb"
+import {changeSolidConfig,loadmySolid,mySolidTmp} from "$lib/function/localdb"
 
 //let { data }: { data: windowConfigType } = $props();
 const myConfig:windowConfigType  =$state({
@@ -37,14 +37,14 @@ onMount(()=>{
     initSolidPage(solidConfig)
     //window.localStorage.getItem("")
     initMenu(solidConfig,myConfig)
-    loadSolidConfig(solidConfig)
+    loadmySolid(solidConfig)
     changeSolidConfig(solidConfig,showMenu) 
     window.addEventListener("storage",(e)=>{
-        console.log("storage",e)
-        
-        if (e.newValue && e.key.startsWith(mySolidConfig.getPathX()) && !e.key.endsWith(mySolidConfig.name)){
-            //if (e.key.startsWith(mySolidConfig.getPath()))
-            //const name = e.key.split("*")[1]
+        console.log("storage",e) 
+        if (e.newValue 
+            && e.key.startsWith(mySolidTmp.getPathX()) 
+            && !e.key.endsWith(mySolidTmp.name)
+        ){
             handleCurrentMsg({name:e.key.split("*")[1] ,db:e.newValue})
             solidConfig.showMenu=showMenu
             runWorker(solidConfig)

@@ -76,9 +76,7 @@
     link.click();
     URL.revokeObjectURL(link.href); 
   } 
-
   const downCodeclick = async ()=>{
-
     const compressedBlob = await getCodeGz(solidConfig)
     if (!compressedBlob){
       console.log("down code err")
@@ -91,7 +89,6 @@
     URL.revokeObjectURL(link.href); 
   }
   
- 
 </script>
 <details    >
     <summary style="cursor:pointer;height:48px;text-align:left;line-height: 48px;" >

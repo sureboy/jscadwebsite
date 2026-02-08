@@ -5,22 +5,25 @@ import Menu,{initMenu}  from './Menu.svelte'
 import { runWorker } from "./function/worker";
 import {delCurrentMsg,handleCurrentMsg,getCurrent,getCurrentCode}  from "./function/ImportParser"
 import type {messageObj} from "./function/ImportParser"
-import {gzipToString,srcStringToJsFile,MenuType} from "./function/utils"
+import {gzipToString,srcStringToFile,MenuType} from "./function/utils"
 import { addSceneSTL} from "./function/threeScene" 
 import {STLLoader} from "three/addons/loaders/STLLoader.js" 
 import type { sConfig,workerConfigType } from './function/utils';
 
 //export const solidConfig:sConfig=$state({ showMenu:1})
-export const solidConfig:sConfig=$state( { showMenu:0,setWorkerMsg:(w:workerConfigType)=>{
-  solidConfig.workermsg = {...w}
- }}
+export const solidConfig:sConfig=$state( 
+  { 
+    showMenu:0,setWorkerMsg:(w:workerConfigType)=>{
+    solidConfig.workermsg = {...w}
+  }}
 )
 const myConfig = (window as any).myConfig as {
     pageType:'run'|'gzData'|'stlData',
     src:string,
     name:string,
     in:string,
-    func:string}
+    func:string
+}
 initMenu(solidConfig,myConfig)
 type  handlePostMsg = (msg:any,postMessage?: (e: {name:string,db:string|ArrayBuffer,open:boolean}) => void)=>void
 const del:{name:string,fn:handlePostMsg} = {
@@ -86,7 +89,7 @@ const getSrc:{name:string,fn:handlePostMsg} = {
 const gzData:{name:string,fn:handlePostMsg} = {
   fn:(message:{db:ArrayBuffer},postMessage?: (e: any) => void)=>{
   gzipToString(message.db).then(src=>{    
-    srcStringToJsFile(src,(db)=>{       
+    srcStringToFile(src,(db)=>{       
         handleCurrentMsg(db) 
         //console.log(db.name);
     }) 

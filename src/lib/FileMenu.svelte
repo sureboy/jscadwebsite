@@ -1,7 +1,7 @@
 <script lang="ts">
     //import modeling from '@jscad/modeling';
     import type {windowConfigType,sConfig} from "./function/utils"
-    import {mySolidConfig,cleanSolidConfig} from "./function/localdb"
+    import {mySolidTmp,cleanSolidConfig} from "./function/localdb"
     import LoadGzFile   from "./LoadGzFile.svelte";
     import {currentMap}  from "./function/ImportParser"
     //import { onMount } from 'svelte';
@@ -12,19 +12,19 @@
 {#if solidConfig.showMenu!==0}
 <details    >
     <summary  style="cursor: pointer;height:48px;text-align: left;line-height: 48px;"  >
-        {mySolidConfig.getP()}
+        {mySolidTmp.getP()}
     </summary>
     <div  style="color:white;text-align: center;" id="module_list"> 
         {#each currentMap as [f] }
-        <a class="btn"  href="/edit#{mySolidConfig.getPathX()+f}" target="_blank"   >  {f}</a>  
+        <a class="btn"  href="/edit#{mySolidTmp.getPathX()+f}" target="_blank"   >  {f}</a>  
         {/each}
-        <a class="btn"  href="/edit#{mySolidConfig.configName()}" target="_blank"   >  {mySolidConfig.name}</a>
+        <a class="btn"  href="/edit#{mySolidTmp.configName()}" target="_blank"   >  {mySolidTmp.name}</a>
         <button onclick={(e)=>{
             console.log(e)
             if (!window.confirm(`The current data will be clean!!`)){
                 return;
             } 
-            cleanSolidConfig(myConfig.files)
+            cleanSolidConfig()
         }}>✖</button>
          
     </div> 
@@ -36,8 +36,7 @@
 {:else}
 <LoadGzFile {myConfig} {solidConfig}></LoadGzFile>
 {/if}
- <style>
- 
+<style> 
 .btn {
     cursor: pointer;
     padding-left: 10px;
@@ -45,14 +44,12 @@
     color: white;
     display: inline-block;
 }
-
 .btn:active {
     color:gray;
     transform: translateY(-1px);
     transition: all 0.1s;
-}
- 
+} 
 .btn:hover {
     color:whitesmoke; 
 }
- </style>
+</style>

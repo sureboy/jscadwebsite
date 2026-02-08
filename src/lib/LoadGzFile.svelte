@@ -5,7 +5,7 @@ import { runWorker } from "./function/worker";
 import {MenuType} from "./function/utils"
 import { addSceneSTL,startSceneOBJ} from "./function/threeScene" 
 import {STLLoader} from "three/addons/loaders/STLLoader.js" 
-import {analysisGzipDB,mySolidConfig} from "./function/localdb"
+import {analysisGzipDB,mySolidTmp} from "./function/localdb"
 //    import { getOutputFileNames } from "typescript";
 const { myConfig,solidConfig }: { myConfig: windowConfigType,solidConfig:sConfig  } = $props(); 
 const reader = new FileReader();
@@ -36,9 +36,9 @@ const readfile = (file:File)=>{
                 const msg = {db:textDecoder.decode(e.target.result as ArrayBuffer),name:file.name}
                 //console.log("js",msg)
                 //solidConfig.showMenu=0
-                window.localStorage.setItem(mySolidConfig.getPathX()+msg.name,msg.db)
+                window.localStorage.setItem(mySolidTmp.getPathX()+msg.name,msg.db)
                 handleCurrentMsg(msg)
-                if (window.localStorage.getItem(mySolidConfig.configName())){
+                if (window.localStorage.getItem(mySolidTmp.configName())){
                     solidConfig.showMenu=showMenu
                     runWorker(solidConfig );
                 }
@@ -76,7 +76,7 @@ export const main=(opt)=>{
 export const showMenu = MenuType.MainMenu | MenuType.Camera | MenuType.Gzip | MenuType.Stl | MenuType.Png
 
 </script>
-<select name="cars" id="cars" bind:value={mySolidConfig.index  } onchange={(e)=>{
+<select name="cars" id="cars"   onchange={(e)=>{
     const select = e.target as HTMLSelectElement
     //console.log(select.value)
     switch (select.value) {
@@ -86,14 +86,15 @@ export const showMenu = MenuType.MainMenu | MenuType.Camera | MenuType.Gzip | Me
             window.open("/more");
             return 
         default:
-            mySolidConfig.index = Number(select.value)
-            mySolidConfig.update()
+            mySolidTmp.index = Number(select.value)
+            mySolidTmp.update()
+            console.log(mySolidTmp)
             window.location.reload()
             return
     }   
 }}>
     <option value="">--</option>
-    {#each mySolidConfig.path as p,i}
+    {#each mySolidTmp.path as p,i}
         <option value={i} >{p}</option>
     {/each}
     <option value="more">...more</option>
@@ -132,21 +133,21 @@ type="file" onchange={(event)=>{
         myConfig.date = Date.now().toString()
         myConfig.files = [fileName]
         //[func,in_,name,date]
-        mySolidConfig.setPath(
+        mySolidTmp.setPath(
             [
                 myConfig.func,
                 myConfig.in,
                 myConfig.name,
                 myConfig.date].join("_")
             )
-        window.localStorage.setItem(mySolidConfig.configName(),JSON.stringify(myConfig))
-        window.localStorage.setItem(mySolidConfig.getPathX()+fileName,newPackageCode)
-        mySolidConfig.update()
+        window.localStorage.setItem(mySolidTmp.configName(),JSON.stringify(myConfig))
+        window.localStorage.setItem(mySolidTmp.getPathX()+fileName,newPackageCode)
+        mySolidTmp.update()
     }
      
 
     //console.log(fileName)
-    window.location.href = "/edit#"+mySolidConfig.getPathX()+fileName
+    window.location.href = "/edit#"+mySolidTmp.getPathX()+fileName
     //window.open("/edit#"+mySolidConfig.getPathX()+fileName)
 
  
