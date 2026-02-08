@@ -37,8 +37,10 @@ onMount(()=>{
     initSolidPage(solidConfig)
     //window.localStorage.getItem("")
     initMenu(solidConfig,myConfig)
-    loadmySolid(solidConfig)
-    changeSolidConfig(solidConfig,showMenu) 
+    loadmySolid(solidConfig).then(()=>{
+        changeSolidConfig(solidConfig,showMenu) 
+    })
+    
     window.addEventListener("storage",(e)=>{
         console.log("storage",e) 
         if (e.newValue 
@@ -48,8 +50,8 @@ onMount(()=>{
             handleCurrentMsg({name:e.key.split("*")[1] ,db:e.newValue})
             solidConfig.showMenu=showMenu
             runWorker(solidConfig)
-        }else{
-            window.location.reload()
+        //}else{
+        //    window.location.reload()
         }
 
     })

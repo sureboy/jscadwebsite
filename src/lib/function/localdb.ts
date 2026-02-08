@@ -102,8 +102,15 @@ const unzipDB = async(name:string,data:ArrayBuffer)=>{
     }
     let obj:windowConfigType|undefined = undefined
     const files:string[] = []  
+    mySolidTmp.setPath(name) 
     cleanCurrentMsg()
-    window.localStorage.clear()
+    for (let i=0;i<window.localStorage.length;i++){
+        const key = window.localStorage.key(i)
+        if (key !==currentMySolidKey )
+        window.localStorage.removeItem(key)
+    }
+    //window.localStorage.clear()
+    mySolidTmp.update()
     srcStringToFile(v,(msg)=>{ 
         window.localStorage.setItem(mySolidTmp.getPathX()+msg.name,msg.db) 
         //window.localStorage.setItem( msg.name,msg.db) 
@@ -137,15 +144,14 @@ export const analysisGzipDB =async (name:string,data:ArrayBuffer )=>{
         const olddb = await file.arrayBuffer()
         myStorage.put(oldName,olddb)
     }
-    mySolidTmp.setPath(name) 
+    //mySolidTmp.setPath(name) 
     //cleanCurrentMsg()
     //window.localStorage.clear()
     
     myStorage.put(name,data)
-
-    const obj =  await unzipDB(name,data)
-    mySolidTmp.update()
-    return obj
+    return await unzipDB(name,data)
+    //mySolidTmp.update()
+    //return obj
      
 }
 export const changeSolidConfig = (solidConfig:sConfig,showMenu:number)=>{
@@ -213,7 +219,7 @@ const reloadSolidConfig = (files:string[])=>{
             db:window.localStorage.getItem(name)})
     }*/
 }
-export const loadmySolid  = (solidConfig:sConfig)=>{
+export const loadmySolid  =async (solidConfig:sConfig)=>{
     //solidConfig_ = solidConfig
     try{
         Object.assign(
@@ -222,6 +228,7 @@ export const loadmySolid  = (solidConfig:sConfig)=>{
                 window.localStorage.getItem(currentMySolidKey) || "{}"
             )
         )
+        mySolidTmp.path = await myStorage.keys() 
     }catch(e){
         return
     }
