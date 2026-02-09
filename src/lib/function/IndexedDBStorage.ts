@@ -84,7 +84,6 @@ export class IndexedDBStorage {
   // 获取数据（get方法）
   async get<T = any>(key: string): Promise<T | null> {
     const db = await this.ensureDB();
-    
     return new Promise((resolve, reject) => {
       const transaction = db.transaction([this.storeName], 'readonly');
       const store = transaction.objectStore(this.storeName);

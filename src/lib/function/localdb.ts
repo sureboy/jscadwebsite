@@ -11,6 +11,7 @@ import {
 import { runWorker } from "./worker";
 import {IndexedDBStorage} from "$lib/function/IndexedDBStorage"
 const myStorage = new IndexedDBStorage('solidjscad', 'gzfile', 1);
+//export const tmpSolidConfig ={tmp:"solidjscad.json",conf:{}}
 export const  currentMySolidKey = "currentSolidConfig"
 export const mySolidTmp :{
     name:string ,
@@ -32,6 +33,7 @@ export const mySolidTmp :{
             return this.path[this.index]
         else  if (this.path.length>0){
             this.index = this.path.length-1
+            //this.update()
             return this.getP()
         }else{
             return ""
@@ -154,23 +156,76 @@ export const analysisGzipDB =async (name:string,data:ArrayBuffer )=>{
     //return obj
      
 }
+const initName =async ()=>{
+    if (window.location.hash){
+        const p = window.location.hash.slice(1)
+        //window.location.hash=""
+        clearHash()
+        return p
+    }
+    if (window.localStorage.length>0){
+        return window.localStorage.key(0).split("*")[0]
+    }
+    const keys = await myStorage.keys()
+    if (keys.length>0)
+        return keys[0]
+    return null
+}
+const reloadDB =async ( )=>{
+    const name = await initName()
+    if (!name){ 
+        return null
+    }
+    console.log(name)
+    const SolidPath = name +"*"
+    const confPath = SolidPath+mySolidTmp.name
+    const conf  = window.localStorage.getItem(confPath)
+    if (conf){
+        //console.log(conf)
+        const obj = JSON.parse(conf) as windowConfigType
+        obj.files.forEach((name)=>{
+            handleCurrentMsg({
+                name ,
+                db:window.localStorage.getItem(SolidPath+name)})
+        })
+        return obj       
+    }
+    const db = await myStorage.get(name) 
+    if (db){
+        return await unzipDB(name,db)  
+    }
+    const req =await fetch(`${getDBUrl()}?k=${name}`)
+    if (req.ok){
+        return await analysisGzipDB(name,await req.arrayBuffer()) 
+    } 
+    return null
+    
+}
 export const changeSolidConfig = (solidConfig:sConfig,showMenu:number)=>{
+    reloadDB().then((obj)=>{
+        Object.assign(solidConfig.workermsg,obj) 
+        solidConfig.showMenu=showMenu 
+        runWorker(solidConfig)
+    })
+    return
     if (window.location.hash){
         const p = window.location.hash.slice(1)
         window.location.hash=""
         clearHash()
         if (p){
+            //reloadDB(solidConfig,p)
+            //return
             const index =  mySolidTmp.path.indexOf(p)
             if (index>=0){
                 mySolidTmp.index = index
             }else{
                 fetch(`${getDBUrl()}?k=${p}`).then(v=>{
+                    if (!v.ok)return;
                     v.arrayBuffer().then(db=>{ 
                         analysisGzipDB(p,db).then(obj=>{ 
                             Object.assign(solidConfig.workermsg,obj) 
                             solidConfig.showMenu=showMenu 
                             runWorker(solidConfig)
-                            
                         })
                     })
                 })
@@ -178,6 +233,7 @@ export const changeSolidConfig = (solidConfig:sConfig,showMenu:number)=>{
             }
         }
     }
+    //window.localStorage.
     if (!mySolidTmp.path){
         return
     }
@@ -187,6 +243,7 @@ export const changeSolidConfig = (solidConfig:sConfig,showMenu:number)=>{
         console.log(name,mySolidTmp)
         myStorage.get(name).then(db=>{
             if (!db)return;
+            //console.log(name,db)
             unzipDB(name,db).then(obj=>{
                 Object.assign(solidConfig.workermsg,obj) 
                 solidConfig.showMenu=showMenu 
