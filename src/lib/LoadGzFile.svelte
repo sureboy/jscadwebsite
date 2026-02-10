@@ -22,7 +22,7 @@ const analysisGzip =async ( fileName:string,data: ArrayBuffer)=>{
 }
 
 const readfile = (file:File)=>{
-    console.log(file )
+    //console.log(file )
     reader.onload = (e) => {
         switch (file.type){
             case "text/javascript":

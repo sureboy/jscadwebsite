@@ -139,7 +139,11 @@ export const runWorker =async ( conf:sConfig  )=>{
   
   conf.showMenu = 1;
   if (!conf.baseUrl){
-    conf.baseUrl = await getBaseUrl(conf.workermsg,conf.postMessage) ;
+    conf.baseUrl = await getBaseUrl({
+      func:conf.workermsg.func,
+      src:conf.workermsg.src||"",
+      in:conf.workermsg.in
+    },conf.postMessage) ;
   }
   //const baseUrl =await getBaseUrl(message,postMessage);
 

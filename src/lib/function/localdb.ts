@@ -76,13 +76,6 @@ const unzipDB = async(name:string,data:ArrayBuffer)=>{
     return obj
 }
 export const analysisGzipDB =async (name:string,data:ArrayBuffer )=>{
-    const oldName = currentLocalDBConfig.path
-    if (oldName && oldName!==name && window.confirm("Will the current data be overwritten and need to be saved?")){
-        const db = await getCodeGzFromLocalStorage() 
-        const file = new Blob(db, { type: 'application/gzip' })
-        //const olddb = await file.arrayBuffer()
-        myStorage.put(oldName,await file.arrayBuffer())
-    } 
     myStorage.put(name,data)
     return await unzipDB(name,data) 
 }
@@ -102,18 +95,15 @@ const initName =async ()=>{
     }
     return null
 }
-const reloadDB =async ( )=>{
-    
+const reloadDB =async ( )=>{    
     const name = currentLocalDBConfig.path
     if (!name){ 
         return null
     }
-
     const SolidPath =currentLocalDBConfig.getPathX()// name +"*"
     const confPath =currentLocalDBConfig.configName()// SolidPath+currentLocalDBConfig.name
     const conf  = window.localStorage.getItem(confPath)
-    if (conf){
-        //console.log(conf)
+    if (conf){ 
         const obj = JSON.parse(conf) as windowConfigType
         obj.files.forEach((name)=>{
             handleCurrentMsg({
@@ -121,6 +111,11 @@ const reloadDB =async ( )=>{
                 db:window.localStorage.getItem(SolidPath+name)})
         })
         return obj       
+    }else{
+        const data = await gzipCodeFromLocalStorage()
+        if (data){
+            myStorage.put(data.path,data.db)
+        }
     }
     const db = await myStorage.get(name) 
     if (db){
@@ -148,9 +143,27 @@ export const loadLocalDBList  =async (solidConfig:sConfig)=>{
     //solidConfig_ = solidConfig
     currentLocalDBConfig.path =await initName()
     currentLocalDBConfig.paths = await myStorage.keys() 
-   
 }
-export const getCodeGzFromLocalStorage =()=>{
+export const gzipCodeFromLocalStorage =async ()=>{
+    if (window.localStorage.length===0){
+        return
+    }
+    let path = ""
+    let codeSrc = ""
+    for (let i=0;i<window.localStorage.length;i++){
+        const kn = window.localStorage.key(i)
+        const [key,name] = kn.split("*")
+        if (!path)path = key
+        const src = window.localStorage.getItem(kn)
+        codeSrc+=`
+/**${name}*/
+${src}`
+         
+    }
+    return {db :await stringToGzip(codeSrc),path}
+}
+ 
+export const getCodeGzFromLocalStorage_ =()=>{
     const confStr = window.localStorage.getItem(currentLocalDBConfig.configName())
     if (!confStr)return
     const conf = JSON.parse(confStr) as windowConfigType
@@ -169,11 +182,15 @@ ${code}
     })
     return stringToGzip(codeSrc)
 }
-export const getCodeGz =async (solidConfig:sConfig)=>{
-    if (!window.CompressionStream || !window.DecompressionStream) {
-        return
-    }
-    //const res = Exporter()  
+export const getCodeGz_ =async (solidConfig:sConfig)=>{ 
+    const data =await gzipCodeFromLocalStorage()
+    if (data)
+        return new Blob(data.db, { type: 'application/gzip' })
+    else
+        return await getCodeGz (solidConfig)
+}
+
+export const getCodeGz =async (solidConfig:sConfig)=>{ 
     let indexName = solidConfig.workermsg.in;
     if (!indexName.startsWith("./")){
     indexName = "./"+indexName;

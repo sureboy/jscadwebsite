@@ -50,10 +50,10 @@ const run:{name:string,fn:handlePostMsg} ={
 const getSrc:{name:string,fn:handlePostMsg} = {
   fn:(msg:{name?:string},postMessage?: (e: any) => void) =>{
   //let indexName =msg.name?msg.name: solidConfig.workermsg.in;
-  let indexName = solidConfig.workermsg.in;
-      if (!indexName.startsWith("./")){
-        indexName = "./"+indexName;
-      }
+    let indexName = solidConfig.workermsg.in;
+    if (!indexName.startsWith("./")){
+      indexName = "./"+indexName;
+    }
     getCurrent(indexName,postMessage).then(
       current=>{   
         console.log(current)     
