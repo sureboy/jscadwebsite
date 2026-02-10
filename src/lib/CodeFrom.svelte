@@ -1,7 +1,7 @@
 <script lang="ts">
 import QRCode from 'qrcode';
 import modeling from '@jscad/modeling'; 
-import { mySolidTmp,getCodeGz } from "./function/localdb";
+import { currentLocalDBConfig,getCodeGz } from "./function/localdb";
 import type { sConfig } from './function/utils';
 import {CodeWorker} from "./function/worker" 
 const { solidConfig }:{ solidConfig:sConfig} = $props();
@@ -29,7 +29,7 @@ const showCaptchaCode = (captchaCode:any[] )=>{
 }
 const uploadCodeClick = ()=>{
     //console.log(Date.now().toString(36))
-    if (!confirm(`warning!!! The [${mySolidTmp.getP()}] will be uploaded to the server cloud.`))return
+    if (!confirm(`warning!!! The [${currentLocalDBConfig.path}] will be uploaded to the server cloud.`))return
     fetch(`/code?${Date.now().toString()}`).then(r=>{
       if (!r.ok)return
       r.json().then(db=>{

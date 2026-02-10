@@ -11,6 +11,5 @@ onMount(()=>{
             console.log(v)
         })
     })
-
 })
 </script>

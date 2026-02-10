@@ -1,7 +1,7 @@
 <script lang="ts">
     //import modeling from '@jscad/modeling';
     import type {windowConfigType,sConfig} from "./function/utils"
-    import {mySolidTmp,cleanSolidConfig} from "./function/localdb"
+    import {currentLocalDBConfig,cleanSolidConfig} from "./function/localdb"
     import LoadGzFile   from "./LoadGzFile.svelte";
     import {currentMap}  from "./function/ImportParser"
     //import { onMount } from 'svelte';
@@ -12,13 +12,13 @@
 {#if solidConfig.showMenu!==0}
 <details    >
     <summary  style="cursor: pointer;height:48px;text-align: left;line-height: 48px;"  >
-        {mySolidTmp.getP()}
+        {currentLocalDBConfig.path}
     </summary>
     <div  style="color:white;text-align: center;" id="module_list"> 
         {#each currentMap as [f] }
-        <a class="btn"  href="/edit#{mySolidTmp.getPathX()+f}" target="_blank"   >  {f}</a>  
+        <a class="btn"  href="/edit#{currentLocalDBConfig.getPathX()+f}" target="_blank"   >  {f}</a>  
         {/each}
-        <a class="btn"  href="/edit#{mySolidTmp.configName()}" target="_blank"   >  {mySolidTmp.name}</a>
+        <a class="btn"  href="/edit#{currentLocalDBConfig.configName()}" target="_blank"   >  {currentLocalDBConfig.name}</a>
         <button onclick={(e)=>{
             console.log(e)
             if (!window.confirm(`The current data will be clean!!`)){

@@ -26,6 +26,7 @@ export const MenuType  = {
   Gzip:1<<3,
   Src:1<<4,
   Png:1<<5,
+  File:1<<6,
 }
  
 export type sConfig = {

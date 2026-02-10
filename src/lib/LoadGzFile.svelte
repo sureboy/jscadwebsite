@@ -5,22 +5,15 @@ import { runWorker } from "./function/worker";
 import {MenuType} from "./function/utils"
 import { addSceneSTL,startSceneOBJ} from "./function/threeScene" 
 import {STLLoader} from "three/addons/loaders/STLLoader.js" 
-import {analysisGzipDB,mySolidTmp} from "./function/localdb"
+import {analysisGzipDB,currentLocalDBConfig,changeSolidConfig} from "./function/localdb"
 //    import { getOutputFileNames } from "typescript";
 const { myConfig,solidConfig }: { myConfig: windowConfigType,solidConfig:sConfig  } = $props(); 
 const reader = new FileReader();
 const textDecoder = new TextDecoder();
 
-const analysisGzip =async ( fileName:string,data: ArrayBuffer)=>{
-      
-    //if (!window.confirm(`The current data will be overwritten!!`)){
-    //    return;
-    //}    
+const analysisGzip =async ( fileName:string,data: ArrayBuffer)=>{    
     solidConfig.showMenu=0
-    const p = fileName.split(".")[0]
-    //mySolidConfig.setPath(p) 
-    //const v = await gzipToString(data)  
-    //if (!v)return 
+    const p = fileName.split(".")[0] 
     let obj =await analysisGzipDB(p,data) 
     if (!obj)return 
     Object.assign(myConfig,obj) 
@@ -36,9 +29,9 @@ const readfile = (file:File)=>{
                 const msg = {db:textDecoder.decode(e.target.result as ArrayBuffer),name:file.name}
                 //console.log("js",msg)
                 //solidConfig.showMenu=0
-                window.localStorage.setItem(mySolidTmp.getPathX()+msg.name,msg.db)
+                window.localStorage.setItem(currentLocalDBConfig.getPathX()+msg.name,msg.db)
                 handleCurrentMsg(msg)
-                if (window.localStorage.getItem(mySolidTmp.configName())){
+                if (window.localStorage.getItem(currentLocalDBConfig.configName())){
                     solidConfig.showMenu=showMenu
                     runWorker(solidConfig );
                 }
@@ -86,16 +79,20 @@ export const showMenu = MenuType.MainMenu | MenuType.Camera | MenuType.Gzip | Me
             window.open("/more");
             return 
         default:
-            mySolidTmp.index = Number(select.value)
-            mySolidTmp.update()
-            console.log(mySolidTmp)
+            //mySolidTmp.index = Number(select.value)
+            //mySolidTmp.update()
+            //currentLocalDBConfig.path = select.value 
+            //history.replaceState(null, null, '#'+select.value);
+            window.location.hash = select.value
+            //changeSolidConfig(solidConfig,showMenu)
+            //console.log(mySolidTmp)
             window.location.reload()
             return
     }   
 }}>
     <option value="">--</option>
-    {#each mySolidTmp.path as p,i}
-        <option value={i} >{p}</option>
+    {#each currentLocalDBConfig.paths as p}
+        <option value={p} >{p}</option>
     {/each}
     <option value="more">...more</option>
     
@@ -133,21 +130,20 @@ type="file" onchange={(event)=>{
         myConfig.date = Date.now().toString()
         myConfig.files = [fileName]
         //[func,in_,name,date]
-        mySolidTmp.setPath(
-            [
+        currentLocalDBConfig.path = [
                 myConfig.func,
                 myConfig.in,
                 myConfig.name,
                 myConfig.date].join("_")
-            )
-        window.localStorage.setItem(mySolidTmp.configName(),JSON.stringify(myConfig))
-        window.localStorage.setItem(mySolidTmp.getPathX()+fileName,newPackageCode)
-        mySolidTmp.update()
+            
+        window.localStorage.setItem(currentLocalDBConfig.configName(),JSON.stringify(myConfig))
+        window.localStorage.setItem(currentLocalDBConfig.getPathX()+fileName,newPackageCode)
+        //mySolidTmp.update()
     }
      
 
     //console.log(fileName)
-    window.location.href = "/edit#"+mySolidTmp.getPathX()+fileName
+    window.location.href = "/edit#"+currentLocalDBConfig.getPathX()+fileName
     //window.open("/edit#"+mySolidConfig.getPathX()+fileName)
 
  
