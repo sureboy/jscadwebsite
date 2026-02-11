@@ -4,7 +4,7 @@
 import type { PageProps } from './$types';
 import List from '$lib/List.svelte'
 let { data }: PageProps = $props();
- 
+
 
 </script> 
-<List list={data.db.list} ></List>
+<List list={data.list} ></List>

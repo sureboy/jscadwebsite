@@ -1,9 +1,15 @@
 <script lang="ts">
-
+import {fetchGZBuffer} from "./function/utils"
 //import libdata from '/assets/data.json' assert { type: 'json' };
 //import type { PageProps } from './$types';
-let { list }: { list:{img?:string,title:string,metadata:string,save?:boolean}[]}  = $props();
- 
+let { list }: { list:{
+    img?:string,
+    expiration?:string,
+    email?:string,
+    title:string, 
+    save?:boolean,
+    update?:string,
+    url?:string}[]}  = $props();
 
 </script>
 <svelte:head>
@@ -11,15 +17,17 @@ let { list }: { list:{img?:string,title:string,metadata:string,save?:boolean}[]}
 </svelte:head>
  
 <div class="gallery"> 
-{#each  list as item,k }
+{#each  list as item,i }
  <figure  >
     {#if item.img}
     <img src={item.img} alt="{item.title}" width="800" height="600"/>
     {/if}
     <figcaption>
-        <h3>{item.title}</h3>
-        <p>{item.metadata}</p>
-        <a href="/#{item.title}" target="_blank" >查看</a>
+        <h3>{ item.title||item.url}</h3>
+        {#if item.update}<p>{new Date(item.update).toLocaleDateString()}</p>{/if}
+        {#if item.expiration}<p>end:{new Date(item.expiration).toLocaleDateString()}</p>{/if}
+        <p> {item.email}</p>
+        <a href="/#{item.url}" target="_blank" >查看</a>
         {#if item.save}
             <button  onclick={(e)=>{
 

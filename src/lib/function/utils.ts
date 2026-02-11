@@ -40,7 +40,18 @@ export type sConfig = {
   //endBack?:()=>void,
   //setWorkerMsg:(db:workerConfigType)=>void
 }  
-
+export const fetchGZBuffer = async (name:string)=>{
+    let url = ""
+    if (name.endsWith(".solidjscad.gz")){
+        url = "/assets/"+name
+    }else{
+        url = `${getDBUrl()}?k=${name}`
+    }
+    const req =await fetch(url)
+    if (!req.ok)
+        return null
+    return await req.arrayBuffer()
+}
 export const gzipToString= async (data: ArrayBuffer )=>{
   
   if (!window.CompressionStream || !window.DecompressionStream) {

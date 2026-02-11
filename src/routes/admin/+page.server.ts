@@ -1,35 +1,20 @@
-import type { PageServerLoad } from './$types'; 
+import type { PageServerLoad } from './$types';  
 import {kvdblist} from '$lib/function/kvdb'
 import db from '$lib/assets/data.json' assert { type: 'json' }; 
- 
-export const load: PageServerLoad = async ({ params,url,platform }) => {
-   
-    
-    //const _db  = await platform.env.solidtmp.list()
-    /*
-    let uri = "https://db.solidjscad.cn?list=1"
-    const cursor = url.searchParams.get("cursor")
-    if (cursor){
-        uri +="&cursor="+cursor
-    }
-    const r = await fetch(uri) 
-    if (!r.ok){
-        return {msg:"nothing"}
-    }
-    const _db =await  r.json() as {cacheStatus?:any,keys?:{name:string,expiration?:number,metadata?:any}[],list_complete:boolean,cursor:string}
-    */
-    const items = db.list.map(l=>l.title)
-   //const req = list()
-   //(await req).getNextPage
+const items = db.list.map(l=>l.url)
+export const load: PageServerLoad = async ({ params,url,platform }) => { 
+    const list:any[] = [...db.list]
     for await (const key of kvdblist() ) {
         //console.log(key.name);
         if (!items.includes(key.name)){
-            const metadata =key.metadata? Object.keys(key.metadata).map(k=>{
-                return k+":"+key.metadata[k] 
-            }).join("\n") :""
-            db.list.push({title:key.name, save:true,metadata,})
+            console.log(key.name);
+            list.push(Object.assign(key.metadata||{},{
+                expiration:key.expiration||undefined,
+                url: key.name,
+                update: parseInt(key.name,32) ,
+                save:true}))
+
         }
-    }
-    //(await req).hasNextPage()
-    return {db:db};
+    } 
+    return {list};
 };

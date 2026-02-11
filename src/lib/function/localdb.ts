@@ -1,5 +1,5 @@
 import {gzipToString,srcStringToFile,
-    getDBUrl,clearHash,stringToGzip
+    getDBUrl,clearHash,stringToGzip,fetchGZBuffer
 } from "./utils"
 import type {windowConfigType,sConfig} from "./utils"
 import {
@@ -120,14 +120,13 @@ const reloadDB =async ( )=>{
     const db = await myStorage.get(name) 
     if (db){
         return await unzipDB(name,db)  
-    }
-    const req =await fetch(`${getDBUrl()}?k=${name}`)
-    if (req.ok){
-        return await analysisGzipDB(name,await req.arrayBuffer()) 
-    } 
+    }   
+    const data =  await fetchGZBuffer(name)
+    if (data)
+        return await analysisGzipDB(name,data)     
     return null
-    
 }
+
 export const changeSolidConfig = (solidConfig:sConfig,showMenu:number)=>{
     reloadDB().then((obj)=>{
         console.log(obj)
@@ -136,7 +135,6 @@ export const changeSolidConfig = (solidConfig:sConfig,showMenu:number)=>{
         solidConfig.showMenu=showMenu 
         runWorker(solidConfig)
     })
-    
 }
  
 export const loadLocalDBList  =async (solidConfig:sConfig)=>{
@@ -234,11 +232,11 @@ const postSrcMsg = (solidConfig:sConfig,e:{ path?:string})=>{
     fetch( 
         e.path.replace(/^\.\//,`./${solidConfig.workermsg.src}/`) )
         .then(f=>{
-        f.text().then(db=>{
-            handleCurrentMsg({name:e.path,db},(e)=>{
-            postSrcMsg(solidConfig,e)
-        })
-        })
+            f.text().then(db=>{
+                handleCurrentMsg({name:e.path,db},(e)=>{
+                    postSrcMsg(solidConfig,e)
+                })
+            })
         })
     }
 }
