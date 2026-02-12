@@ -30,7 +30,20 @@ let { list }: { list:{
         <a href="/#{item.url}" target="_blank" >查看</a>
         {#if item.save}
             <button  onclick={(e)=>{
-
+                fetch("/admin",{
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    method:"POST",body:JSON.stringify(item)}).then(r=>{
+                    if (!r.ok)
+                        return;
+                    r.json().then(db=>{
+                        console.log(db)
+                        if (db.msg){
+                            db.save = false
+                        }
+                    })
+                })
             }}>save</button>
         {/if}
     </figcaption>

@@ -1,8 +1,10 @@
 {
-    "update":0,
-    "list":[
-        { 
-            "url":"1jgh8ftbhs"
-        }
-    ]
+  "update": 0,
+  "list": [
+    {
+      "url": "1jggungqs.solidjscad.gz",
+      "update": 1770095625052,
+      "save": false
+    }
+  ]
 }

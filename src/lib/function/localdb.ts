@@ -1,5 +1,5 @@
 import {gzipToString,srcStringToFile,
-    getDBUrl,clearHash,stringToGzip,fetchGZBuffer
+    clearHash,stringToGzip,fetchGZBuffer
 } from "./utils"
 import type {windowConfigType,sConfig} from "./utils"
 import {
@@ -39,9 +39,10 @@ export const cleanSolidConfig = ()=>{
     window.location.reload()
 }
 const unzipDB = async(name:string,data:ArrayBuffer)=>{
-    const v = await gzipToString(data)  
+    let v = await gzipToString(data)  
     if (!v){
-        throw new Error('data err'); 
+        v =new TextDecoder().decode(data)
+        //throw new Error('data err'); 
     }
     let obj:windowConfigType|undefined = undefined
     const files:string[] = []  
@@ -117,6 +118,7 @@ const reloadDB =async ( )=>{
             myStorage.put(data.path,data.db)
         }
     }
+    console.log(name)
     const db = await myStorage.get(name) 
     if (db){
         return await unzipDB(name,db)  

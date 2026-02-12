@@ -45,8 +45,10 @@ export const fetchGZBuffer = async (name:string)=>{
     if (name.endsWith(".solidjscad.gz")){
         url = "/assets/"+name
     }else{
-        url = `${getDBUrl()}?k=${name}`
+        url = "/db?k="+name
+        //url = `${getDBUrl()}?k=${name}`
     }
+    console.log(url)
     const req =await fetch(url)
     if (!req.ok)
         return null
@@ -59,6 +61,7 @@ export const gzipToString= async (data: ArrayBuffer )=>{
     window.alert("CompressionStream code err")
     return
   }
+  
   //let resultText:string = "";
   try {
     const decompressedStream = new DecompressionStream('gzip');
@@ -79,14 +82,16 @@ export const gzipToString= async (data: ArrayBuffer )=>{
         //const textDecoder = new TextDecoder();
         //resultText = textDecoder.decode(decompressedArrayBuffer);
     } catch (e) {
+      console.log(data)
       console.error(e);
-      window.alert(e)
+      //window.alert(e)
         // 如果不是有效的文本，显示为十六进制
         //resultText = arrayBufferToHexString(decompressedArrayBuffer);
     }
     
     //return resultText;
   };
+  /*
 export const getDBUrl = ()=>{
     //  let url = "db.solidjscad.cn"
     if (window.location.host.endsWith("com")){
@@ -94,7 +99,7 @@ export const getDBUrl = ()=>{
     } else{
       return "https://db.solidjscad.cn"
     }
-}
+}*/
 export function clearHash() {
     // 获取当前URL的pathname和search部分
     var url = window.location.pathname + window.location.search;
