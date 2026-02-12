@@ -89,8 +89,13 @@ const getSrc:{name:string,fn:handlePostMsg} = {
 const gzData:{name:string,fn:handlePostMsg} = {
   fn:(message:{db:ArrayBuffer},postMessage?: (e: any) => void)=>{
   gzipToString(message.db).then(src=>{    
-    srcStringToFile(src,(db)=>{       
+    srcStringToFile(src,(db)=>{    
+      if (db.name.endsWith("solidjscad.json")){
+        Object.assign(solidConfig.workermsg,JSON.parse(db.db) )
+      }else{
         handleCurrentMsg(db) 
+      }
+        
         //console.log(db.name);
     }) 
     console.log(solidConfig)

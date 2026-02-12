@@ -9,7 +9,7 @@ import {
     getCurrentCode
 }  from "./ImportParser"
 import { runWorker } from "./worker";
-import {IndexedDBStorage} from "$lib/function/IndexedDBStorage"
+import {IndexedDBStorage} from "./IndexedDBStorage"
 const myStorage = new IndexedDBStorage('solidjscad', 'gzfile', 1);
 //export const tmpSolidConfig ={tmp:"solidjscad.json",conf:{}}
 export const  currentLocalDBConfig:{
@@ -131,7 +131,7 @@ const reloadDB =async ( )=>{
 
 export const changeSolidConfig = (solidConfig:sConfig,showMenu:number)=>{
     reloadDB().then((obj)=>{
-        console.log(obj)
+        //console.log(obj)
         if (!obj)return
         Object.assign(solidConfig.workermsg,obj) 
         solidConfig.showMenu=showMenu 

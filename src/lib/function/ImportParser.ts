@@ -1,5 +1,5 @@
-import type { sConfig } from './utils'; 
-import { stringToGzip,regexExec } from "./utils";
+ 
+import {  regexExec } from "./utils";
 export type messageObj = {
     name:string,
     db?:ArrayBuffer | string

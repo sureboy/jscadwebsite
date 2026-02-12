@@ -5,7 +5,7 @@ import { runWorker } from "./function/worker";
 import {MenuType} from "./function/utils"
 import { addSceneSTL,startSceneOBJ} from "./function/threeScene" 
 import {STLLoader} from "three/addons/loaders/STLLoader.js" 
-import {analysisGzipDB,currentLocalDBConfig,changeSolidConfig} from "./function/localdb"
+import {analysisGzipDB,currentLocalDBConfig} from "./function/localdb"
 //    import { getOutputFileNames } from "typescript";
 const { myConfig,solidConfig }: { myConfig: windowConfigType,solidConfig:sConfig  } = $props(); 
 const reader = new FileReader();
@@ -16,7 +16,7 @@ const analysisGzip =async ( fileName:string,data: ArrayBuffer)=>{
     const p = fileName.split(".")[0] 
     let obj =await analysisGzipDB(p,data) 
     if (!obj)return 
-    Object.assign(myConfig,obj) 
+    Object.assign(solidConfig.workermsg,obj) 
     solidConfig.showMenu=showMenu
     runWorker(solidConfig ); 
 }

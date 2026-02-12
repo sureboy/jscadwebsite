@@ -20,6 +20,4 @@ export const GET:RequestHandler=async (e) => {
         'Content-Type': 'application/gzip'
         }
     });
-    
-  
 }
