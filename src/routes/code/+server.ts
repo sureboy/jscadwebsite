@@ -66,7 +66,7 @@ const getMinDateTime = ()=>{
     const now = new Date();
     now.setMonth(now.getMonth() + 1);
     console.log(now.toISOString() )
-    return now.getTime()
+    return Math.floor(now.getTime()/1000)
 }
 export const POST:RequestHandler=async (e) => { 
     const code = e.url.searchParams.get("code")
