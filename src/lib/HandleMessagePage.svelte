@@ -56,9 +56,9 @@ const getSrc:{name:string,fn:handlePostMsg} = {
     }
     getCurrent(indexName,postMessage).then(
       current=>{   
-        console.log(current)     
+        //console.log(current)     
         getCurrentCode(current,(name:string,code:string)=>{
-          console.log(name);
+          //console.log(name);
           postMessage({
             type:"src",
             name,
@@ -76,8 +76,8 @@ const getSrc:{name:string,fn:handlePostMsg} = {
               }) 
             }).then(()=>{
               postMessage({
-            type:"src"
-          }) 
+                type:"src"
+              }) 
             })
           });
           

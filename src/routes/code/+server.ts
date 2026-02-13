@@ -62,6 +62,12 @@ export const GET: RequestHandler =async (req) => {
       key:await sha256(API_SECRET_KEY+code.toLocaleLowerCase() + Date.now().toString().slice(0,8))
     }) 
 };
+const getMinDateTime = ()=>{
+    const now = new Date();
+    now.setMonth(now.getMonth() + 1);
+    console.log(now.toISOString() )
+    return now.getTime()
+}
 export const POST:RequestHandler=async (e) => { 
     const code = e.url.searchParams.get("code")
     const key = e.url.searchParams.get("key") 
@@ -74,7 +80,7 @@ export const POST:RequestHandler=async (e) => {
     if (!arrayBuffer)
       return json({msg :"not db"})  
     const k = Date.now().toString(32)
-    const opt:{metadata?:any,expiration?:number,expirationTtl?:number} = {} 
+    const opt:{metadata?:any,expiration:number,expirationTtl?:number} = {expiration:getMinDateTime()} 
     const email =  e.url.searchParams.get("email") || ""
   
     const title =  e.url.searchParams.get("title")||""

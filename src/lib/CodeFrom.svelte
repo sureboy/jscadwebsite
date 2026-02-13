@@ -8,7 +8,8 @@ const { solidConfig }:{ solidConfig:sConfig} = $props();
 let showInputCode:{
     key?:string,
     QRUrl?:string,
-     code?:string,email?:string,expiration?:string,
+     code?:string,email?:string,
+     //expiration?:string,
     url?:string
 } = $state({})
 const getMinDateTime = ()=>{
@@ -48,7 +49,7 @@ const checkInputCode =async ( )=>{
 
     const u = new URLSearchParams({
         code:showInputCode.code,
-        expiration:ISOToTimestamp(showInputCode.expiration ) ,
+        //expiration:ISOToTimestamp(showInputCode.expiration ) ,
         key:showInputCode.key,
         email:showInputCode.email||"",
         title:`${solidConfig.workermsg.func}_${solidConfig.workermsg.in}_${solidConfig.workermsg.name}`
@@ -78,7 +79,7 @@ const checkInputCode =async ( )=>{
     }).finally(()=>{
       showInputCode.code=""
       showInputCode.email=""
-      showInputCode.expiration=""
+      //showInputCode.expiration=""
       
     })
   }
@@ -101,16 +102,12 @@ const checkInputCode =async ( )=>{
   <p>
     <label>Email: <input type="email" bind:value={showInputCode.email} placeholder="dimon@solidjscad.com" /> </label>
   </p>
-  <p> 
-    <label>expiration: 
-    <input bind:value={showInputCode.expiration}   type="datetime-local"  min="{getMinDateTime()}" /> </label>
-  </p>
   <p><button onclick={(e)=>{
     if (showInputCode.code && showInputCode.code.length===8)
       checkInputCode()
   }} >submit</button></p>
 </div>
- {/if}
+{/if}
 {#if showInputCode.url}
 <p><a style="color:white" href={showInputCode.url} target="_blank" >{showInputCode.url}</a></p>
 {/if}
