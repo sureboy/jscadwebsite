@@ -54,11 +54,15 @@ const getSrc:{name:string,fn:handlePostMsg} = {
     if (!indexName.startsWith("./")){
       indexName = "./"+indexName;
     }
+    if (!indexName.endsWith(".js")){
+      indexName += ".js";
+    }
+    //console.log("getsrc",indexName)
     getCurrent(indexName,postMessage).then(
       current=>{   
         //console.log(current)     
         getCurrentCode(current,(name:string,code:string)=>{
-          //console.log(name);
+          //console.log("getsrc",name,code);
           postMessage({
             type:"src",
             name,

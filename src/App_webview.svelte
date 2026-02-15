@@ -6,8 +6,7 @@
   //import { vscode } from './lib/function/vscodeApi';
 const vscode = (window as any).vscode
   solidConfig.showMenu = -1
-  onMount(() => {
-    
+  onMount(() => {    
     initSolidPage(solidConfig) 
     solidConfig.postMessage = vscode.postMessage
     vscode.postMessage({ 

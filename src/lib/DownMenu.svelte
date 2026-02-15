@@ -9,10 +9,9 @@
   const downSrcClick = ()=>{
     console.log("down src")
     solidConfig.postMessage({
-          type:"downSrc"
-      }) 
-      return;
-  
+      type:"downSrc"
+    }) 
+    return;  
   }
   const downPngClick = ()=>{
     console.log("get png")

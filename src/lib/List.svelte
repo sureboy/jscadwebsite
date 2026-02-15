@@ -1,5 +1,5 @@
 <script lang="ts">
-import {fetchGZBuffer} from "./function/utils"
+//import {fetchGZBuffer} from "./function/utils"
 //import libdata from '/assets/data.json' assert { type: 'json' };
 //import type { PageProps } from './$types';
 let { list }: { list:{
@@ -24,9 +24,10 @@ let { list }: { list:{
     {/if}
     <figcaption>
         <h3>{ item.title||item.url}</h3>
-        {#if item.update}<p>{new Date(item.update).toLocaleDateString()}</p>{/if}
-        {#if item.expiration}<p>end:{new Date(item.expiration).toLocaleDateString()}</p>{/if}
-        <p> {item.email}</p>
+        {#if item.email}<p> {item.email}</p>{/if}
+        {#if item.update}<p>begin:{new Date(item.update).toLocaleDateString()}</p>{/if}
+        {#if item.expiration}<p>end:{new Date(Number(item.expiration)*1000).toLocaleDateString()}</p>{/if}
+
         <a href="/#{item.url}" target="_blank" >查看</a>
         {#if item.save}
             <button  onclick={(e)=>{
