@@ -8,7 +8,7 @@ import type {messageObj} from "./function/ImportParser"
 import {gzipToString,srcStringToFile,MenuType} from "./function/utils"
 import { addSceneSTL} from "./function/threeScene" 
 import {STLLoader} from "three/addons/loaders/STLLoader.js" 
-import type { sConfig,workerConfigType } from './function/utils';
+import type { sConfig,workerConfigType,windowConfigType } from './function/utils';
 
 //export const solidConfig:sConfig=$state({ showMenu:1})
 export const solidConfig:sConfig=$state( 
@@ -17,13 +17,7 @@ export const solidConfig:sConfig=$state(
     solidConfig.workermsg = {...w}
   }}
 )
-const myConfig = (window as any).myConfig as {
-    pageType:'run'|'gzData'|'stlData',
-    src:string,
-    name:string,
-    in:string,
-    func:string
-}
+const myConfig = (window as any).myConfig as windowConfigType
 initMenu(solidConfig,myConfig)
 type  handlePostMsg = (msg:any,postMessage?: (e: {name:string,db:string|ArrayBuffer,open:boolean}) => void)=>void
 const del:{name:string,fn:handlePostMsg} = {
@@ -32,7 +26,6 @@ const del:{name:string,fn:handlePostMsg} = {
     delCurrentMsg(msg.name);
   }
 }
-
 const init:{name:string,fn:handlePostMsg} = {
   name:"init",
   fn:(msg:messageObj&{open:boolean},postMessage?: (e: any) => void) =>{

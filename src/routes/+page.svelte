@@ -1,29 +1,34 @@
 <script lang="ts">
-
 import type {windowConfigType,sConfig} from "$lib/function/utils" 
-import ShowSolid,{    initSolidPage}  from '$lib/ShowSolid.svelte';
+import ShowSolid,{initSolidPage}  from '$lib/ShowSolid.svelte';
 import { handleCurrentMsg }  from "$lib/function/ImportParser" 
 import FileMenu from "$lib/FileMenu.svelte";
 import Menu ,{initMenu} from '$lib/Menu.svelte'
 import { runWorker } from "$lib/function/worker";
 import { showMenu } from "$lib/LoadGzFile.svelte";
 import { onMount } from 'svelte'; 
-import {changeSolidConfig,loadLocalDBList,currentLocalDBConfig} from "$lib/function/localdb" 
-
-const myConfig:windowConfigType  =$state({
+import {
+    changeSolidConfig,
+    loadLocalDBList,
+    currentLocalDBConfig
+} from "$lib/function/localdb" 
+const myConfig:windowConfigType  = $state({
     name:"",
     func:"",
     in:"",
     src:"",
     pageType:"run"
 }) 
-const solidConfig:sConfig= $state({ showMenu:0,
-    postMessage:(e:{type:string,path?:string})=>{
-        console.log("listen",e)
-        if (e.path){ 
-            //requestAnimationFrame(()=>{
+const solidConfig:sConfig = $state({ 
+    showMenu:0,
+    postMessage:(e:{type:string,path?:string})=>{ 
+        if (e.path){
             setTimeout(()=>{
-                handleCurrentMsg({name:e.path,db:window.localStorage.getItem(e.path)},solidConfig.postMessage)
+                handleCurrentMsg({
+                    name:e.path,
+                    db:window.localStorage.getItem(e.path)},
+                    solidConfig.postMessage
+                )
             }) 
         }
     },

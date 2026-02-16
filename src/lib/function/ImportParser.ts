@@ -99,8 +99,7 @@ export const getCurrent = (name:string,reqMessage?:(e:{type:"req",path:string})=
         }
         if (!reqMessage ){
             console.log("not reqmsg",name);
-            resolve(InitCurrentMap({name}));
-            //reject("Found Not");
+            resolve(InitCurrentMap({name})); 
             return;
         }
         
@@ -157,12 +156,8 @@ const reloadCurrent = (c:currentObj,msg:messageObj,postMessage?:(e:any)=>void)=>
     }else{
         console.log(msg,typeof msg.db);
         return;
-    }
-    //src = (typeof msg.db ==="string")?msg.db: decoder.decode(msg.db);
-    let tmpEndPos:number = 0;
-   
-
-    //let indexPos = 0;
+    } 
+    let tmpEndPos:number = 0; 
     importParser(src).forEach(p=>{
         c.srcList!.push( src.slice(tmpEndPos,p.startPosition) );
         c.srcList!.push( ()=>getCurrent(p.moduleName,postMessage) );
@@ -170,7 +165,7 @@ const reloadCurrent = (c:currentObj,msg:messageObj,postMessage?:(e:any)=>void)=>
     });
     c.srcList.push( src.slice(tmpEndPos) ); 
 };
-const toStringCurrent =async (c:currentObj)=>{
+const toStringCurrent = async (c:currentObj)=>{
     //console.log(new URL(import.meta.url).origin);
     if (c.url){
         return c.url;
@@ -217,7 +212,10 @@ export const cleanCurrentMsg = ()=>{
     currentMap.clear();
 };
  
-export const handleCurrentMsg =(message:messageObj,postMessage?:(e:any)=>void)=>{
+export const handleCurrentMsg =(
+    message:messageObj,
+    postMessage?:(e:any)=>void
+)=>{
     if (!message.name){         
         return;
     }  
@@ -225,12 +223,11 @@ export const handleCurrentMsg =(message:messageObj,postMessage?:(e:any)=>void)=>
     if (!currentMap.has(message.name)){
         cur = InitCurrentMap(message);
         currentMap.set(message.name,cur);
-
     }else{
         cur = currentMap.get(message.name)!;        
     }
     reloadCurrent(cur,message,postMessage);
     if (waitGetMap.has(message.name)){
-        waitGetMap.get(message.name)!(cur);  
+        waitGetMap.get(message.name)(cur);  
     }
 };

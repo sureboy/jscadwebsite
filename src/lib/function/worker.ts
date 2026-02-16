@@ -24,10 +24,7 @@ const consoleLogEnd=`}catch(error){
 //let baseUrl:string;
 //let oldMenu:number = 0;
 const getBaseUrl =async (config:{in:string,func:string,src:string },postMessage?:(e:any)=>void)=>{
- 
-
   let indexName = config.in;
-
   if (!indexName.startsWith("./")){
     indexName = "./"+indexName;
   }
@@ -41,10 +38,8 @@ const getBaseUrl =async (config:{in:string,func:string,src:string },postMessage?
     indexName = [li[0], config.src,...li.slice(1)].join("/");
   }
   const csgObj = await getCurrent(csgObjUrl,postMessage);
-
   const csgUri = await csgObj.getUri();
   const indexObj = await getCurrent(indexName,postMessage);
- 
   const indexuri = await indexObj.getUri();
   const src = `
   ${consoleLog} 
@@ -70,7 +65,7 @@ const getBaseUrl =async (config:{in:string,func:string,src:string },postMessage?
   csg.getCsgObjArray(src[module.basename](),(msg)=>{
   self.postMessage(msg)
 }) 
-${consoleLogEnd} `; 
+${consoleLogEnd}`; 
 //console.log(src);
   return URL.createObjectURL(
     new Blob([src],{type:'application/javascript'}));
