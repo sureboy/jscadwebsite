@@ -25,11 +25,12 @@
       },
       body:JSON.stringify({ 
         msg: {direction:Direction.map(v=>{ 
-          return v.name}),pageType:solidConfig.workermsg.pageType||"run"}, 
+          return v.name}),pageType:solidConfig.workermsg?.pageType||"run"}, 
         type:'loaded'
       })
     }).then(data=>{
       data.json().then(db=>{
+        console.log("loaded",db)
         HandleMessage(db,solidConfig.postMessage)
       })
     })

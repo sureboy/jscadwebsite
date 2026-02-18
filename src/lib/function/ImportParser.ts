@@ -1,8 +1,8 @@
  
-import {  regexExec } from "./utils";
+import {  regexExec } from "./utils"; 
 export type messageObj = {
     name:string,
-    db?:ArrayBuffer | string
+    db?:ArrayBuffer | string | any
 }
 type currentObj = { 
     url?:string;

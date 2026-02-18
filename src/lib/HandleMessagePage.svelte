@@ -17,8 +17,8 @@ export const solidConfig:sConfig=$state(
     solidConfig.workermsg = {...w}
   }}
 )
-const myConfig = (window as any).myConfig as windowConfigType
-initMenu(solidConfig,myConfig)
+//const myConfig = ((window as any).myConfig as windowConfigType) || null
+
 type  handlePostMsg = (msg:any,postMessage?: (e: {name:string,db:string|ArrayBuffer,open:boolean}) => void)=>void
 const del:{name:string,fn:handlePostMsg} = {
   name:"del",
@@ -32,12 +32,31 @@ const init:{name:string,fn:handlePostMsg} = {
     handleCurrentMsg(msg,postMessage)
   }
 }
+const begin:{name:string,fn:handlePostMsg} ={
+  name:"begin",
+  fn:(msg:messageObj ,
+  postMessage?: (e: any) => void) =>{  
+    initMenu(
+        solidConfig,
+        //{func:c.func,in:c.in,name:c.name,src:c.src}
+        msg.db as windowConfigType
+      ) 
+  }
+}
 const run:{name:string,fn:handlePostMsg} ={
-  fn:(msg:{open:boolean},postMessage?: (e: any) => void) =>{ 
-    //solidConfig.workermsg = 
-    Object.assign(solidConfig.workermsg,{cameraType:msg.open?solidConfig.workermsg.cameraType:'' })
-    runWorker(solidConfig );    
-  },
+  fn:(msg:messageObj&{open:boolean},
+    postMessage?: (e: any) => void) =>{  
+      /*
+      console.log(msg)
+      //const c = msg.db as windowConfigType
+      initMenu(
+        solidConfig,
+        //{func:c.func,in:c.in,name:c.name,src:c.src}
+        msg.db as windowConfigType
+      ) */
+      Object.assign(solidConfig.workermsg,{cameraType:msg.open?solidConfig.workermsg.cameraType:'' })
+      runWorker(solidConfig );    
+    },
   name:"run"
 }
 const getSrc:{name:string,fn:handlePostMsg} = {
@@ -85,15 +104,15 @@ const getSrc:{name:string,fn:handlePostMsg} = {
 }
 const gzData:{name:string,fn:handlePostMsg} = {
   fn:(message:{db:ArrayBuffer},postMessage?: (e: any) => void)=>{
+   // console.log(message)
   gzipToString(message.db).then(src=>{    
-    srcStringToFile(src,(db)=>{    
+    srcStringToFile(src,(db)=>{  
+      //console.log(db.name)  
       if (db.name.endsWith("solidjscad.json")){
         Object.assign(solidConfig.workermsg,JSON.parse(db.db) )
       }else{
         handleCurrentMsg(db) 
       }
-        
-        //console.log(db.name);
     }) 
     console.log(solidConfig)
     runWorker(solidConfig );
@@ -108,7 +127,7 @@ const stlData:{name:string,fn:handlePostMsg} = {
   },
   name:"stlData"
 }
-export const Direction:{name:string,fn:handlePostMsg}[] =[ init, del,run,getSrc,gzData,stlData ] 
+export const Direction:{name:string,fn:handlePostMsg}[] =[begin, init, del,run,getSrc,gzData,stlData ] 
 const getMsgHandle = (type:number )=>{
   function* getTag  () {
     for (let i = 0; i < Direction.length; i ++) {    
@@ -122,12 +141,15 @@ const getMsgHandle = (type:number )=>{
 export const HandleMessage = ( 
   message:{type:number,msg:any},
   postMessage?: (e: any) => void)=>{
-    console.log("messagepost",message)
+    //console.log("messagepost",message)
     for (const type of getMsgHandle(message.type)) {
-      console.log(type.name);
+      //console.log(type.name);
       type.fn(message.msg,postMessage)
     }
 } 
 </script>
+<svelte:head>
+  <title>{solidConfig.workermsg?.name || ""}</title>
+</svelte:head>
 <ShowSolid></ShowSolid> 
 <Menu   >{""}</Menu>
