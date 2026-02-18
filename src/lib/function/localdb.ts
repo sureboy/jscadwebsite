@@ -38,11 +38,18 @@ export const cleanSolidConfig = ()=>{
     window.localStorage.clear() 
     window.location.reload()
 }
-const unzipDB = async(name:string,data:ArrayBuffer)=>{
-    let v = await gzipToString(data)  
-    if (!v){
-        v =new TextDecoder().decode(data)
-        //throw new Error('data err'); 
+const unzipDB = async(name:string,data:ArrayBuffer|Array<any>)=>{
+    let v=""
+    if (Array.isArray(data)){ 
+        v = await gzipToString(await new Blob(data).arrayBuffer()) 
+    }else{
+        v = await gzipToString(data)          
+        if (!v ){
+            v =new TextDecoder().decode(data)
+        }
+    }    
+    if (!v ){         
+        return
     }
     let obj:windowConfigType|undefined = undefined
     const files:string[] = []  

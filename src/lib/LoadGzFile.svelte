@@ -8,8 +8,7 @@ import {STLLoader} from "three/addons/loaders/STLLoader.js"
 import {analysisGzipDB,currentLocalDBConfig} from "./function/localdb"
 //    import { getOutputFileNames } from "typescript";
 const { myConfig,solidConfig }: { myConfig: windowConfigType,solidConfig:sConfig  } = $props(); 
-const reader = new FileReader();
-const textDecoder = new TextDecoder();
+
 
 const analysisGzip =async ( fileName:string,data: ArrayBuffer)=>{    
     solidConfig.showMenu=0
@@ -23,6 +22,8 @@ const analysisGzip =async ( fileName:string,data: ArrayBuffer)=>{
 
 const readfile = (file:File)=>{
     //console.log(file )
+    const reader = new FileReader();
+const textDecoder = new TextDecoder();
     reader.onload = (e) => {
         switch (file.type){
             case "text/javascript":

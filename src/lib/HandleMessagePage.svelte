@@ -1,6 +1,6 @@
 <script lang="ts" module >
 import ShowSolid  from './ShowSolid.svelte';
-import Menu,{initMenu}  from './Menu.svelte'
+import Menu,{menuConfig}  from './Menu.svelte'
 
 import { runWorker } from "./function/worker";
 import {delCurrentMsg,handleCurrentMsg,getCurrent,getCurrentCode}  from "./function/ImportParser"
@@ -34,13 +34,11 @@ const init:{name:string,fn:handlePostMsg} = {
 }
 const begin:{name:string,fn:handlePostMsg} ={
   name:"begin",
-  fn:(msg:messageObj ,
+  fn:(msg:{config:windowConfigType} ,
   postMessage?: (e: any) => void) =>{  
-    initMenu(
-        solidConfig,
-        //{func:c.func,in:c.in,name:c.name,src:c.src}
-        msg.db as windowConfigType
-      ) 
+    //console.log("begin",msg)
+    solidConfig.workermsg  =Object.assign(menuConfig,msg.config )
+     
   }
 }
 const run:{name:string,fn:handlePostMsg} ={
@@ -54,7 +52,8 @@ const run:{name:string,fn:handlePostMsg} ={
         //{func:c.func,in:c.in,name:c.name,src:c.src}
         msg.db as windowConfigType
       ) */
-      Object.assign(solidConfig.workermsg,{cameraType:msg.open?solidConfig.workermsg.cameraType:'' })
+     //console.log("run",solidConfig)
+      Object.assign(solidConfig.workermsg,{cameraType:msg.open?solidConfig.workermsg?.cameraType:'' })
       runWorker(solidConfig );    
     },
   name:"run"
@@ -152,4 +151,4 @@ export const HandleMessage = (
   <title>{solidConfig.workermsg?.name || ""}</title>
 </svelte:head>
 <ShowSolid></ShowSolid> 
-<Menu   >{""}</Menu>
+<Menu {solidConfig}  >{""}</Menu>

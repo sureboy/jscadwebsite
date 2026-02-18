@@ -9,18 +9,37 @@ import { changeWorker,runWorker } from "./function/worker";
 import {cleanCurrentMsg} from "./function/ImportParser";
 import {MenuType} from "./function/utils";
 //import { onMount } from 'svelte';
-let solidConfig:sConfig = $state(undefined)
-export const initMenu = (solidConfig_:sConfig,myConfig:windowConfigType)=>{
-    solidConfig= solidConfig_
+// $state(undefined)
+export const menuConfig = { 
+        cameraType:"Perspective", 
+        module:(
+            m:{ list: string[];
+            basename: string;}
+        )=>{ 
+            moduleInit(m)
+        }
+    } as menuConfigType
+    /*
+export const initMenu = ( myConfig:windowConfigType)=>{
+    //solidConfig= solidConfig_
     solidConfig.workermsg  =Object.assign(myConfig, { 
         cameraType:"Perspective", 
-        module:(m:{ list: string[];
-        basename: string;})=>{ 
+        module:(
+            m:{ list: string[];
+            basename: string;}
+        )=>{ 
             moduleInit(m)
         }
     } as menuConfigType) 
 }
 
+*/
+ 
+</script>
+<script lang="ts">
+const {children,solidConfig }:{children:any,solidConfig:sConfig}  = $props(); 
+//const {solidConfig}:{solidConfig:sConfig} = $props() 
+//solidConfig.workermsg = Object.assign()
 const handleView = new Map<string,()=>void>()
 handleView.set("camera",()=>{
     solidConfig.workermsg.cameraType = toggleCamera()
@@ -33,10 +52,6 @@ handleView.set("refresh",()=>{
 handleView.set("show",()=>{ 
     onWindowResize(solidConfig.el!,solidConfig.workermsg.cameraType)
 }) 
- 
-</script>
-<script lang="ts">
-const {children }  = $props(); 
 </script>
 {#if solidConfig}
 <div style="position: absolute;left:5px;top:5px;z-index: 11;cursor: pointer;" class="pointer-events-auto" id="camera-toggle">
@@ -45,7 +60,7 @@ const {children }  = $props();
     {/if}
      
     {#if  (solidConfig.showMenu & MenuType.MainMenu )} 
-     <MainMenu   Clickhandle = {(n:string)=>{            
+    <MainMenu   Clickhandle = {(n:string)=>{            
         solidConfig.workermsg.func = n    
         initView()
         //clean old options
@@ -66,7 +81,7 @@ const {children }  = $props();
     {#if  ((solidConfig.showMenu >>2 )!==0 )}   
     <DownMenu {solidConfig} ></DownMenu>  
     {/if} 
-    {#if (solidConfig.workermsg.options)} 
+    {#if (solidConfig.workermsg?.options)} 
     <Options name="Options" options={solidConfig.workermsg.options} >
     <div style="padding-left:20px;" ><input type="submit" onclick={(e)=>{
         initView()

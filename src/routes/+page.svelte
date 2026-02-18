@@ -3,7 +3,7 @@ import type {windowConfigType,sConfig} from "$lib/function/utils"
 import ShowSolid,{initSolidPage}  from '$lib/ShowSolid.svelte';
 import { handleCurrentMsg }  from "$lib/function/ImportParser" 
 import FileMenu from "$lib/FileMenu.svelte";
-import Menu ,{initMenu} from '$lib/Menu.svelte'
+import Menu ,{menuConfig} from '$lib/Menu.svelte'
 import { runWorker } from "$lib/function/worker";
 import { showMenu } from "$lib/LoadGzFile.svelte";
 import { onMount } from 'svelte'; 
@@ -33,10 +33,13 @@ const solidConfig:sConfig = $state({
         }
     },
 }) 
+const initMenu = (myConfig:windowConfigType)=>{
+    solidConfig.workermsg  =Object.assign(myConfig,menuConfig)
+}
 onMount(()=>{
     initSolidPage(solidConfig)
     //window.localStorage.getItem("")
-    initMenu(solidConfig,myConfig)
+    initMenu(myConfig)
     loadLocalDBList(solidConfig).then(()=>{
         changeSolidConfig(solidConfig,showMenu) 
     }) 
@@ -58,7 +61,7 @@ onMount(()=>{
 <ShowSolid></ShowSolid> 
  
  
-<Menu    >
+<Menu  {solidConfig}  >
     <FileMenu {myConfig} {solidConfig} ></FileMenu> 
 </Menu> 
  
