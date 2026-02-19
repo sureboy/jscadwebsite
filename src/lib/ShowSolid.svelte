@@ -14,7 +14,7 @@ export const initSolidPage = (solidConfig:sConfig)=>{
     window.addEventListener('resize', ()=>{
       solidConfig.el!.width = document.body.clientWidth;
       solidConfig.el!.height = document.body.clientHeight; 
-      onWindowResize(solidConfig.el!,solidConfig.workermsg.cameraType)
+      onWindowResize(solidConfig.el!,solidConfig.workermsg?.cameraType||"Perspective")
     });   
 }
 </script>

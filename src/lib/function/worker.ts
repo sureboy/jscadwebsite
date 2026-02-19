@@ -191,7 +191,7 @@ export const runWorker =async ( conf:sConfig  )=>{
     if (msg.end ){
 
       //console.log("cameraType",conf.workermsg.cameraType);
-      onWindowResize(conf.el!,conf.workermsg.cameraType )	;
+      onWindowResize(conf.el!,conf.workermsg?.cameraType||"Perspective" )	;
       if (conf.postMessage){
       conf.postMessage({
         type:'end'
