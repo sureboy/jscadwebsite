@@ -7,92 +7,64 @@ export type messageObj = {
 type currentObj = { 
     url?:string;
     persons:Set<currentObj>;
-    //code?: string; 
-    srcList?:((()=>Promise<currentObj> )|string)[]
+    srcList:((()=>Promise<currentObj> )|string)[]
     getUri:()=>Promise<string>;
-    //toString:()=>string;
-    //children?:Set<currentObj>;
-    //update?:()=>void;
-    //reload?:(db:AllowSharedBufferSource)=>void;
- 
+
 } & messageObj
 type importType = {
     moduleName:string,
     startPosition:number,
     endPosition:number,
-    //fullImport:string,
     obj:currentObj,
 }
 export const currentMap = new Map<string,currentObj>();
 const waitGetMap = new Map<string,(c:currentObj)=>void>();
 
 const  importParser = (code:string)=> {
-    const regex = /import\s*(?:(?:(?:\w+|\*\s*as\s*\w+|\{[^}]*\})\s+from\s+)?['"]([^'"]+)['"]|['"]([^'"]+)['"])/g;
+    const regex = /import\s+[\s\S]*?\s+from\s+['"]([^'"]+)|import\s*\(?\s*['"]([^'"]+)/g;
     const imports:importType[] = [];
-    regexExec(code,regex,(match,i)=>{
-        //console.log(match,match[0].length,i);
-        const moduleName = match[1] || match[2];
-
+    regexExec(code,regex,(match,i)=>{ 
+        const moduleName = match[1] || match[2] ;
         const quoteIndex = Math.max(
             match[0].indexOf("'"),
             match[0].indexOf('"')
         );
-        const startPosition = match.index + quoteIndex + 1;
-        
+        const startPosition = match.index + quoteIndex + 1;        
         imports.push({
-            moduleName:moduleName,//.startsWith(".")?moduleName.split("/").pop():moduleName ,
+            moduleName:moduleName,//.trim(),
             startPosition: startPosition,
             endPosition: startPosition + moduleName.length,
-            // fullImport: match[0]
         } as importType);
     });
-   
-    //console.log(imports);
     return imports;
 };
  
 export const getCurrentCode =async ( src:currentObj,back:(name:string,code:string)=>void,children = new Set<currentObj>()) => {
     let code = "";    
     children.add(src);
-    if (!src.srcList){
-        return;
-    }
+ 
     for (const _src of src.srcList){ 
         if (typeof _src ==="string"){
             code+=_src;
             continue;
         }
         const ___src =await _src();
-
-         
-        //if (!___src.name)console.log(___src);
         if (___src.db){
             
             if (!children.has(___src)) {
                
                 await getCurrentCode(___src,back,children);
-            }
-            //code+= "./" + ___src.name;   
-        }//else{
-            code+=  ___src.name;      
-        //}    
-        
-        
+            } 
+        } 
+        code+=  ___src.name;  
     };
     if (code){
-        //console.log(code);
         back(src.name,code);
     }
 };
  
 export const getCurrent = (name:string,reqMessage?:(e:{type:"req",path:string})=>void )=>{
     return new Promise<currentObj>((resolve, reject)=>{
-        /*
-        if (!name.startsWith("./")){
-            if (includeImport[name]){
-                name = includeImport[name];
-            }
-        }*/
         if (currentMap.has(name)){
             resolve(currentMap.get(name)!);
             return ;
@@ -101,30 +73,18 @@ export const getCurrent = (name:string,reqMessage?:(e:{type:"req",path:string})=
             console.log("not reqmsg",name);
             resolve(InitCurrentMap({name})); 
             return;
-        }
-        
+        }        
         reqMessage({type:"req",path:name});
         const t = setTimeout(()=>{
-            
             waitGetMap.delete(name);
             resolve(InitCurrentMap({name}));
         }, 2000);
         waitGetMap.set(name,(c:currentObj)=>{
             clearTimeout(t);
-            resolve(c);
-            
-            
+            resolve(c);   
             waitGetMap.delete(name);
-        });
-        
-    });
-    
-    //return getMsg(name);
-
-    //return currentMap.has(name)?currentMap.get(name):name;
-    
-
-     
+        });        
+    }); 
 };
 const decoder = new TextDecoder();
 const updateCurrent = (c:currentObj)=>{
@@ -170,7 +130,7 @@ const toStringCurrent = async (c:currentObj)=>{
     if (c.url){
         return c.url;
     }
-    if (!c.srcList){
+    if (c.srcList.length===0){
         return new URL(c.name,new URL(import.meta.url).origin).toString();
     }
     let code ="";
@@ -200,7 +160,8 @@ const InitCurrentMap = (v:messageObj)=>{
         persons:new Set<currentObj>(),
         getUri:async ()=>{
             return toStringCurrent(cur);            
-        },        
+        },  
+        srcList:[]   ,   
         ...v
     } as currentObj;
     return cur;

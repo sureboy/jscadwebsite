@@ -10,6 +10,7 @@ export type windowConfigType = {
   pageType?:'run'|'gzData'|'stlData', 
   in: string;
   func: string;
+  port:number;
   name:string;
   src?:string;
   date?:string;
@@ -35,71 +36,39 @@ export type sConfig = {
   oldMenu?:number,
   el?:HTMLCanvasElement,
   workermsg?:workerConfigType,showMenu:number,
-  postMessage?:(m:any)=>void,
-
-  //endBack?:()=>void,
-  //setWorkerMsg:(db:workerConfigType)=>void
+  postMessage?:(m:any)=>void, 
 }  
 export const fetchGZBuffer = async (name:string)=>{
-    let url = ""
-    if (name.endsWith(".solidjscad.gz")){
-        url = "/assets/"+name
-    }else{
-        url = "/db?k="+name
-        //url = `${getDBUrl()}?k=${name}`
-    }
-    console.log(url)
-    const req =await fetch(url)
-    if (!req.ok)
-        return null
-    return await req.arrayBuffer()
+  let url = ""
+  if (name.endsWith(".solidjscad.gz")){
+      url = "/assets/"+name
+  }else{
+      url = "/db?k="+name 
+  }
+  console.log(url)
+  const req =await fetch(url)
+  if (!req.ok)
+      return null
+  return await req.arrayBuffer()
 }
-export const gzipToString= async (data: ArrayBuffer )=>{
-  
+export const gzipToString= async (data: ArrayBuffer )=>{  
   if (!window.CompressionStream || !window.DecompressionStream) {
     console.log("down code err")
     window.alert("CompressionStream code err")
     return
-  }
-  
-  //let resultText:string = "";
+  } 
   try {
-    const decompressedStream = new DecompressionStream('gzip');
-   
-    const writer = decompressedStream.writable.getWriter();
-   
+    const decompressedStream = new DecompressionStream('gzip');   
+    const writer = decompressedStream.writable.getWriter();   
     writer.write(data as BufferSource);
     writer.close();
-    const decompressedResponse = new Response(decompressedStream.readable);
-    //window.alert("1")
-    return await decompressedResponse.text()
-    //const decompressedArrayBuffer = await decompressedResponse.arrayBuffer(); 
-   
-    //window.alert("2")
-   
-    // 尝试将解压缩数据转换为文本，如果不是文本则显示为十六进制
-  
-        //const textDecoder = new TextDecoder();
-        //resultText = textDecoder.decode(decompressedArrayBuffer);
-    } catch (e) {
-      console.log(data)
-      console.error(e);
-      //window.alert(e)
-        // 如果不是有效的文本，显示为十六进制
-        //resultText = arrayBufferToHexString(decompressedArrayBuffer);
-    }
-    
-    //return resultText;
-  };
-  /*
-export const getDBUrl = ()=>{
-    //  let url = "db.solidjscad.cn"
-    if (window.location.host.endsWith("com")){
-      return "https://db.solidjscad.com"
-    } else{
-      return "https://db.solidjscad.cn"
-    }
-}*/
+    const decompressedResponse = new Response(decompressedStream.readable); 
+    return await decompressedResponse.text() 
+  } catch (e) {
+    console.log(data)
+    console.error(e); 
+  } 
+}; 
 export function clearHash() {
     // 获取当前URL的pathname和search部分
     var url = window.location.pathname + window.location.search;
@@ -115,40 +84,20 @@ export const regexExec = (code:string,
         back(match,regex.lastIndex);
     }
 };
-  export  const srcStringToFile = (src:string,back:(msg:{name:string,db:string})=>void)=>{
-    let name = "";
-    let codeStart = 0;
-    //let codeEnd  = 0
-    //console.log(src)
-    regexExec(src,/\/\*\*\s*([^\*|\s]+)\s*\*/g,(r,i)=>{      
-      if (name){
-        //codeEnd = 
-        //console.log(r,codeStart,src.slice(r.index,i))
-        //const db = src.slice(codeStart,r.index).trim()
-        //if (db)
-        back({name,db:src.slice(codeStart,r.index).trim()});
-      }
-      name = r[1];
-      codeStart = i+1;
-
-      // r[1]
-      // r.index,i
-    });
-    if (name){
-        back({name,db:src.slice(codeStart).trim()});
+export  const srcStringToFile = (src:string,back:(msg:{name:string,db:string})=>void)=>{
+  let name = "";
+  let codeStart = 0; 
+  regexExec(src,/\/\*\*\s*([^\*|\s]+)\s*\*/g,(r,i)=>{      
+    if (name){ 
+      back({name,db:src.slice(codeStart,r.index).trim()});
     }
-/*
-    src.split("========").forEach(db=>{
-     const name = getFileName(db)
-     //console.log("filename",getFileName(db))
-     if (name)
-     back({
-      name ,
-      db,
-     })
-    })
-     */
-  }  ;
+    name = r[1];
+    codeStart = i+1; 
+  });
+  if (name){
+      back({name,db:src.slice(codeStart).trim()});
+  }
+}  ;
 
 export const stringToGzip= async (src:string)=>{
     const originalBytes = new TextEncoder().encode(src);

@@ -13,6 +13,7 @@ import {
     currentLocalDBConfig
 } from "$lib/function/localdb" 
 const myConfig:windowConfigType  = $state({
+    port:0,
     name:"",
     func:"",
     in:"",

@@ -1,4 +1,4 @@
-import {getCurrent} from "./ImportParser";
+import {getCurrent,handleCurrentMsg} from "./ImportParser";
 import {onWindowResize,startSceneOBJ,addSceneOBJ} from "./threeScene" ;
 import { CSG2Three } from "./csg2Three";
 import type { sConfig } from './utils';
@@ -24,6 +24,23 @@ const consoleLogEnd=`}catch(error){
 //let baseUrl:string;
 //let oldMenu:number = 0;
 const getBaseUrl =async (config:{in:string,func:string,src:string },postMessage?:(e:any)=>void)=>{
+  //return "http://localhost:3000/src/lib/worker.js"
+  const workerObj =await getCurrent("./worker.js",postMessage||(e=>{
+    fetch("./worker.js").then(req=>[
+      req.arrayBuffer().then(db=>{
+        handleCurrentMsg({
+          name:e.path,
+          db ,
+        })
+      })
+    ])
+  }))
+  
+  if (workerObj.srcList.length>0 ){
+    console.log("worker ",workerObj)
+    return await workerObj.getUri()
+  }
+  console.log("write worker")
   let indexName = config.in;
   if (!indexName.startsWith("./")){
     indexName = "./"+indexName;
@@ -32,15 +49,17 @@ const getBaseUrl =async (config:{in:string,func:string,src:string },postMessage?
     indexName += ".js";
   }
   let csgObjUrl = "./lib/csgChange.js";
+  /*
   if (!postMessage){
     csgObjUrl = `./${config.src}/lib/csgChange.js`;
     const li = indexName.split("/");
     indexName = [li[0], config.src,...li.slice(1)].join("/");
-  }
+  }*/
   const csgObj = await getCurrent(csgObjUrl,postMessage);
   const csgUri = await csgObj.getUri();
   const indexObj = await getCurrent(indexName,postMessage);
   const indexuri = await indexObj.getUri();
+  //
   const src = `
   ${consoleLog} 
   const csg = await import( '${csgUri}' )
