@@ -4,7 +4,7 @@ export type messageObj = {
     name:string,
     db?:ArrayBuffer | string | any
 }
-type currentObj = { 
+export type currentObj = { 
     url?:string;
     persons:Set<currentObj>;
     srcList:((()=>Promise<currentObj> )|string)[]

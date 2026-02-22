@@ -61,15 +61,17 @@ const run:{name:string,fn:handlePostMsg} ={
 const getSrc:{name:string,fn:handlePostMsg} = {
   fn:(msg:{name?:string},postMessage?: (e: any) => void) =>{
   //let indexName =msg.name?msg.name: solidConfig.workermsg.in;
-    let indexName = solidConfig.workermsg.in;
+/*
+    let indexName = solidConfig.workermsg.worker;
     if (!indexName.startsWith("./")){
       indexName = "./"+indexName;
     }
     if (!indexName.endsWith(".js")){
       indexName += ".js";
-    }
-    //console.log("getsrc",indexName)
-    getCurrent(indexName,postMessage).then(
+    }*/
+    //console.log("getsrc",solidConfig.workermsg.worker)
+    //console.log("getsrc")
+    getCurrent(solidConfig.workermsg.worker,postMessage).then(
       current=>{   
         //console.log(current)     
         getCurrentCode(current,(name:string,code:string)=>{
@@ -80,7 +82,8 @@ const getSrc:{name:string,fn:handlePostMsg} = {
             code
             //code:new TextEncoder().encode(code)
           }) 
-        }).then(()=>{
+        })
+        /*.then(()=>{
           getCurrent("./lib/csgChange.js",postMessage).then(c=>{
             getCurrentCode(c,(name:string,code:string)=>{
               postMessage({
@@ -96,7 +99,7 @@ const getSrc:{name:string,fn:handlePostMsg} = {
             })
           });
           
-        })
+        })*/
       })
   },
   name:"getSrc"

@@ -74,7 +74,7 @@ const unzipDB = async(name:string,data:ArrayBuffer|Array<any>)=>{
         const plist = name.split("_")
         if (plist.length>=4){
             const [func,in_,name,date] = plist
-            obj =  {func,in:in_,name,date,files}
+            obj =  {func,in:in_,name,date,files }
             window.localStorage.setItem(currentLocalDBConfig.configName(),JSON.stringify(obj))
         }else{
             throw new Error('config err'); 
@@ -198,6 +198,7 @@ export const getCodeGz_ =async (solidConfig:sConfig)=>{
 }
 
 export const getCodeGz =async (solidConfig:sConfig)=>{ 
+    /*
     let indexName = solidConfig.workermsg.in;
     if (!indexName.startsWith("./")){
     indexName = "./"+indexName;
@@ -211,17 +212,14 @@ export const getCodeGz =async (solidConfig:sConfig)=>{
         });
     //console.log("csg",csgObj)
     //handleCurrentMsg({name:indexName},postSrcMsg)
-    const current =await getCurrent(indexName,(e)=>{
+    */
+    console.log("getCodeGz",solidConfig.workermsg.worker)
+    const current =await getCurrent(solidConfig.workermsg.worker||"./worker.js",(e)=>{
             postSrcMsg(solidConfig,e)
         })  
     //console.log(current)
     let codeSrc = ""
-    await getCurrentCode( csgObj,(name:string,code:string)=>{
-    codeSrc +=`
-/**${name}*/
-${code}
-`        //codeList.push(code)
-    })
+ 
     await getCurrentCode( current,(name:string,code:string)=>{
     codeSrc +=`
 /**${name}*/
@@ -231,8 +229,10 @@ ${code}
     })
     codeSrc +=`
 /**${currentLocalDBConfig.name}*/
-${window.localStorage.getItem(currentLocalDBConfig.configName())}
-` 
+${JSON.stringify(solidConfig.workermsg,null,2)}
+`
+//${window.localStorage.getItem(currentLocalDBConfig.configName())}
+//` 
     const chunks = await stringToGzip(codeSrc)
     return new Blob(chunks, { type: 'application/gzip' });
 }

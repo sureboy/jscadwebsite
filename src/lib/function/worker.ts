@@ -1,7 +1,9 @@
 import {getCurrent,handleCurrentMsg} from "./ImportParser";
+import type {currentObj} from "./ImportParser"
 import {onWindowResize,startSceneOBJ,addSceneOBJ} from "./threeScene" ;
 import { CSG2Three } from "./csg2Three";
 import type { sConfig } from './utils';
+ 
 
 const consoleLog = `
 const originalLog = console.log;
@@ -20,27 +22,24 @@ const consoleLogEnd=`}catch(error){
     end:true
     });
 };`;
-//let _worker: Worker|null; 
-//let baseUrl:string;
-//let oldMenu:number = 0;
-const getBaseUrl =async (config:{in:string,func:string,src:string },postMessage?:(e:any)=>void)=>{
-  //return "http://localhost:3000/src/lib/worker.js"
-  const workerObj =await getCurrent("./worker.js",postMessage||(e=>{
-    fetch("./worker.js").then(req=>[
-      req.arrayBuffer().then(db=>{
-        handleCurrentMsg({
-          name:e.path,
-          db ,
-        })
-      })
-    ])
-  }))
-  
-  if (workerObj.srcList.length>0 ){
-    console.log("worker ",workerObj)
-    return await workerObj.getUri()
-  }
-  console.log("write worker")
+
+const getBaseUrl =async (config:{in:string,func:string,src:string,worker?:string },postMessage?:(e:any)=>void)=>{
+ 
+  let workerObj:currentObj
+  if (config.worker){ 
+    if (!config.worker.startsWith("./")){
+      config.worker = "./"+config.worker;
+    }
+    if (!config.worker.endsWith(".js")){
+      config.worker += ".js";
+    }
+    workerObj =await getCurrent(config.worker,postMessage)
+    if (workerObj.srcList.length>0 ){
+      return await workerObj.getUri()
+    }
+  }else{
+    config.worker = "./worker.js"
+  } 
   let indexName = config.in;
   if (!indexName.startsWith("./")){
     indexName = "./"+indexName;
@@ -49,21 +48,10 @@ const getBaseUrl =async (config:{in:string,func:string,src:string },postMessage?
     indexName += ".js";
   }
   let csgObjUrl = "./lib/csgChange.js";
-  /*
-  if (!postMessage){
-    csgObjUrl = `./${config.src}/lib/csgChange.js`;
-    const li = indexName.split("/");
-    indexName = [li[0], config.src,...li.slice(1)].join("/");
-  }*/
-  const csgObj = await getCurrent(csgObjUrl,postMessage);
-  const csgUri = await csgObj.getUri();
-  const indexObj = await getCurrent(indexName,postMessage);
-  const indexuri = await indexObj.getUri();
-  //
-  const src = `
+  const db = `
   ${consoleLog} 
-  const csg = await import( '${csgUri}' )
-  const src = await import("${indexuri}")
+  const csg = await import( '${csgObjUrl}' )
+  const src = await import("${indexName}")
   const main = "${config.func}";
   const list = Object.keys(src)
   const module = {list,basename:main?main:list[0]}
@@ -85,20 +73,13 @@ const getBaseUrl =async (config:{in:string,func:string,src:string },postMessage?
   self.postMessage(msg)
 }) 
 ${consoleLogEnd}`; 
-//console.log(src);
-  return URL.createObjectURL(
-    new Blob([src],{type:'application/javascript'}));
+handleCurrentMsg({name:config.worker,db},postMessage)
+ 
+  return workerObj?workerObj.getUri():(await getCurrent(config.worker,postMessage)).getUri()
+ 
+  //return await getBaseUrl(config,postMessage)
 };
-/*
-export const runWorkerInVscode = (el:HTMLCanvasElement,message:workerConfigType )=>{
-    
-    runWorkerBase(el,message,vscode.postMessage);
-      vscode.postMessage({
-        type:'start'
-      });
-   
-};
-*/
+
 export const changeWorker = (conf:sConfig  )=>{
   if (!conf.worker){
     runWorker(conf);
@@ -108,8 +89,7 @@ export const changeWorker = (conf:sConfig  )=>{
     conf.postMessage({
       type:'start'
     });
-  }
-  
+  }  
   conf.showMenu = 1; 
   if (conf.workermsg.options){
     const options =JSON.parse( JSON.stringify(conf.workermsg.options));
@@ -120,7 +100,6 @@ export const changeWorker = (conf:sConfig  )=>{
     conf.worker.postMessage({func:conf.workermsg.func});
   }
 };
-
 export const CodeWorker = (conf:sConfig,code:any  )=>{
   if (!conf.worker){
     //runWorker(conf);
@@ -156,13 +135,11 @@ export const runWorker =async ( conf:sConfig  )=>{
     conf.baseUrl = await getBaseUrl({
       func:conf.workermsg.func,
       src:conf.workermsg.src||"",
-      in:conf.workermsg.in
+      in:conf.workermsg.in,
+      worker:conf.workermsg.worker,
     },conf.postMessage) ;
   }
-  //const baseUrl =await getBaseUrl(message,postMessage);
-
   conf.worker = new Worker(conf.baseUrl,{type: "module"});
-  //console.log(worker)  
   conf.worker.onerror = e=>{
     console.error("error", e );
     if (conf.postMessage){
@@ -180,13 +157,9 @@ export const runWorker =async ( conf:sConfig  )=>{
         msg:e.data
       });
     }
-  };
-  
+  };  
   conf.worker.onmessage = function(e) {
-    
     const msg = e.data;
-    //message.msg = msg;
-    //console.log(e,msg);
     if (msg.start ){
       try{
         startSceneOBJ(conf.el);

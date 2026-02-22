@@ -10,7 +10,7 @@ export type windowConfigType = {
   pageType?:'run'|'gzData'|'stlData', 
   in: string;
   func: string;
-  port:number;
+  worker?:string;
   name:string;
   src?:string;
   date?:string;
