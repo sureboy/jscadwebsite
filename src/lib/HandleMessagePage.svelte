@@ -30,6 +30,11 @@ const init:{name:string,fn:handlePostMsg} = {
   name:"init",
   fn:(msg:messageObj&{open:boolean},postMessage?: (e: any) => void) =>{
     handleCurrentMsg(msg,postMessage)
+    if (solidConfig.workermsg.files){
+      solidConfig.workermsg.files.push(msg.name)
+    }else{
+      solidConfig.workermsg.files = [msg.name]
+    }
   }
 }
 const begin:{name:string,fn:handlePostMsg} ={

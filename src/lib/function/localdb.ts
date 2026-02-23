@@ -113,11 +113,24 @@ const reloadDB =async ( )=>{
     const conf  = window.localStorage.getItem(confPath)
     if (conf){ 
         const obj = JSON.parse(conf) as windowConfigType
+        if (obj.files && obj.files.length>0){
         obj.files.forEach((name)=>{
             handleCurrentMsg({
                 name ,
                 db:window.localStorage.getItem(SolidPath+name)})
-        })
+        })}else{
+            obj.files=[]
+            for (let i = 0;i<window.localStorage.length;i++){
+                const key = window.localStorage.key(i)
+                if (key.startsWith(SolidPath) && key !== confPath){
+                    obj.files.push(key.split("*")[1]) 
+                    handleCurrentMsg({
+                        name ,
+                        db:window.localStorage.getItem(key)})
+                }
+            }
+            window.localStorage.setItem(confPath,JSON.stringify(obj,null,2))
+        }
         return obj       
     }else{
         const data = await gzipCodeFromLocalStorage()
