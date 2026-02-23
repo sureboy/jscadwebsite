@@ -2,7 +2,7 @@ import {getCurrent,handleCurrentMsg} from "./ImportParser";
 import type {currentObj} from "./ImportParser"
 import {onWindowResize,startSceneOBJ,addSceneOBJ} from "./threeScene" ;
 import { CSG2Three } from "./csg2Three";
-import type { sConfig } from './utils';
+import type { sConfig,windowConfigType } from './utils';
  
 
 const consoleLog = `
@@ -23,7 +23,7 @@ const consoleLogEnd=`}catch(error){
     });
 };`;
 
-const getBaseUrl =async (config:{in:string,func:string,src:string,worker?:string },postMessage?:(e:any)=>void)=>{
+const getBaseUrl =async (config:windowConfigType,postMessage?:(e:any)=>void)=>{
  
   let workerObj:currentObj
   if (config.worker){ 
@@ -73,10 +73,8 @@ const getBaseUrl =async (config:{in:string,func:string,src:string,worker?:string
   self.postMessage(msg)
 }) 
 ${consoleLogEnd}`; 
-handleCurrentMsg({name:config.worker,db},postMessage)
- 
+  handleCurrentMsg({name:config.worker,db},postMessage) 
   return workerObj?workerObj.getUri():(await getCurrent(config.worker,postMessage)).getUri()
- 
   //return await getBaseUrl(config,postMessage)
 };
 
@@ -132,12 +130,7 @@ export const runWorker =async ( conf:sConfig  )=>{
   
   conf.showMenu = 1;
   if (!conf.baseUrl){
-    conf.baseUrl = await getBaseUrl({
-      func:conf.workermsg.func,
-      src:conf.workermsg.src||"",
-      in:conf.workermsg.in,
-      worker:conf.workermsg.worker,
-    },conf.postMessage) ;
+    conf.baseUrl = await getBaseUrl(conf.workermsg,conf.postMessage) ;
   }
   conf.worker = new Worker(conf.baseUrl,{type: "module"});
   conf.worker.onerror = e=>{

@@ -101,7 +101,7 @@
       <button style="height:48:px;line-height:48px;cursor: pointer;" onclick={downCodeclick} >Gzip</button>      
       {/if}
       {#if (solidConfig.showMenu & MenuType.Src )}
-      <button style="height:48:px;line-height:48px;cursor: pointer;" onclick={downSrcClick} >Src</button>      
+      <button style="height:48:px;line-height:48px;cursor: pointer;" onclick={downSrcClick} >UnGzip</button>      
       {/if}
       {#if (solidConfig.showMenu & MenuType.Png )}
       <button style="height:48:px;line-height:48px;cursor: pointer;" onclick={downPngClick} >Png</button>      

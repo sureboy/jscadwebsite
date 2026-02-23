@@ -35,90 +35,56 @@ const init:{name:string,fn:handlePostMsg} = {
 const begin:{name:string,fn:handlePostMsg} ={
   name:"begin",
   fn:(msg:{config:windowConfigType} ,
-  postMessage?: (e: any) => void) =>{  
-    //console.log("begin",msg)
-    solidConfig.workermsg  =Object.assign(menuConfig,msg.config )
-     
+  postMessage?: (e: any) => void) =>{   
+    solidConfig.workermsg  =Object.assign(menuConfig,msg.config )    
   }
 }
 const run:{name:string,fn:handlePostMsg} ={
   fn:(msg:messageObj&{open:boolean},
-    postMessage?: (e: any) => void) =>{  
-      /*
-      console.log(msg)
-      //const c = msg.db as windowConfigType
-      initMenu(
-        solidConfig,
-        //{func:c.func,in:c.in,name:c.name,src:c.src}
-        msg.db as windowConfigType
-      ) */
-     //console.log("run",solidConfig)
+    postMessage?: (e: any) => void) =>{   
       Object.assign(solidConfig.workermsg,{cameraType:msg.open?solidConfig.workermsg?.cameraType:'' })
+      solidConfig.showMenu=MenuType.Camera|MenuType.MainMenu|MenuType.Png|MenuType.Src|MenuType.Stl|MenuType.Gzip
       runWorker(solidConfig );    
     },
   name:"run"
 }
 const getSrc:{name:string,fn:handlePostMsg} = {
   fn:(msg:{name?:string},postMessage?: (e: any) => void) =>{
-  //let indexName =msg.name?msg.name: solidConfig.workermsg.in;
-/*
-    let indexName = solidConfig.workermsg.worker;
-    if (!indexName.startsWith("./")){
-      indexName = "./"+indexName;
-    }
-    if (!indexName.endsWith(".js")){
-      indexName += ".js";
-    }*/
     //console.log("getsrc",solidConfig.workermsg.worker)
     //console.log("getsrc")
     getCurrent(solidConfig.workermsg.worker,postMessage).then(
-      current=>{   
-        //console.log(current)     
-        getCurrentCode(current,(name:string,code:string)=>{
-          //console.log("getsrc",name,code);
+      current=>{
+        console.log("getsrc",current)
+        getCurrentCode(current,(name:string,code:string)=>{ 
+          //console.log("getsrc",name)
           postMessage({
             type:"src",
             name,
-            code
-            //code:new TextEncoder().encode(code)
+            code 
+          })
+        }).then(()=>{
+          postMessage({
+            type:"src"
           }) 
         })
-        /*.then(()=>{
-          getCurrent("./lib/csgChange.js",postMessage).then(c=>{
-            getCurrentCode(c,(name:string,code:string)=>{
-              postMessage({
-                type:"src",
-                name,
-                code
-                //code:new TextEncoder().encode(code)
-              }) 
-            }).then(()=>{
-              postMessage({
-                type:"src"
-              }) 
-            })
-          });
-          
-        })*/
       })
   },
   name:"getSrc"
 }
 const gzData:{name:string,fn:handlePostMsg} = {
   fn:(message:{db:ArrayBuffer},postMessage?: (e: any) => void)=>{
-   // console.log(message)
-  gzipToString(message.db).then(src=>{    
-    srcStringToFile(src,(db)=>{  
-      //console.log(db.name)  
-      if (db.name.endsWith("solidjscad.json")){
-        Object.assign(solidConfig.workermsg,JSON.parse(db.db) )
-      }else{
-        handleCurrentMsg(db) 
-      }
+    gzipToString(message.db).then(src=>{
+      srcStringToFile(src,(db)=>{  
+        if (db.name.endsWith("solidjscad.json")){
+          Object.assign(solidConfig.workermsg,JSON.parse(db.db) )
+        }else{
+          handleCurrentMsg(db) 
+        }
+      }) 
+      console.log(solidConfig)
+      solidConfig.showMenu=MenuType.Camera|MenuType.MainMenu|MenuType.Png|MenuType.Src|MenuType.Stl
+      runWorker(solidConfig );
     }) 
-    console.log(solidConfig)
-    runWorker(solidConfig );
-  }) 
   },
   name:'gzData'
 }
