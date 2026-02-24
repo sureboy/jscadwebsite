@@ -8,13 +8,16 @@
 
 
   solidConfig.postMessage = (e:{type:string,path?:string})=>{ 
-    console.log("post",e)
+    //console.log("post",e)
     fetch("/api",{
       method:"POST",
       body:JSON.stringify(e),
+      headers: {
+        "Content-Type": "application/json", 
+      },
     }).then(res=>{
       res.json().then(db=>{
-        console.log("get",db)
+        //console.log("get",db)
         HandleMessage(db,solidConfig.postMessage)
       })
       
@@ -45,7 +48,7 @@
       })
     }).then(data=>{
       data.json().then(db=>{
-        console.log("loaded",db)
+        //console.log("loaded",db)
         HandleMessage(db,solidConfig.postMessage)
       })
     })
@@ -71,13 +74,12 @@ function base64ToArrayBuffer(base64) {
     initSolidPage(solidConfig)
     loadedFetch();
     const eventSource = new EventSource('/events');
-
+ 
     eventSource.onmessage = (event) => {
       //console.log("events",event.data)
       const data = JSON.parse(event.data) as {type:number,msg:{name:string,db?:string|ArrayBuffer}}
       if (data.msg.db && typeof data.msg.db ==="string"){
-        data.msg.db = base64ToArrayBuffer(data.msg.db)
-        //data.msg.db = Buffer.from(data.msg.db,'base64').buffer
+        data.msg.db = base64ToArrayBuffer(data.msg.db) 
       }
       HandleMessage( data ,solidConfig.postMessage)
     };
