@@ -112,7 +112,7 @@ const getMsgHandle = (type:number )=>{
   return getTag()
 }
 export const HandleMessage = ( 
-  message:{type:number,msg:any},
+  message:{type:number,msg?:any},
   postMessage?: (e: any) => void)=>{
     //console.log("messagepost",message)
     for (const type of getMsgHandle(message.type)) {
