@@ -3,6 +3,13 @@
   import {initSolidPage} from './lib/ShowSolid.svelte';
   import {MenuType} from './lib/function/utils'    
   import HandlePage,{ HandleMessage,Direction,solidConfig} from './lib/HandleMessagePage.svelte';
+  type msgType = {type:number,msg?:{name:string,db?:string|ArrayBuffer}}
+  const DecodeDB = (data:msgType)=>{
+    if (data.msg && data.msg.db && typeof data.msg.db ==="string"){
+        data.msg.db = base64ToArrayBuffer(data.msg.db) 
+    }
+    return data
+  }
   solidConfig.oldMenu =MenuType.MainMenu|MenuType.Src | MenuType.Camera | MenuType.Gzip | MenuType.Png | MenuType.Stl;//  1 | (1<<1) | (1<<2) | (1<<3);
   solidConfig.postMessage = (e:{type:string,path?:string})=>{ 
     //console.log("post",e)
@@ -14,7 +21,10 @@
       },
     }).then(res=>{
       res.json().then(db=>{
-        //console.log("get",db)
+        console.log("get",db)
+        if (db.type){
+          HandleMessage(DecodeDB(db),solidConfig.postMessage)
+        }
         //HandleMessage(db,solidConfig.postMessage)
       })
       
@@ -34,7 +44,8 @@
   
   const loadedFetch = ()=>{
     solidConfig.postMessage({ 
-        msg: {direction:Direction.map(v=>{ 
+        msg: {
+          direction:Direction.map(v=>{ 
           return v.name}),pageType:solidConfig.workermsg?.pageType||"run"}, 
         type:'loaded'
       })
@@ -78,31 +89,22 @@ function base64ToArrayBuffer(base64:string) {
   }
  
 }
-  onMount(() => {
-    initSolidPage(solidConfig)
-    const eventSource = new EventSource('/events');
-    //console.log("event",eventSource)
-    //eventSource.addEventListener("open", (e)=>{
-    //  console.log("open",e)
-    //})
- 
-    eventSource.onmessage = (event) => { 
-      const data = JSON.parse(event.data) as {type:number,msg?:{name:string,db?:string|ArrayBuffer}}
-      if (data.type===0){
-        loadedFetch();
-        return
-      }
-      if (data.msg && data.msg.db && typeof data.msg.db ==="string"){
-        data.msg.db = base64ToArrayBuffer(data.msg.db) 
-      }
-      HandleMessage( data ,solidConfig.postMessage)
-    };
-    eventSource.onerror = (err) => {
-      console.error('EventSource failed:', err);
-    };
-    //loadedFetch();
-  })
-   
-    
+onMount(() => {
+  initSolidPage(solidConfig)
+  const eventSource = new EventSource('/events'); 
+  eventSource.onmessage = (event) => { 
+    const data = JSON.parse(event.data) as msgType
+    if (data.type===0){
+      //loadedFetch();
+      return
+    }
+
+    HandleMessage( DecodeDB(data) ,solidConfig.postMessage)
+  };
+  eventSource.onerror = (err) => {
+    console.error('EventSource failed:', err);
+  };
+  loadedFetch();
+})
   </script> 
 <HandlePage  ></HandlePage> 
