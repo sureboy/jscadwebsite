@@ -13,7 +13,7 @@
   solidConfig.oldMenu =MenuType.MainMenu|MenuType.Src | MenuType.Camera | MenuType.Gzip | MenuType.Png | MenuType.Stl;//  1 | (1<<1) | (1<<2) | (1<<3);
   solidConfig.postMessage = (e:{type:string,path?:string})=>{ 
     //console.log("post",e)
-    fetch("/api",{
+    fetch(getUrl("api") ,{
       method:"POST",
       body:JSON.stringify(e),
       headers: {
@@ -89,9 +89,12 @@ function base64ToArrayBuffer(base64:string) {
   }
  
 }
+const getUrl = (path:string)=>{
+  return window.location.hash?`/${path}?tag=${window.location.hash.slice(1)}`:("/"+path)
+}
 onMount(() => {
   initSolidPage(solidConfig)
-  const eventSource = new EventSource('/events'); 
+  const eventSource = new EventSource(getUrl("events")  ); 
   eventSource.onmessage = (event) => { 
     const data = JSON.parse(event.data) as msgType
     if (data.type===0){
