@@ -15,6 +15,7 @@ export type windowConfigType = {
   src?:string;
   date?:string;
   files:string[];
+  includeImport?:{ [key: string]: string }
 }
 export type workerConfigType = {
   //pageType?:'run'|'gzData'|'stlData', 

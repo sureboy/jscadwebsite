@@ -14,7 +14,7 @@
     return;  
   }
   const downPngClick = ()=>{
-    console.log("get png")
+    //console.log("get png")
     const screenCanvas = document.createElement('canvas');
     const ctx = screenCanvas.getContext("2d")
     const img = new Image()

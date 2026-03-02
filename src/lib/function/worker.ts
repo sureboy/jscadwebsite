@@ -40,6 +40,8 @@ const getBaseUrl =async (config:windowConfigType,postMessage?:(e:any)=>void)=>{
   }else{
     config.worker = "./worker.js"
   } 
+  
+  //console.log("worker",config)
   let indexName = config.in;
   if (!indexName.startsWith("./")){
     indexName = "./"+indexName;

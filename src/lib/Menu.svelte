@@ -18,23 +18,7 @@ export const menuConfig = {
         )=>{ 
             moduleInit(m)
         }
-    } as menuConfigType
-    /*
-export const initMenu = ( myConfig:windowConfigType)=>{
-    //solidConfig= solidConfig_
-    solidConfig.workermsg  =Object.assign(myConfig, { 
-        cameraType:"Perspective", 
-        module:(
-            m:{ list: string[];
-            basename: string;}
-        )=>{ 
-            moduleInit(m)
-        }
-    } as menuConfigType) 
-}
-
-*/
- 
+    } as menuConfigType 
 </script>
 <script lang="ts">
 const {children,solidConfig }:{children:any,solidConfig:sConfig}  = $props(); 
@@ -61,7 +45,7 @@ handleView.set("show",()=>{
      
     {#if  (solidConfig.showMenu & MenuType.MainMenu )} 
     <MainMenu   Clickhandle = {(n:string)=>{            
-        solidConfig.workermsg.mainConfig.func = n    
+        solidConfig.workermsg.windowConfig.func = n    
         initView()
         //clean old options
         solidConfig.workermsg.options=undefined;

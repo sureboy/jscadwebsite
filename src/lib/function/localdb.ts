@@ -74,7 +74,9 @@ const unzipDB = async(name:string,data:ArrayBuffer|Array<any>)=>{
         const plist = name.split("_")
         if (plist.length>=4){
             const [func,in_,name,date] = plist
-            obj =  {func,in:in_,name,date,files,worker:"" }
+            obj =  {
+            func,in:in_,name,date,files,worker:"" 
+            }
             window.localStorage.setItem(currentLocalDBConfig.configName(),JSON.stringify(obj))
         }else{
             throw new Error('config err'); 
@@ -212,27 +214,32 @@ export const getCodeGz_ =async (solidConfig:sConfig)=>{
 }
 */
 export const getCodeGz =async (solidConfig:sConfig)=>{  
-    console.log("getCodeGz",solidConfig.workermsg.windowConfig)
+    
     const current =await getCurrent(solidConfig.workermsg.windowConfig.worker||"./worker.js",(e)=>{
         postSrcMsg(solidConfig,e)
     })  
     //console.log(current)
     let codeSrc = ""
- 
+    solidConfig.workermsg.windowConfig.files = []
     await getCurrentCode( current,(name:string,code:string)=>{
     codeSrc +=`
 /**${name}*/
 ${code}
-`        //codeList.push(code)
+`       
+    //codeList.push(code)
 //console.log(name)
+        if (!solidConfig.workermsg.windowConfig.includeImport[name])
+        solidConfig.workermsg.windowConfig.files.push(name)
 
     })
+
     codeSrc +=`
 /**${currentLocalDBConfig.name}*/
 ${JSON.stringify(solidConfig.workermsg.windowConfig,null,2)}
 `
 //${window.localStorage.getItem(currentLocalDBConfig.configName())}
 //` 
+console.log("getCodeGz",solidConfig.workermsg.windowConfig)
     const chunks = await stringToGzip(codeSrc)
     return new Blob(chunks, { type: 'application/gzip' });
 }

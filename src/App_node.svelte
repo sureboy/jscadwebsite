@@ -2,7 +2,9 @@
   import { onMount } from 'svelte';
   import {initSolidPage} from './lib/ShowSolid.svelte';
   import {MenuType} from './lib/function/utils'    
-  import HandlePage,{ HandleMessage,Direction,solidConfig} from './lib/HandleMessagePage.svelte';
+  import HandlePage,{solidConfig,handleMsg} from './lib/HandleMessagePage.svelte';
+  //import {HandleMessageClass} from './lib/function/handleMessage' 
+  // const handleMsg =new HandleMessageClass(solidConfig)
   type msgType = {type:number,msg?:{name:string,db?:string|ArrayBuffer}}
   const DecodeDB = (data:msgType)=>{
     if (data.msg && data.msg.db && typeof data.msg.db ==="string"){
@@ -23,7 +25,7 @@
       res.json().then(db=>{
         console.log("get",db)
         if (db.type){
-          HandleMessage(DecodeDB(db),solidConfig.postMessage)
+          handleMsg.HandleMessage(DecodeDB(db),solidConfig.postMessage)
         }
         //HandleMessage(db,solidConfig.postMessage)
       })
@@ -45,7 +47,7 @@
   const loadedFetch = ()=>{
     solidConfig.postMessage({ 
         msg: {
-          direction:Direction.map(v=>{ 
+          direction:handleMsg.Direction.map(v=>{ 
           return v.name}) }, 
         type:'loaded'
       })
@@ -87,7 +89,6 @@ function base64ToArrayBuffer(base64:string) {
   }catch(e){
     return base64;
   }
- 
 }
 const getUrl = (path:string)=>{
   return window.location.hash?`/${path}?tag=${window.location.hash.slice(1)}`:("/"+path)
@@ -101,7 +102,10 @@ onMount(() => {
       //loadedFetch();
       return
     }
-    HandleMessage( DecodeDB(data) ,solidConfig.postMessage)
+    handleMsg.HandleMessage( 
+      DecodeDB(data),
+      solidConfig.postMessage
+    )
   };
   eventSource.onerror = (err) => {
     console.error('EventSource failed:', err);
