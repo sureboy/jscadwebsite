@@ -52,7 +52,7 @@ const checkInputCode =async ( )=>{
         //expiration:ISOToTimestamp(showInputCode.expiration ) ,
         key:showInputCode.key,
         email:showInputCode.email||"",
-        title:`${solidConfig.workermsg.func}_${solidConfig.workermsg.in}_${solidConfig.workermsg.name}`
+        title:`${solidConfig.workermsg.windowConfig.func}_${solidConfig.workermsg.windowConfig.in}_${solidConfig.workermsg.windowConfig.name}`
     })
     showInputCode.key=""
     fetch(`/code?${u}`,{

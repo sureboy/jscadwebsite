@@ -46,7 +46,7 @@
     solidConfig.postMessage({ 
         msg: {
           direction:Direction.map(v=>{ 
-          return v.name}),pageType:solidConfig.workermsg?.pageType||"run"}, 
+          return v.name}) }, 
         type:'loaded'
       })
       /*
@@ -101,7 +101,6 @@ onMount(() => {
       //loadedFetch();
       return
     }
-
     HandleMessage( DecodeDB(data) ,solidConfig.postMessage)
   };
   eventSource.onerror = (err) => {

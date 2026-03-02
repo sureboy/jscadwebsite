@@ -9,14 +9,10 @@ import {gzipToString,srcStringToFile,MenuType} from "./function/utils"
 import { addSceneSTL} from "./function/threeScene" 
 import {STLLoader} from "three/addons/loaders/STLLoader.js" 
 import type { sConfig,workerConfigType,windowConfigType } from './function/utils';
+ //   import { objectDirection } from 'three/tsl';
 
-//export const solidConfig:sConfig=$state({ showMenu:1})
-export const solidConfig:sConfig=$state( 
-  { 
-    showMenu:0,setWorkerMsg:(w:workerConfigType)=>{
-    solidConfig.workermsg = {...w}
-  }}
-)
+//export const solidConfig:sConfig={ showMenu:0}
+export let solidConfig:sConfig=$state( { showMenu:0} )
 //const myConfig = ((window as any).myConfig as windowConfigType) || null
 
 type  handlePostMsg = (msg:any,postMessage?: (e: {name:string,db:string|ArrayBuffer,open:boolean}) => void)=>void
@@ -28,28 +24,44 @@ const del:{name:string,fn:handlePostMsg} = {
 }
 const init:{name:string,fn:handlePostMsg} = {
   name:"init",
-  fn:(msg:messageObj&{open:boolean},postMessage?: (e: any) => void) =>{
-    handleCurrentMsg(msg,postMessage)
-    if (solidConfig.workermsg.files){
-      solidConfig.workermsg.files.push(msg.name)
+  fn:(msg:messageObj ,postMessage?: (e: any) => void) =>{
+    /*
+    console.log(solidConfig.workermsg.windowConfig)
+    if (solidConfig.workermsg.windowConfig.files){
+      solidConfig.workermsg.windowConfig.files.push(msg.name)
     }else{
-      solidConfig.workermsg.files = [msg.name]
+      Object.assign(solidConfig.workermsg.windowConfig,{files:[msg.name]})
     }
+    console.log(solidConfig.workermsg.windowConfig,msg.name)
+*/
+    handleCurrentMsg(msg,postMessage)
   }
 }
 const begin:{name:string,fn:handlePostMsg} ={
   name:"begin",
   fn:(msg:{config:windowConfigType} ,
-  postMessage?: (e: any) => void) =>{   
-    solidConfig.workermsg  =Object.assign(menuConfig,msg.config )    
+  postMessage?: (e: any) => void) =>{ 
+    console.log("begin",solidConfig)
+    if (solidConfig.workermsg){
+      if (solidConfig.workermsg.windowConfig){
+        Object.assign(solidConfig.workermsg.windowConfig,msg.config)
+      }else{
+        Object.assign(solidConfig.workermsg,{windowConfig:msg.config})
+      }
+    }else{
+      solidConfig.workermsg  =Object.assign( menuConfig,{windowConfig:msg.config} )    
+    }   
+    console.log("begin1",solidConfig) 
   }
 }
 const run:{name:string,fn:handlePostMsg} ={
   fn:(msg:messageObj&{open:boolean},
     postMessage?: (e: any) => void) =>{   
-      Object.assign(solidConfig.workermsg,{cameraType:msg.open?solidConfig.workermsg?.cameraType:'' })
-      solidConfig.showMenu=MenuType.Camera|MenuType.MainMenu|MenuType.Png|MenuType.Src|MenuType.Stl|MenuType.Gzip
+      //Object.assign(solidConfig.workermsg,{cameraType:msg.open?solidConfig.workermsg?.cameraType:'' })
+      if (!msg.open){ solidConfig.workermsg.cameraType = ""}
+      solidConfig.showMenu=MenuType.Camera|MenuType.MainMenu|MenuType.Png|MenuType.Stl|MenuType.Gzip//|MenuType.Src
       runWorker(solidConfig );    
+      console.log("run",solidConfig)
     },
   name:"run"
 }
@@ -57,7 +69,7 @@ const getSrc:{name:string,fn:handlePostMsg} = {
   fn:(msg:{name?:string},postMessage?: (e: any) => void) =>{
     //console.log("getsrc",solidConfig.workermsg.worker)
     //console.log("getsrc")
-    getCurrent(solidConfig.workermsg.worker,postMessage).then(
+    getCurrent(solidConfig.workermsg.windowConfig.worker,postMessage).then(
       current=>{
         console.log("getsrc",current)
         getCurrentCode(current,(name:string,code:string)=>{ 
@@ -122,7 +134,7 @@ export const HandleMessage = (
 } 
 </script>
 <svelte:head>
-  <title>{solidConfig.workermsg?.name || ""}</title>
+  <title>{solidConfig.workermsg?.windowConfig?.name || ""}</title>
 </svelte:head>
 <ShowSolid></ShowSolid> 
 <Menu {solidConfig}  >{""}</Menu>

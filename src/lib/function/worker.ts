@@ -93,9 +93,9 @@ export const changeWorker = (conf:sConfig  )=>{
     const options =JSON.parse( JSON.stringify(conf.workermsg.options));
     console.log("up options",options)
     conf.workermsg.options=undefined;
-    conf.worker.postMessage({func:conf.workermsg.func,options});
+    conf.worker.postMessage({func:conf.workermsg.windowConfig.func,options});
   }else{
-    conf.worker.postMessage({func:conf.workermsg.func});
+    conf.worker.postMessage({func:conf.workermsg.windowConfig.func});
   }
 };
 export const CodeWorker = (conf:sConfig,code:any  )=>{
@@ -129,9 +129,9 @@ export const runWorker =async ( conf:sConfig  )=>{
   }
   
   conf.showMenu = 1;
-  if (!conf.baseUrl){
-    conf.baseUrl = await getBaseUrl(conf.workermsg,conf.postMessage) ;
-  }
+  //if (!conf.baseUrl){
+    conf.baseUrl = await getBaseUrl(conf.workermsg.windowConfig,conf.postMessage) ;
+  //}
   conf.worker = new Worker(conf.baseUrl,{type: "module"});
   conf.worker.onerror = e=>{
     console.error("error", e );

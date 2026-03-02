@@ -1,25 +1,26 @@
  
 export type menuConfigType = {
-  cameraType: 'Perspective' |'Orthographic';
+  cameraType?: 'Perspective' |'Orthographic' | '';
   module: (modulelist: {
       list: string[];
       basename: string;
   }) => void;
 }
 export type windowConfigType = {
-  pageType?:'run'|'gzData'|'stlData', 
+  
   in: string;
   func: string;
-  worker?:string;
+  worker:string;
   name:string;
   src?:string;
   date?:string;
-  files?:string[];
+  files:string[];
 }
 export type workerConfigType = {
- 
+  //pageType?:'run'|'gzData'|'stlData', 
+  windowConfig?:windowConfigType,
   options?:Object;
-} &menuConfigType & windowConfigType
+} &menuConfigType 
 export const MenuType  = {
   MainMenu:1,
   Camera:1<<1,
@@ -35,7 +36,8 @@ export type sConfig = {
   baseUrl?:string,
   oldMenu?:number,
   el?:HTMLCanvasElement,
-  workermsg?:workerConfigType,showMenu:number,
+  workermsg?:workerConfigType,
+  showMenu:number,
   postMessage?:(m:any)=>void, 
 }  
 export const fetchGZBuffer = async (name:string)=>{

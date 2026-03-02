@@ -53,7 +53,7 @@
     ctx.drawImage(img, minX, minY, croppedWidth, croppedHeight, 0, 0, croppedWidth, croppedHeight);
     
     let aTag = document.createElement('a'); 
-    aTag.download = `${solidConfig.workermsg.func}_${solidConfig.workermsg.in.split(".").shift()}_${solidConfig.workermsg.name}_${Date.now()}.png`; //e.detail.name+"_screen.png";
+    aTag.download = `${solidConfig.workermsg.windowConfig.func}_${solidConfig.workermsg.windowConfig.in.split(".").shift()}_${solidConfig.workermsg.windowConfig.name}_${Date.now()}.png`; //e.detail.name+"_screen.png";
     let href =screenCanvas.toDataURL()
     //console.log(href)
     //screenImgList.push(href)
@@ -71,7 +71,7 @@
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     //console.log(workermsg)
-    link.download = `${solidConfig.workermsg.func}_${solidConfig.workermsg.in.split(".").shift()}_${solidConfig.workermsg.name}_${Date.now()}.stl`; 
+    link.download = `${solidConfig.workermsg.windowConfig.func}_${solidConfig.workermsg.windowConfig.in.split(".").shift()}_${solidConfig.workermsg.windowConfig.name}_${Date.now()}.stl`; 
     link.click();
     URL.revokeObjectURL(link.href); 
   } 
@@ -83,7 +83,7 @@
     }
     const link = document.createElement('a');
     link.href = URL.createObjectURL(compressedBlob);
-    link.download = `${solidConfig.workermsg.func}_${solidConfig.workermsg.in.split(".").shift()}_${solidConfig.workermsg.name}_${Date.now()}.solidjscad.gz`; 
+    link.download = `${solidConfig.workermsg.windowConfig.func}_${solidConfig.workermsg.windowConfig.in.split(".").shift()}_${solidConfig.workermsg.windowConfig.name}_${Date.now()}.solidjscad.gz`; 
     link.click();
     URL.revokeObjectURL(link.href); 
   }

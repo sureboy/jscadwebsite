@@ -5,9 +5,10 @@
   { 
     HandleMessage,
     Direction,
-    solidConfig
+    solidConfig  
   } from './lib/HandleMessagePage.svelte';
   //
+  //const solidConfig = $state(conf)
   solidConfig.showMenu = -1
   onMount(() => {    
     initSolidPage(solidConfig) 
@@ -15,7 +16,7 @@
     solidConfig.postMessage =  vscode.postMessage
     vscode.postMessage({ 
       msg:{direction:Direction.map(v=>{ 
-        return v.name}),pageType:solidConfig.workermsg?.pageType||"run"}, 
+        return v.name}) }, 
       type:'loaded'
     });
     

@@ -61,7 +61,7 @@ handleView.set("show",()=>{
      
     {#if  (solidConfig.showMenu & MenuType.MainMenu )} 
     <MainMenu   Clickhandle = {(n:string)=>{            
-        solidConfig.workermsg.func = n    
+        solidConfig.workermsg.mainConfig.func = n    
         initView()
         //clean old options
         solidConfig.workermsg.options=undefined;

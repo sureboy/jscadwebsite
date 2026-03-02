@@ -18,7 +18,9 @@ const myConfig:windowConfigType  = $state({
     func:"",
     in:"",
     src:"",
-    pageType:"run"
+    worker:"",
+    files:[]
+    //pageType:"run"
 }) 
 const solidConfig:sConfig = $state({ 
     showMenu:0,
@@ -35,7 +37,7 @@ const solidConfig:sConfig = $state({
     },
 }) 
 const initMenu = (myConfig:windowConfigType)=>{
-    solidConfig.workermsg  =Object.assign(myConfig,menuConfig)
+    solidConfig.workermsg  =Object.assign(menuConfig,{mainConfig:myConfig})
 }
 onMount(()=>{
     initSolidPage(solidConfig)

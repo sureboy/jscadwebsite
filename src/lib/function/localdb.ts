@@ -74,7 +74,7 @@ const unzipDB = async(name:string,data:ArrayBuffer|Array<any>)=>{
         const plist = name.split("_")
         if (plist.length>=4){
             const [func,in_,name,date] = plist
-            obj =  {func,in:in_,name,date,files }
+            obj =  {func,in:in_,name,date,files,worker:"" }
             window.localStorage.setItem(currentLocalDBConfig.configName(),JSON.stringify(obj))
         }else{
             throw new Error('config err'); 
@@ -150,10 +150,10 @@ const reloadDB =async ( )=>{
 }
 
 export const changeSolidConfig = (solidConfig:sConfig,showMenu:number)=>{
-    reloadDB().then((obj)=>{
+    reloadDB().then((windowConfig)=>{
         //console.log(obj)
-        if (!obj)return
-        Object.assign(solidConfig.workermsg,obj) 
+        if (!windowConfig)return
+        Object.assign(solidConfig.workermsg,{windowConfig}) 
         solidConfig.showMenu=showMenu 
         runWorker(solidConfig)
     })
@@ -202,6 +202,7 @@ ${code}
     })
     return stringToGzip(codeSrc)
 }
+/*
 export const getCodeGz_ =async (solidConfig:sConfig)=>{ 
     const data =await gzipCodeFromLocalStorage()
     if (data)
@@ -209,27 +210,12 @@ export const getCodeGz_ =async (solidConfig:sConfig)=>{
     else
         return await getCodeGz (solidConfig)
 }
-
-export const getCodeGz =async (solidConfig:sConfig)=>{ 
-    /*
-    let indexName = solidConfig.workermsg.in;
-    if (!indexName.startsWith("./")){
-    indexName = "./"+indexName;
-    }
-    if (!indexName.endsWith(".js")){
-    indexName += ".js"
-    }
-    //handleCurrentMsg({name:"./lib/csgChange.js"},postSrcMsg)
-    const csgObj = await getCurrent("./lib/csgChange.js",(e)=>{
-            postSrcMsg(solidConfig,e)
-        });
-    //console.log("csg",csgObj)
-    //handleCurrentMsg({name:indexName},postSrcMsg)
-    */
-    console.log("getCodeGz",solidConfig.workermsg.worker)
-    const current =await getCurrent(solidConfig.workermsg.worker||"./worker.js",(e)=>{
-            postSrcMsg(solidConfig,e)
-        })  
+*/
+export const getCodeGz =async (solidConfig:sConfig)=>{  
+    console.log("getCodeGz",solidConfig.workermsg.windowConfig)
+    const current =await getCurrent(solidConfig.workermsg.windowConfig.worker||"./worker.js",(e)=>{
+        postSrcMsg(solidConfig,e)
+    })  
     //console.log(current)
     let codeSrc = ""
  
@@ -239,10 +225,11 @@ export const getCodeGz =async (solidConfig:sConfig)=>{
 ${code}
 `        //codeList.push(code)
 //console.log(name)
+
     })
     codeSrc +=`
 /**${currentLocalDBConfig.name}*/
-${JSON.stringify(solidConfig.workermsg,null,2)}
+${JSON.stringify(solidConfig.workermsg.windowConfig,null,2)}
 `
 //${window.localStorage.getItem(currentLocalDBConfig.configName())}
 //` 
@@ -252,7 +239,7 @@ ${JSON.stringify(solidConfig.workermsg,null,2)}
 const postSrcMsg = (solidConfig:sConfig,e:{ path?:string})=>{
     if (e.path){
     fetch( 
-        e.path.replace(/^\.\//,`./${solidConfig.workermsg.src}/`) )
+        e.path.replace(/^\.\//,`./${solidConfig.workermsg.windowConfig.src}/`) )
         .then(f=>{
             f.text().then(db=>{
                 handleCurrentMsg({name:e.path,db},(e)=>{
