@@ -170,46 +170,52 @@ function getSizeVector  (obj: Object3D,position:Vector3){
 };
 
 export function onWindowResize(el: HTMLCanvasElement, changeCamera:string = "Perspective" ) {
-	if (!renderer){
-		return;
+	try{
+
+	
+		if (!renderer){
+			return;
+		}
+		//if (group.children.length===0)return;
+		//console.log(el.width,el.height,orthographic,changeCamera,group)
+	
+		if (changeCamera ==="Orthographic"){  
+			isOrthographic=true;
+			const k = el.width/el.height;
+			const s = getSize(group)/2;
+			if (camera){
+				camera.clear();
+			}
+			camera = new OrthographicCamera(0,0,0,0,0.1,2000); 
+			camera.left = -s *k;
+			camera.right = s*k;
+			camera.top = s;
+			camera.bottom = -s;
+			camera.position.set(0,0,-s); 
+			QviewDistance = s;
+			
+			initOrb(el); 
+		}else if (changeCamera==="Perspective"){
+			isOrthographic=false;
+			if (camera){
+				camera.clear();
+			}
+			camera =new PerspectiveCamera(40, 1, 0.1, 2000);
+			const  size = getSize(group);
+			cameraFov = camera.fov;
+			const fov =  camera.fov*(Math.PI /180); 	 
+			camera.position.z = size /2/Math.tan(fov/2); 	
+			//viewDistance =  camera.position.z;	
+			camera.aspect = el.width/el.height	;
+			initOrb(el)	;	
+		} 
+		camera.updateProjectionMatrix();
+		renderer.setSize(el.width,el.height);	
+		renderer.render(scene, camera);
+		switchView("front");
+	}catch(e){
+		console.log(e)
 	}
-	//if (group.children.length===0)return;
-	//console.log(el.width,el.height,orthographic,changeCamera,group)
- 
-	if (changeCamera ==="Orthographic"){  
-		isOrthographic=true;
-		const k = el.width/el.height;
-		const s = getSize(group)/2;
-		if (camera){
-			camera.clear();
-		}
-		camera = new OrthographicCamera(0,0,0,0,0.1,2000); 
-		camera.left = -s *k;
-		camera.right = s*k;
-		camera.top = s;
-		camera.bottom = -s;
-		camera.position.set(0,0,-s); 
-		QviewDistance = s;
-		
-		initOrb(el); 
-	}else if (changeCamera==="Perspective"){
-		isOrthographic=false;
-		if (camera){
-			camera.clear();
-		}
-		camera =new PerspectiveCamera(40, 1, 0.1, 2000);
-		const  size = getSize(group);
-		cameraFov = camera.fov;
-		const fov =  camera.fov*(Math.PI /180); 	 
-		camera.position.z = size /2/Math.tan(fov/2); 	
-		//viewDistance =  camera.position.z;	
-		camera.aspect = el.width/el.height	;
-		initOrb(el)	;	
-	} 
-	camera.updateProjectionMatrix();
-	renderer.setSize(el.width,el.height);	
-	renderer.render(scene, camera);
-	switchView("front");
 }
 const AnimationFrame = ()=>{
 	requestAnimationFrame(() => {
@@ -254,37 +260,35 @@ const initRender = (el:HTMLCanvasElement,orthographic:boolean=false)=>{
 	
 };
 export const  startSceneOBJTF = (el: HTMLCanvasElement,...object: Object3D[])=>{
-	if (el !== _el){
-		_el = el
-		initRender(el)
-		 
-	}	else{
-		group.clear();
-		/*
-		const al = 0.3
-		const directionalLight1 = new DirectionalLight( 0xffffff, al );
-		directionalLight1.position.set(-1, -1, -1)  
-		const directionalLight2 = new DirectionalLight( 0xffffff, al );
-		directionalLight2.position.set(1, 1, 1)  
-		group.add(...object)
-		
-		*/
+	try{
+		if (el !== _el){
+			_el = el
+			initRender(el)
+			
+		}	else{
+			group.clear();
+	
+		}
+	}catch(e){
+		console.error(e)
 	}
-
-	//group.add(hemisphereLight);
-	//onWindowResize(el)	 
+  
 
 }
  
 export const  startSceneOBJ = (el: HTMLCanvasElement)=>{
-	if (el !== _el){
-		_el = el;
-		initRender(el);
-		 
-	}	else{
-		group.clear();
-		//cube.clear();
-		//group.add(hemisphereLight,axes)
+	try{
+		if (el !== _el){
+			_el = el;
+			initRender(el);
+			
+		}	else{
+			group.clear();
+			//cube.clear();
+			//group.add(hemisphereLight,axes)
+		}
+	}catch(e){
+		console.error(e)
 	}
 
 	//group.add(hemisphereLight);
@@ -297,26 +301,29 @@ const materialSTL = new MeshPhongMaterial({
 	shininess: 200
 });
 export const addSceneSTL = (el:HTMLCanvasElement,m:BufferGeometry) =>{
-	if (el !== _el){
-		_el = el;
-		initRender(el);
-	}	
-	group.add(new Mesh(m,materialSTL));
-	onWindowResize(el);
-	return;
+	try{
+		if (el !== _el){
+			_el = el;
+			initRender(el);
+		}	
+		group.add(new Mesh(m,materialSTL));
+		onWindowResize(el);
+		return;
+	}catch(e){
+		console.error(e)
+	}
+	
 };
 export const  addSceneOBJ = (el: HTMLCanvasElement,...m:Object3D[])=>{
-	if (el !== _el){
-		_el = el
-		initRender(el)
-	}	
-	//console.log(m)
- 
-	group.add(...m )
-	
-	
-	//group.updateMatrix()
-	return
-
+	try{
+		if (el !== _el){
+			_el = el
+			initRender(el)
+		}	 
+		group.add(...m ) 
+		return
+	}catch(e){
+		console.error(e)
+	}
 }
  

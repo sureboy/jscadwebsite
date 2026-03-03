@@ -1,5 +1,5 @@
 <script lang="ts" module >
-import type { sConfig,windowConfigType,menuConfigType } from './function/utils';
+import type { sConfig,menuConfigType } from './function/utils';
 import Options from "./OptionsMenu.svelte"
 import DownMenu from "./DownMenu.svelte";
 import MainMenu,{moduleInit} from "./MainMenu.svelte"; 

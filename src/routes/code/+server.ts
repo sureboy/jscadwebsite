@@ -55,12 +55,15 @@ function char(c:string ){
 }
 //const tmpCode = new Map<string,string>()
 export const GET: RequestHandler =async (req) => {
- 
+  //req.setHeaders
+    //req.setHeader("Access-Control-Allow-Origin","*");
     const code = generateRandomString(8)   
     return json({ 
       code:char(code),
       key:await sha256(API_SECRET_KEY+code.toLocaleLowerCase() + Date.now().toString().slice(0,8))
-    }) 
+    },{headers:{
+      "Access-Control-Allow-Origin":"*"
+    }}) 
 };
 const getMinDateTime = ()=>{
     const now = new Date();
@@ -97,5 +100,9 @@ export const POST:RequestHandler=async (e) => {
     } 
     console.log(opt,Math.floor(Date.now()/1000))
     await e.platform?.env.solidtmp.put(k,arrayBuffer,opt) 
-    return json({msg:"ok",k})
+    return json(
+      {msg:"ok",k},
+      {headers:{
+      "Access-Control-Allow-Origin":"*"
+    }})
 };

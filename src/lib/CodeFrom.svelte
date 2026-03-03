@@ -8,10 +8,11 @@ const { solidConfig }:{ solidConfig:sConfig} = $props();
 let showInputCode:{
     key?:string,
     QRUrl?:string,
-     code?:string,email?:string,
-     //expiration?:string,
+    code?:string,
+    email?:string, 
     url?:string
 } = $state({})
+
 const getMinDateTime = ()=>{
     const now = new Date();
     now.setMinutes(now.getMinutes() + 5);
@@ -28,10 +29,19 @@ const showCaptchaCode = (captchaCode:any[] )=>{
     })
     return lineSegments
 }
+const getRemoteUrl = ()=>{
+  if (currentLocalDBConfig.path){
+    return "/"
+  }else{
+    return 'https://solidjscad.com/'
+  }
+}
 const uploadCodeClick = ()=>{
     //console.log(Date.now().toString(36))
-    if (!confirm(`warning!!! The [${currentLocalDBConfig.path}] will be uploaded to the server cloud.`))return
-    fetch(`/code?${Date.now().toString()}`).then(r=>{
+    //if (!currentLocalDBConfig.path)return;
+    if (!(window as any).vscode)
+      if (!confirm(`warning!!! The [${currentLocalDBConfig.path||"solid jscad work"}] will be uploaded to the server cloud.`))return
+    fetch(`${getRemoteUrl()}code?${Date.now().toString()}`).then(r=>{
       if (!r.ok)return
       r.json().then(db=>{
         //console.log(db)
@@ -55,7 +65,7 @@ const checkInputCode =async ( )=>{
         title:`${solidConfig.workermsg.windowConfig.func}_${solidConfig.workermsg.windowConfig.in}_${solidConfig.workermsg.windowConfig.name}`
     })
     showInputCode.key=""
-    fetch(`/code?${u}`,{
+    fetch(`${getRemoteUrl()}code?${u}`,{
     method: "POST",body:await getCodeGz(solidConfig) }).then(r=>{
         if (!r.ok)return
         r.json().then(db=>{
