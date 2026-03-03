@@ -71,12 +71,12 @@ export  class HandleMessageClass {
             getCurrent(this.solidConfig.workermsg.windowConfig.worker,postMessage).then(
             current=>{
                 console.log("getsrc",current)
-                getCurrentCode(current,(name:string,code:string)=>{ 
+                getCurrentCode(current,(name:string,db:string)=>{ 
                 //console.log("getsrc",name)
                 postMessage({
                     type:"src",
-                    name,
-                    code 
+                    msg:{name,
+                    db }
                 })
                 }).then(()=>{
                 postMessage({
@@ -98,7 +98,7 @@ export  class HandleMessageClass {
                 }
             }) 
             console.log(this.solidConfig)
-            this.solidConfig.showMenu=MenuType.Camera|MenuType.MainMenu|MenuType.Png|MenuType.Src|MenuType.Stl
+            this.solidConfig.showMenu=MenuType.Camera|MenuType.MainMenu|MenuType.Png|MenuType.Src|MenuType.Stl|MenuType.Gzip
             runWorker(this.solidConfig );
             }) 
         },

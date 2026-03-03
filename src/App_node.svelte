@@ -12,7 +12,7 @@
     }
     return data
   }
-  solidConfig.oldMenu =MenuType.MainMenu|MenuType.Src | MenuType.Camera | MenuType.Gzip | MenuType.Png | MenuType.Stl;//  1 | (1<<1) | (1<<2) | (1<<3);
+  //solidConfig.oldMenu =MenuType.MainMenu|MenuType.Src | MenuType.Camera | MenuType.Gzip | MenuType.Png | MenuType.Stl;//  1 | (1<<1) | (1<<2) | (1<<3);
   solidConfig.postMessage = (e:{type:string,path?:string})=>{ 
     //console.log("post",e)
     fetch(getUrl("api") ,{
