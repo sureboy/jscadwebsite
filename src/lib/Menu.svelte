@@ -7,7 +7,7 @@ import Camera,{toggleCamera,initView} from "./Camera.svelte";
 import {onWindowResize,switchView } from "./function/threeScene" 
 import { changeWorker,runWorker } from "./function/worker";  
 import {cleanCurrentMsg} from "./function/ImportParser";
-import {MenuType} from "./function/utils";
+import {MenuType,getRemoteUrl} from "./function/utils";
 //import { onMount } from 'svelte';
 // $state(undefined)
 export const menuConfig = { 
@@ -74,5 +74,6 @@ handleView.set("show",()=>{
     </Options>
     
     {/if}
+        <a style="color:white" target="_blank" href="{getRemoteUrl(solidConfig.workermsg?.windowConfig?.serverIP)}more">more</a>
 </div>
 {/if}

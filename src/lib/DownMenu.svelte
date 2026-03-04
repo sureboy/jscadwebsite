@@ -1,7 +1,7 @@
 <script lang="ts" >
   import { Exporter} from "./function/threeScene" 
   import {getCodeGz} from "./function/localdb"  
-  import { MenuType} from "./function/utils";
+  import { MenuType,getRemoteUrl } from "./function/utils";
   import type { sConfig } from './function/utils';
   import CodeFrom from './CodeFrom.svelte'
   const { solidConfig }:{ solidConfig:sConfig} = $props();
@@ -91,7 +91,7 @@
 </script>
 <details    >
     <summary style="cursor:pointer;height:48px;text-align:left;line-height: 48px;" >
-       Download
+       Function
     </summary>
     <div >
       {#if (solidConfig.showMenu & MenuType.Stl )}
@@ -110,6 +110,7 @@
      
        <CodeFrom {solidConfig} />
       {/if}
+  
     </div>
 </details>
 

@@ -53,6 +53,16 @@ function char(c:string ){
     return shuffle(modeling.text.vectorText({xOffset:-h*4,height:h,align:a,input:c}))
  
 }
+export const OPTIONS = async () => {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    }
+  });
+};
 //const tmpCode = new Map<string,string>()
 export const GET: RequestHandler =async (req) => {
   //req.setHeaders
@@ -62,7 +72,7 @@ export const GET: RequestHandler =async (req) => {
       code:char(code),
       key:await sha256(API_SECRET_KEY+code.toLocaleLowerCase() + Date.now().toString().slice(0,8))
     },{headers:{
-      "Access-Control-Allow-Origin":"*"
+      "Access-Control-Allow-Origin":"*",
     }}) 
 };
 const getMinDateTime = ()=>{
@@ -77,11 +87,17 @@ export const POST:RequestHandler=async (e) => {
     if (!code 
       || !key       
       || key != await sha256(API_SECRET_KEY+code.toLocaleLowerCase() + Date.now().toString().slice(0,8))){ 
-      return json({msg :"err"}) 
+      return json(
+        {msg :"err"},
+        {headers:{
+      "Access-Control-Allow-Origin":"*"
+    }}); 
     }
     const arrayBuffer = await e.request.arrayBuffer();
     if (!arrayBuffer)
-      return json({msg :"not db"})  
+      return json({msg :"not db"},{headers:{
+      "Access-Control-Allow-Origin":"*"
+    }})  
     const k = Date.now().toString(32)
     const opt:{metadata?:any,expiration:number,expirationTtl?:number} = {expiration:getMinDateTime()} 
     const email =  e.url.searchParams.get("email") || ""

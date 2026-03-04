@@ -4,6 +4,7 @@ import modeling from '@jscad/modeling';
 import { currentLocalDBConfig,getCodeGz } from "./function/localdb";
 import type { sConfig } from './function/utils';
 import {CodeWorker} from "./function/worker" 
+import {getRemoteUrl} from './function/utils'
 const { solidConfig }:{ solidConfig:sConfig} = $props();
 let showInputCode:{
     key?:string,
@@ -29,19 +30,13 @@ const showCaptchaCode = (captchaCode:any[] )=>{
     })
     return lineSegments
 }
-const getRemoteUrl = ()=>{
-  if (currentLocalDBConfig.path){
-    return "/"
-  }else{
-    return 'https://solidjscad.com/'
-  }
-}
+ 
 const uploadCodeClick = ()=>{
     //console.log(Date.now().toString(36))
     //if (!currentLocalDBConfig.path)return;
     if (!(window as any).vscode)
-      if (!confirm(`warning!!! The [${currentLocalDBConfig.path||"solid jscad work"}] will be uploaded to the server cloud.`))return
-    fetch(`${getRemoteUrl()}code?${Date.now().toString()}`).then(r=>{
+      if (!confirm(`warning!!! The [${currentLocalDBConfig.path||solidConfig.workermsg.windowConfig.name}] will be uploaded to the server cloud.`))return
+    fetch(`${getRemoteUrl(solidConfig.workermsg.windowConfig.serverIP)}code?${Date.now().toString()}`).then(r=>{
       if (!r.ok)return
       r.json().then(db=>{
         //console.log(db)
@@ -65,7 +60,7 @@ const checkInputCode =async ( )=>{
         title:`${solidConfig.workermsg.windowConfig.func}_${solidConfig.workermsg.windowConfig.in}_${solidConfig.workermsg.windowConfig.name}`
     })
     showInputCode.key=""
-    fetch(`${getRemoteUrl()}code?${u}`,{
+    fetch(`${getRemoteUrl(solidConfig.workermsg.windowConfig.serverIP)}code?${u}`,{
     method: "POST",body:await getCodeGz(solidConfig) }).then(r=>{
         if (!r.ok)return
         r.json().then(db=>{
@@ -73,7 +68,7 @@ const checkInputCode =async ( )=>{
           alert(JSON.stringify(db))
           return
         }
-        showInputCode.url =`${window.location.protocol}//${window.location.host}#${db.k}`
+        showInputCode.url =`${getRemoteUrl(solidConfig.workermsg.windowConfig.serverIP)}#${db.k}`
         QRCode.toDataURL(showInputCode.url, {
           width: 200, 
           color: {
@@ -94,7 +89,7 @@ const checkInputCode =async ( )=>{
     })
   }
 </script>
- <button  style="height:48:px;line-height:48px;cursor: pointer;" onclick={uploadCodeClick}>Share</button> 
+ <button  style="height:48:px;line-height:48px;cursor: pointer;" onclick={uploadCodeClick}>QR code</button> 
  {#if showInputCode.key}
  <!-- A11y: <div> with click handler must have an ARIA role -->
  <div role="button" tabindex="0" 

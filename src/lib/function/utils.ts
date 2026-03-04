@@ -6,16 +6,21 @@ export type menuConfigType = {
       basename: string;
   }) => void;
 }
-export type windowConfigType = {
-  
-  in: string;
-  func: string;
-  worker:string;
-  name:string;
-  src?:string;
-  date?:string;
+type mainConfigType = {
+  src:string,
+  name: string,
+  func: string,
+  in: string,
+  date:string,
+  port:number,
+  worker?:string,
+  webview:boolean,
+  webUI?:string,
+  serverIP?:string[],
+  includeImport:{ [key: string]: string }
+}
+export type windowConfigType =mainConfigType & {
   files:string[];
-  includeImport?:{ [key: string]: string }
 }
 export type workerConfigType = {
   //pageType?:'run'|'gzData'|'stlData', 
@@ -31,7 +36,7 @@ export const MenuType  = {
   Png:1<<5,
   File:1<<6,
 }
- 
+
 export type sConfig = {
   worker?: Worker,
   baseUrl?:string,
@@ -41,6 +46,21 @@ export type sConfig = {
   showMenu:number,
   postMessage?:(m:any)=>void, 
 }  
+export const getRemoteUrl = (serverIP?: string[])=>{
+  //return "/"
+  if (! serverIP || serverIP.length===0){
+    return "/"
+  }else{
+    let addr =  serverIP[0]
+    if (!addr.startsWith("http")){
+      addr = "https://"+addr
+    }
+    if (!addr.endsWith("/")){
+      addr += "/"
+    }
+    return addr
+  }
+}
 export const fetchGZBuffer = async (name:string)=>{
   let url = ""
   if (name.endsWith(".solidjscad.gz")){
