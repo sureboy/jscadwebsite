@@ -71,9 +71,8 @@ handleView.set("show",()=>{
         initView()
         changeWorker(solidConfig )
     }}/></div>    
-    </Options>
-    
+    </Options> 
     {/if}
-        <a style="color:white" target="_blank" href="{getRemoteUrl(solidConfig.workermsg?.windowConfig?.serverIP)}more">more</a>
+    <a style="color:white" target="_blank" href="{getRemoteUrl(solidConfig.workermsg?.windowConfig?.serverIP)}more">more</a>
 </div>
 {/if}

@@ -7,17 +7,17 @@ export type menuConfigType = {
   }) => void;
 }
 type mainConfigType = {
-  src:string,
+  src?:string,
   name: string,
-  func: string,
-  in: string,
-  date:string,
-  port:number,
+  func?: string,
+  in?: string,
+  date?:string,
+  port?:number,
   worker?:string,
-  webview:boolean,
+  webview?:boolean,
   webUI?:string,
   serverIP?:string[],
-  includeImport:{ [key: string]: string }
+  includeImport?:{ [key: string]: string }
 }
 export type windowConfigType =mainConfigType & {
   files:string[];

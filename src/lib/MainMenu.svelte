@@ -7,9 +7,9 @@ export const moduleInit = (modulelist:{list:string[],basename:string} )=>{
     solidName.textContent = modulelist.basename 
     //console.log("change Main name",solidName)
     modulelist.list.forEach(m=>{
-       const div = tmpDiv.cloneNode(true)
-       div.textContent = m;
-       menu.appendChild(div)
+      const div = tmpDiv.cloneNode(true)
+      div.textContent = m;
+      menu.appendChild(div)
     }) 
 }
 </script>

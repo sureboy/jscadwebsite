@@ -36,14 +36,14 @@ const solidConfig:sConfig = $state({
         }
     },
 }) 
-const initMenu = (myConfig:windowConfigType)=>{
-    solidConfig.workermsg  =Object.assign(menuConfig,{mainConfig:myConfig})
+const initMenu = (windowConfig:windowConfigType)=>{
+    solidConfig.workermsg  = Object.assign(menuConfig,{windowConfig})
 }
 onMount(()=>{
     initSolidPage(solidConfig)
     //window.localStorage.getItem("")
     initMenu(myConfig)
-    loadLocalDBList(solidConfig).then(()=>{
+    loadLocalDBList().then(()=>{
         changeSolidConfig(solidConfig,showMenu) 
     }) 
     window.addEventListener("storage",(e)=>{

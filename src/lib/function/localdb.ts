@@ -75,10 +75,10 @@ const unzipDB = async(name:string,data:ArrayBuffer|Array<any>)=>{
         if (plist.length>=4){
             const [func,in_,name,date] = plist
             obj =  {
-            func,in:in_,name,date,files,worker:"" 
+            func,in:in_,name,date ,files,worker:"" 
             }
             window.localStorage.setItem(currentLocalDBConfig.configName(),JSON.stringify(obj))
-        }else{
+        }else{ 
             throw new Error('config err'); 
         }
     }
@@ -108,8 +108,9 @@ const initName =async ()=>{
 const reloadDB =async ( )=>{    
     const name = currentLocalDBConfig.path
     if (!name){ 
-        return null
+        return undefined
     }
+    
     const SolidPath =currentLocalDBConfig.getPathX()// name +"*"
     const confPath =currentLocalDBConfig.configName()// SolidPath+currentLocalDBConfig.name
     const conf  = window.localStorage.getItem(confPath)
@@ -148,20 +149,23 @@ const reloadDB =async ( )=>{
     const data =  await fetchGZBuffer(name)
     if (data)
         return await analysisGzipDB(name,data)     
-    return null
+    return undefined
 }
 
 export const changeSolidConfig = (solidConfig:sConfig,showMenu:number)=>{
     reloadDB().then((windowConfig)=>{
         //console.log(obj)
-        if (!windowConfig)return
+        if (!windowConfig){
+            window.alert("not data")
+            return
+        }
         Object.assign(solidConfig.workermsg,{windowConfig}) 
         solidConfig.showMenu=showMenu 
         runWorker(solidConfig)
     })
 }
  
-export const loadLocalDBList  =async (solidConfig:sConfig)=>{
+export const loadLocalDBList  =async ( )=>{
     //solidConfig_ = solidConfig
     currentLocalDBConfig.path =await initName()
     currentLocalDBConfig.paths = await myStorage.keys() 

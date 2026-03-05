@@ -1,15 +1,17 @@
+<script lang="ts" module>
+   export type itemType ={
+        img?:string,
+        expiration?:number,
+        email?:string,
+        title:string, 
+        save?:boolean,
+        update?:number,
+        url?:string
+    }
+</script>
 <script lang="ts">
-//import {fetchGZBuffer} from "./function/utils"
-//import libdata from '/assets/data.json' assert { type: 'json' };
-//import type { PageProps } from './$types';
-let { list }: { list:{
-    img?:string,
-    expiration?:string,
-    email?:string,
-    title:string, 
-    save?:boolean,
-    update?:string,
-    url?:string}[]}  = $props();
+
+let { list }: { list:itemType[]}  = $props();
 
 </script>
 <svelte:head>
@@ -46,6 +48,23 @@ let { list }: { list:{
                     })
                 })
             }}>save</button>
+            <button onclick={e=>{
+                //console.log(e)
+                if (!window.confirm(`delete ${item.url}?`)){
+                    return;
+                }
+                fetch("/admin?k="+item.url).then(r=>{
+                    if (!r.ok){
+                        return;
+                    }
+                    r.json().then(db=>{
+                        console.log(db)
+                        if (db.msg){
+                            window.location.reload();
+                        }
+                    })
+                })
+            }}>del</button>
         {/if}
     </figcaption>
 </figure>

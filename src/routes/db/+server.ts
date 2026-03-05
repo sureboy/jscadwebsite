@@ -1,9 +1,13 @@
 import type { RequestHandler } from './$types';  
 import {kvdbGet} from '$lib/function/kvdb'
- 
+import { error } from '@sveltejs/kit';
 export const GET:RequestHandler=async (e) => {
     //e.platform?.env.solidtmp
     const k = e.url.searchParams.get("k")
+    if (!k){
+        error(404);
+        return;
+    }
     let value:ArrayBuffer
     if (e.platform && e.platform.env.solidtmp){
         value = await e.platform.env.solidtmp.get(k,"arrayBuffer")
@@ -19,5 +23,5 @@ export const GET:RequestHandler=async (e) => {
         headers: {
         'Content-Type': 'application/gzip'
         }
-    });
+    });    
 }

@@ -16,3 +16,6 @@ export const kvdbPut=(k:string,v:ArrayBuffer,opt:{metadata?:any,expiration?:numb
 export const kvdbGet = (k:string)=>{
   return client.kv.namespaces.values.get(KV_NAMESPACE_ID,k,{ account_id:  ACCOUNT_ID} )
 }
+export const kvdbDel = (k:string)=>{
+  return client.kv.namespaces.values.delete(KV_NAMESPACE_ID,k,{ account_id:  ACCOUNT_ID} )
+}

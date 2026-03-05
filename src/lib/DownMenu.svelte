@@ -1,7 +1,7 @@
 <script lang="ts" >
   import { Exporter} from "./function/threeScene" 
   import {getCodeGz} from "./function/localdb"  
-  import { MenuType,getRemoteUrl } from "./function/utils";
+  import { MenuType } from "./function/utils";
   import type { sConfig } from './function/utils';
   import CodeFrom from './CodeFrom.svelte'
   const { solidConfig }:{ solidConfig:sConfig} = $props();
