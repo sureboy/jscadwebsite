@@ -1,6 +1,7 @@
 <script lang="ts" >
   import { Exporter} from "./function/threeScene" 
   import {getCodeGz} from "./function/localdb"  
+  import {getPng} from "./function/localImg"  
   import { MenuType } from "./function/utils";
   import type { sConfig } from './function/utils';
   import CodeFrom from './CodeFrom.svelte'
@@ -15,6 +16,18 @@
   }
   const downPngClick = ()=>{
     //console.log("get png")
+    getPng(solidConfig.el,(screenCanvas)=>{
+      let aTag = document.createElement('a'); 
+      aTag.download = `${solidConfig.workermsg.windowConfig.func}_${solidConfig.workermsg.windowConfig.in.split(".").shift()}_${solidConfig.workermsg.windowConfig.name}_${Date.now()}.png`; //e.detail.name+"_screen.png";
+      let href =screenCanvas.toDataURL()
+      //console.log(href)
+      //screenImgList.push(href)
+      aTag.href = href;
+      aTag.click();
+      //screenImgList.add(href)
+      URL.revokeObjectURL(href);  
+    })
+    /*
     const screenCanvas = document.createElement('canvas');
     const ctx = screenCanvas.getContext("2d")
     const img = new Image()
@@ -63,7 +76,7 @@
     URL.revokeObjectURL(href);  	
     URL.revokeObjectURL(img.src); 
   } 
-    
+    */
   }
   const downSTLclick = ()=>{
     const res = Exporter() 

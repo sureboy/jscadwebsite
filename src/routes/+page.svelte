@@ -26,13 +26,32 @@ const solidConfig:sConfig = $state({
     showMenu:0,
     postMessage:(e:{type:string,path?:string})=>{ 
         if (e.path){
-            setTimeout(()=>{
-                handleCurrentMsg({
-                    name:e.path,
-                    db:window.localStorage.getItem(e.path)},
-                    solidConfig.postMessage
-                )
-            }) 
+            const db = window.localStorage.getItem(e.path)
+            if (db){
+                setTimeout(()=>{ 
+                    handleCurrentMsg({
+                        name:e.path,
+                        db},
+                        solidConfig.postMessage
+                    )
+                }) 
+            }else if ( solidConfig.workermsg.windowConfig.includeImport ){
+                const p = solidConfig.workermsg.windowConfig.includeImport[e.path]
+                if (p){
+                    fetch(p).then(res=>{
+                        if (!res.ok){
+                            return
+                        }
+                        res.arrayBuffer().then(db=>{
+                            handleCurrentMsg({
+                                name:e.path,
+                                db},
+                                solidConfig.postMessage
+                            )
+                        })
+                    })
+                }
+            }
         }
     },
 }) 
@@ -52,7 +71,7 @@ onMount(()=>{
             && e.key.startsWith(currentLocalDBConfig.getPathX()) 
             && !e.key.endsWith(currentLocalDBConfig.name)
         ){
-            handleCurrentMsg({name:e.key.split("*")[1] ,db:e.newValue})
+            handleCurrentMsg({name:e.key.split("*")[1] ,db:e.newValue},solidConfig.postMessage)
             solidConfig.showMenu=showMenu
             runWorker(solidConfig) 
         } 

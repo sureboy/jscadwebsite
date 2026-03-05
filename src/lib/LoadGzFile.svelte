@@ -13,9 +13,9 @@ const { myConfig,solidConfig }: { myConfig: windowConfigType,solidConfig:sConfig
 const analysisGzip =async ( fileName:string,data: ArrayBuffer)=>{    
     solidConfig.showMenu=0
     const p = fileName.split(".")[0] 
-    let obj =await analysisGzipDB(p,data) 
-    if (!obj)return 
-    Object.assign(solidConfig.workermsg,obj) 
+    let windowConfig =await analysisGzipDB(p,data,solidConfig) 
+    if (!windowConfig)return 
+    Object.assign(solidConfig.workermsg,{windowConfig}) 
     solidConfig.showMenu=showMenu
     runWorker(solidConfig ); 
 }

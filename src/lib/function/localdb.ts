@@ -38,7 +38,7 @@ export const cleanSolidConfig = ()=>{
     window.localStorage.clear() 
     window.location.reload()
 }
-const unzipDB = async(name:string,data:ArrayBuffer|Array<any>)=>{
+const unzipDB = async(name:string,data:ArrayBuffer|Array<any>,solidConfig:sConfig)=>{
     let v=""
     if (Array.isArray(data)){ 
         v = await gzipToString(await new Blob(data).arrayBuffer()) 
@@ -66,7 +66,7 @@ const unzipDB = async(name:string,data:ArrayBuffer|Array<any>)=>{
             return
         }
         files.push(msg.name)
-        handleCurrentMsg(msg)
+        handleCurrentMsg(msg,solidConfig.postMessage||undefined)
     }) 
     if (obj){        
         if (!obj.files)obj.files=files
@@ -85,9 +85,9 @@ const unzipDB = async(name:string,data:ArrayBuffer|Array<any>)=>{
     
     return obj
 }
-export const analysisGzipDB =async (name:string,data:ArrayBuffer )=>{
+export const analysisGzipDB =async (name:string,data:ArrayBuffer,solidConfig:sConfig )=>{
     myStorage.put(name,data)
-    return await unzipDB(name,data) 
+    return await unzipDB(name,data,solidConfig ) 
 }
 const initName =async ()=>{
     if (window.location.hash){
@@ -105,7 +105,7 @@ const initName =async ()=>{
     }
     return null
 }
-const reloadDB =async ( )=>{    
+const reloadDB =async (solidConfig:sConfig )=>{    
     const name = currentLocalDBConfig.path
     if (!name){ 
         return undefined
@@ -120,7 +120,7 @@ const reloadDB =async ( )=>{
         obj.files.forEach((name)=>{
             handleCurrentMsg({
                 name ,
-                db:window.localStorage.getItem(SolidPath+name)})
+                db:window.localStorage.getItem(SolidPath+name)},solidConfig.postMessage)
         })}else{
             obj.files=[]
             for (let i = 0;i<window.localStorage.length;i++){
@@ -129,7 +129,7 @@ const reloadDB =async ( )=>{
                     obj.files.push(key.split("*")[1]) 
                     handleCurrentMsg({
                         name ,
-                        db:window.localStorage.getItem(key)})
+                        db:window.localStorage.getItem(key)},solidConfig.postMessage)
                 }
             }
             window.localStorage.setItem(confPath,JSON.stringify(obj,null,2))
@@ -144,16 +144,16 @@ const reloadDB =async ( )=>{
     console.log(name)
     const db = await myStorage.get(name) 
     if (db){
-        return await unzipDB(name,db)  
+        return await unzipDB(name,db,solidConfig)  
     }   
     const data =  await fetchGZBuffer(name)
     if (data)
-        return await analysisGzipDB(name,data)     
+        return await analysisGzipDB(name,data,solidConfig)     
     return undefined
 }
 
 export const changeSolidConfig = (solidConfig:sConfig,showMenu:number)=>{
-    reloadDB().then((windowConfig)=>{
+    reloadDB(solidConfig).then((windowConfig)=>{
         //console.log(obj)
         if (!windowConfig){
             window.alert("not data")
@@ -219,22 +219,20 @@ export const getCodeGz_ =async (solidConfig:sConfig)=>{
 */
 export const getCodeGz =async (solidConfig:sConfig)=>{  
     
-    const current =await getCurrent(solidConfig.workermsg.windowConfig.worker||"./worker.js",(e)=>{
-        postSrcMsg(solidConfig,e)
-    })  
-    //console.log(current)
+    const current =await getCurrent(solidConfig.workermsg.windowConfig.worker||"./worker.js",solidConfig.postMessage)  
+    console.log(solidConfig.workermsg?.windowConfig)
     let codeSrc = ""
     solidConfig.workermsg.windowConfig.files = []
-    await getCurrentCode( current,(name:string,code:string)=>{
+    await getCurrentCode( current,(name:string,code:string)=>{ 
+        if (solidConfig.workermsg?.windowConfig?.includeImport && 
+            solidConfig.workermsg?.windowConfig?.includeImport[name]){
+                return
+            }
+        solidConfig.workermsg.windowConfig.files.push(name)
     codeSrc +=`
 /**${name}*/
 ${code}
-`       
-    //codeList.push(code)
-//console.log(name)
-        if (!solidConfig.workermsg.windowConfig.includeImport[name])
-        solidConfig.workermsg.windowConfig.files.push(name)
-
+`  
     })
 
     codeSrc +=`
@@ -247,8 +245,10 @@ console.log("getCodeGz",solidConfig.workermsg.windowConfig)
     const chunks = await stringToGzip(codeSrc)
     return new Blob(chunks, { type: 'application/gzip' });
 }
+/*
 const postSrcMsg = (solidConfig:sConfig,e:{ path?:string})=>{
     if (e.path){
+
     fetch( 
         e.path.replace(/^\.\//,`./${solidConfig.workermsg.windowConfig.src}/`) )
         .then(f=>{
@@ -259,4 +259,4 @@ const postSrcMsg = (solidConfig:sConfig,e:{ path?:string})=>{
             })
         })
     }
-}
+}*/
