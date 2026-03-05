@@ -53,6 +53,7 @@ const getBaseUrl =async (config:windowConfigType,postMessage?:(e:any)=>void)=>{
   let csgObjUrl =  "./lib/csgChange.js";
   if (config.includeImport && config.includeImport["csgChange"]){
     csgObjUrl = "csgChange"
+    console.log(config)
   }
   const db = `
   ${consoleLog} 
@@ -81,7 +82,7 @@ const getBaseUrl =async (config:windowConfigType,postMessage?:(e:any)=>void)=>{
 ${consoleLogEnd}`; 
   handleCurrentMsg({name:config.worker,db},postMessage) 
   return workerObj?workerObj.getUri():(await getCurrent(config.worker,postMessage)).getUri()
-  //return await getBaseUrl(config,postMessage)
+  //return (await getCurrent(config.worker,postMessage)).getUri()
 };
 
 export const changeWorker = (conf:sConfig  )=>{

@@ -1,7 +1,7 @@
 <script lang="ts" >
   import { onMount } from 'svelte';
   import {initSolidPage} from './lib/ShowSolid.svelte';
-  import {MenuType} from './lib/function/utils'    
+  //import {MenuType} from './lib/function/utils'    
   import HandlePage,{solidConfig,handleMsg} from './lib/HandleMessagePage.svelte';
   //import {HandleMessageClass} from './lib/function/handleMessage' 
   // const handleMsg =new HandleMessageClass(solidConfig)

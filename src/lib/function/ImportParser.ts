@@ -70,10 +70,10 @@ export const getCurrent = (name:string,reqMessage?:(e:{type:"req",path:string})=
             return ;
         }
         if (!reqMessage ){
-            console.log("not reqmsg",name);
+            //console.log("not reqmsg",name);
             resolve(InitCurrentMap({name})); 
             return;
-        }        
+        }
         reqMessage({type:"req",path:name});
         const t = setTimeout(()=>{
             waitGetMap.delete(name);

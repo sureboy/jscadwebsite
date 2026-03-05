@@ -94,7 +94,7 @@ export  class HandleMessageClass {
                 if (db.name.endsWith("solidjscad.json")){
                 Object.assign(this.solidConfig.workermsg,JSON.parse(db.db) )
                 }else{
-                handleCurrentMsg(db) 
+                handleCurrentMsg(db,postMessage) 
                 }
             }) 
             console.log(this.solidConfig)
