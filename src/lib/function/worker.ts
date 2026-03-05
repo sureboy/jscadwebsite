@@ -49,7 +49,11 @@ const getBaseUrl =async (config:windowConfigType,postMessage?:(e:any)=>void)=>{
   if (!indexName.endsWith(".js")){
     indexName += ".js";
   }
-  let csgObjUrl = "./lib/csgChange.js";
+  
+  let csgObjUrl =  "./lib/csgChange.js";
+  if (config.includeImport && config.includeImport["csgChange"]){
+    csgObjUrl = "csgChange"
+  }
   const db = `
   ${consoleLog} 
   const csg = await import( '${csgObjUrl}' )
