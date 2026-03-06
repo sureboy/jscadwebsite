@@ -8,10 +8,10 @@ let { data }: PageProps = $props();
 
 </script> 
 <div style="display: block; padding-left: 10px;">
-<h1>风景画廊</h1>
+<h1>Examples</h1>
     <List list={data.list} ></List>
  
-<h1>风景画廊1</h1>
+<h1>Temp</h1>
 <List list={data.newList} ></List>
 </div>
  

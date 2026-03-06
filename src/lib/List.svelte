@@ -35,6 +35,7 @@ const getItemImg =async (item:itemType)=>{
  
 <div class="gallery"> 
 {#each  list as item,i }
+
  <figure  >
     {#await getItemImg(item) then url }
     {#if url}

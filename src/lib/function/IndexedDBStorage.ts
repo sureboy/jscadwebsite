@@ -16,7 +16,7 @@ export class IndexedDBStorage {
   constructor(dbName: string = 'KeyValueDB', storeName: string = 'keyValueStore', version: number = 1) {
     this.dbName = dbName;
     this.storeName = storeName;
-    this.version = version;
+    this.version = version; 
   }
 
   // 初始化数据库

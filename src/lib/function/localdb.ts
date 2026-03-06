@@ -10,7 +10,8 @@ import {
 }  from "./ImportParser"
 import { runWorker } from "./worker";
 import {IndexedDBStorage} from "./IndexedDBStorage"
-const myStorage = new IndexedDBStorage('solidjscad', 'gzfile', 1);
+export const myStorage = new IndexedDBStorage('solidjscad', 'gzfile');
+ 
 //export const tmpSolidConfig ={tmp:"solidjscad.json",conf:{}}
 export const  currentLocalDBConfig:{
     paths?:string[],
