@@ -10,9 +10,24 @@
     }
 </script>
 <script lang="ts">
+import {imgStorage} from "$lib/function/localImg"
+
 
 let { list }: { list:itemType[]}  = $props();
 
+const getItemImg =async (item:itemType)=>{
+    if (item.img){
+        return item.img
+    }
+    const img = (await imgStorage.get(item.url)) as Blob|null
+    console.log(item.url,img)
+    if (img){
+        item.img =URL.createObjectURL(img)
+    }
+    return item.img
+
+}
+//let dataPromise = fetch('/api/data').then(r => r.json());
 </script>
 <svelte:head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,9 +36,13 @@ let { list }: { list:itemType[]}  = $props();
 <div class="gallery"> 
 {#each  list as item,i }
  <figure  >
-    {#if item.img}
-    <img src={item.img} alt="{item.title}" width="800" height="600"/>
-    {/if}
+    {#await getItemImg(item) then url }
+    {#if url}
+     <img src={url} alt="{item.title}" width="800" height="600"/>
+        {/if}
+    {/await }
+    
+   
     <figcaption>
         <h3>{ item.title||item.url}</h3>
         {#if item.email}<p> {item.email}</p>{/if}
@@ -53,7 +72,10 @@ let { list }: { list:itemType[]}  = $props();
                 if (!window.confirm(`delete ${item.url}?`)){
                     return;
                 }
-                fetch("/admin?k="+item.url).then(r=>{
+                fetch("/admin?k="+item.url,{
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }}).then(r=>{
                     if (!r.ok){
                         return;
                     }

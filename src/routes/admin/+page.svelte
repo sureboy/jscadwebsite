@@ -7,4 +7,11 @@ let { data }: PageProps = $props();
 
 
 </script> 
-<List list={data.list} ></List>
+<div style="display: block; padding-left: 10px;">
+<h1>风景画廊</h1>
+    <List list={data.list} ></List>
+ 
+<h1>风景画廊1</h1>
+<List list={data.newList} ></List>
+</div>
+ 

@@ -12,6 +12,7 @@ import {
     loadLocalDBList,
     currentLocalDBConfig
 } from "$lib/function/localdb" 
+import {imgStorage,createPng} from "$lib/function/localImg"
 const myConfig:windowConfigType  = $state({
     port:0,
     name:"",
@@ -52,6 +53,22 @@ const solidConfig:sConfig = $state({
                     })
                 }
             }
+        }
+        if (e.type==="end"){
+            console.log("show 3d solid module end",currentLocalDBConfig)
+            imgStorage.get(currentLocalDBConfig.path).then(v=>{
+                console.log(v)
+                if (v){return}
+                createPng(solidConfig.el,(screenCanvas)=>{
+                    screenCanvas.toBlob((db)=>{
+                        imgStorage.put(currentLocalDBConfig.path,db)
+                        console.log("push",currentLocalDBConfig.path)
+                    })
+                })
+            }).catch(e=>{
+                
+                console.log("get err",e)
+            })
         }
     },
 }) 

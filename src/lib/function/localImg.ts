@@ -1,5 +1,7 @@
+import {IndexedDBStorage} from "./IndexedDBStorage"
+export const imgStorage = new IndexedDBStorage('solidjscadImg', 'imgfile', 1);
 
-export const getPng = (el:HTMLCanvasElement,back:(screenCanvas: HTMLCanvasElement)=>void)=> {
+export const createPng = (el:HTMLCanvasElement,back:(screenCanvas: HTMLCanvasElement)=>void)=> {
     //console.log("get png")
 
     const img = new Image()

@@ -1,19 +1,22 @@
 import type { PageServerLoad } from './$types';  
 import {kvdbList} from '$lib/function/kvdb'
 import db from '$lib/assets/data.json' assert { type: 'json' }; 
-const items = db.list.map(l=>l.url.split(".")[0])
+const items = db.list.map(l=>l.update)
 export const load: PageServerLoad = async ({ params,url,platform }) => { 
-    const list:any[] = [...db.list]
+    const newList:any[] = []
     for await (const key of kvdbList() ) {
         //console.log(key.name);
-        if (!items.includes(key.name)){
+        const update = parseInt(key.name,32)
+        if (!items.includes(update)){
             //console.log(key.name);
-            list.push(Object.assign(key.metadata||{},{
+            newList.push(Object.assign(key.metadata||{},{
                 expiration:key.expiration||undefined,
                 url: key.name,
-                update: parseInt(key.name,32) ,
+                update  ,
                 save:true}))
+        }else{
+            console.log("same",key)
         }
-    } 
-    return {list};
+    }  
+    return {list:db.list,newList};
 };
