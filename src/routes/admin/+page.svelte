@@ -10,7 +10,6 @@ let { data }: PageProps = $props();
 <div style="display: block; padding-left: 10px;">
 <h1>Examples</h1>
     <List list={data.list} ></List>
- 
 <h1>Temp</h1>
 <List list={data.newList} ></List>
 </div>

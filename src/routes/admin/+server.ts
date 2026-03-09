@@ -10,6 +10,7 @@ export const POST:RequestHandler=async (e) => {
     //console.log(db,process.cwd()) 
     (listdb.list as itemType[]).push(db)
     db.save = false
+    db.img = ""
     
     const kvdb = await kvdbGet(db.url)
     db.url = `${db.title||db.url}.solidjscad.gz` 
