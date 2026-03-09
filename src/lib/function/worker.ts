@@ -1,12 +1,12 @@
-import {getCurrent,handleCurrentMsg} from "./ImportParser";
+import {getCurrent,handleCurrentMsg,objUrlMap} from "./ImportParser";
 import type {currentObj} from "./ImportParser"
 import {onWindowResize,startSceneOBJ,addSceneOBJ} from "./threeScene" ;
 import { CSG2Three } from "./csg2Three";
 import type { sConfig,windowConfigType } from './utils';
- 
+//import * as path from "path"
 
 const consoleLog = `
-const originalLog = console.log;
+const originalLog = console.log; 
 console.log = (...e)=>{
 originalLog(e)
   self.postMessage({ 
@@ -15,11 +15,14 @@ originalLog(e)
 } 
 try{
 `;
-const consoleLogEnd=`}catch(error){        
-    console.error(error)
+const consoleLogEnd=`}catch(e){  
+  console.error(e)
     self.postMessage({ 
-    error:error.stack,
-    end:true
+      error:{
+            message:e.message,
+            stack:e.stack
+          },
+      end:true
     });
 };`;
 
@@ -55,8 +58,7 @@ const getBaseUrl =async (config:windowConfigType,postMessage?:(e:any)=>void)=>{
     csgObjUrl = "csgChange"
     console.log(config)
   }
-  const db = `
-  ${consoleLog} 
+  const db = `${consoleLog} 
   const csg = await import( '${csgObjUrl}' )
   const src = await import("${indexName}")
   const main = "${config.func}";
@@ -65,9 +67,19 @@ const getBaseUrl =async (config:windowConfigType,postMessage?:(e:any)=>void)=>{
   self.onmessage = (e)=>{
     const {func,options,code} = e.data
     if ( func){ 
-      csg.getCsgObjArray(src[e.data.func](options),(msg)=>{
-        self.postMessage(msg)
-      }) 
+      try{
+        csg.getCsgObjArray(src[e.data.func](options),(msg)=>{
+          self.postMessage(msg)
+        }) 
+      }catch(e){
+        console.error(e)
+        self.postMessage({ 
+          error:{
+            message:e.message,
+            stack:e.stack
+          }, 
+        });
+      }      
     }
     if (code){
       csg.getCsgObjArray(code,(msg)=>{
@@ -76,10 +88,21 @@ const getBaseUrl =async (config:windowConfigType,postMessage?:(e:any)=>void)=>{
     }
   }
   self.postMessage({module})
-  csg.getCsgObjArray(src[module.basename](),(msg)=>{
-  self.postMessage(msg)
-}) 
+  try{
+    csg.getCsgObjArray(src[module.basename](),(msg)=>{
+      self.postMessage(msg)
+    }) 
+  }catch(e){
+  console.error(e)
+    self.postMessage({ 
+      error:{
+            message:e.message||"",
+            stack:e.stack||""
+          }, 
+    });
+  }     
 ${consoleLogEnd}`; 
+console.log(db)
   handleCurrentMsg({name:config.worker,db},postMessage) 
   return workerObj?workerObj.getUri():(await getCurrent(config.worker,postMessage)).getUri()
   //return (await getCurrent(config.worker,postMessage)).getUri()
@@ -124,7 +147,6 @@ export const runWorker =async ( conf:sConfig  )=>{
     conf.worker = null;
     URL.revokeObjectURL(conf.baseUrl);
     conf.baseUrl = undefined;
-    
   }
   if (!conf.oldMenu){
     conf.oldMenu = conf.showMenu;
@@ -137,15 +159,15 @@ export const runWorker =async ( conf:sConfig  )=>{
   
   conf.showMenu = 1;
   //if (!conf.baseUrl){
-    conf.baseUrl = await getBaseUrl(conf.workermsg.windowConfig,conf.postMessage) ;
+  conf.baseUrl = await getBaseUrl(conf.workermsg.windowConfig,conf.postMessage) ;
   //}
   conf.worker = new Worker(conf.baseUrl,{type: "module"});
   conf.worker.onerror = e=>{
-    console.error("error", e );
+    console.error("error", e, conf.baseUrl );
     if (conf.postMessage){
       conf.postMessage({
         type:'error',
-        msg:"Code syntax error"
+        msg:e.message || "Code syntax error"
       });
     }
   };
@@ -160,6 +182,7 @@ export const runWorker =async ( conf:sConfig  )=>{
   };  
   conf.worker.onmessage = function(e) {
     const msg = e.data;
+    console.log(msg)
     if (msg.start ){
       try{
         startSceneOBJ(conf.el);
@@ -192,7 +215,7 @@ export const runWorker =async ( conf:sConfig  )=>{
 
     }
     if (msg.options){
-      console.log("options",msg.options)
+      //console.log("options",msg.options)
       conf.workermsg.options =msg.options //Object.assign(conf.workermsg.options||{},msg.options);
       //console.log(msg.options);
     }
@@ -206,10 +229,18 @@ export const runWorker =async ( conf:sConfig  )=>{
     }
     if (msg.error){
       if (conf.postMessage){
-      conf.postMessage({
-        type:'error',
-        msg:msg.error
-      });}
+        /*
+        if (msg.error.stack && typeof msg.error.stack === "string"){
+          objUrlMap.forEach((v,k)=>{
+            msg.error.stack = (msg.error.stack as string).replaceAll(k,path.join(conf.workermsg.windowConfig.src,v))
+          })
+        }*/
+        conf.postMessage({
+          type:'error',
+          msg:msg.error,
+          urlMap:Object.fromEntries(objUrlMap),
+        });
+      }
     }    
   };  
 };

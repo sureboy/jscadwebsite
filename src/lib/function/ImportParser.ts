@@ -19,7 +19,7 @@ type importType = {
 }
 export const currentMap = new Map<string,currentObj>();
 const waitGetMap = new Map<string,(c:currentObj)=>void>();
-
+export const objUrlMap = new Map<string,string>();
 const  importParser = (code:string)=> {
     const regex = /import\s+[\s\S]*?\s+from\s+['"]([^'"]+)|import\s*\(?\s*['"]([^'"]+)/g;
     const imports:importType[] = [];
@@ -92,6 +92,7 @@ const updateCurrent = (c:currentObj)=>{
     if (!c.url){
         return;
     }
+    objUrlMap.delete(c.url);
     URL.revokeObjectURL(c.url);
     c.url = '';
     
@@ -152,6 +153,7 @@ const toStringCurrent = async (c:currentObj)=>{
     
     c.url = URL.createObjectURL(new Blob([code],{type:'application/javascript'}));
     //console.log(code);
+    objUrlMap.set(c.url,c.name) 
     return c.url;  
 };
 const InitCurrentMap = (v:messageObj)=>{
@@ -159,7 +161,7 @@ const InitCurrentMap = (v:messageObj)=>{
     const cur = {
         persons:new Set<currentObj>(),
         getUri:async ()=>{
-            return toStringCurrent(cur);            
+            return toStringCurrent(cur);     
         },  
         srcList:[]   ,   
         ...v
@@ -167,10 +169,15 @@ const InitCurrentMap = (v:messageObj)=>{
     return cur;
 };
 export const delCurrentMsg = (name:string)=>{
-    currentMap.delete(name);
+    if (currentMap.has(name)){ 
+        objUrlMap.delete(currentMap.get(name).url)
+        currentMap.delete(name);
+    }
+    
 };
 export const cleanCurrentMsg = ()=>{
     currentMap.clear();
+    objUrlMap.clear();
 };
  
 export const handleCurrentMsg =(
