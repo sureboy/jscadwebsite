@@ -15,6 +15,10 @@ const getLocalDBList =async ()=>{
     return localList
 }
 </script> 
+<svelte:head>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4370679297888448"
+     crossorigin="anonymous"></script>
+</svelte:head>
 <div style="display: block; padding-left: 10px;">
 <h2><a style="color:white;" href="https://docs.solidjscad.com" target="_blank" >Docs</a></h2>
 <List list={db.list} ></List>
