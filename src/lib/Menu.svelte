@@ -73,6 +73,8 @@ handleView.set("show",()=>{
     }}/></div>    
     </Options> 
     {/if}
-    <a style="color:white" target="_blank" href="{getRemoteUrl(solidConfig.workermsg?.windowConfig?.serverIP)}more">more</a>
+    <a style="color:white;cursor: pointer;height:48px;text-align: left;line-height: 48px;" target="_blank" href="{getRemoteUrl(solidConfig.workermsg?.windowConfig?.serverIP)}more">more</a>
+    <a style="color:white;cursor: pointer;height:48px;text-align: left;line-height: 48px;" target="_blank" href="https://docs.solidjscad.com">Docs</a>
+
 </div>
 {/if}
