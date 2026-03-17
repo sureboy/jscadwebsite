@@ -1,15 +1,19 @@
 <script lang="ts"> 
 import type {windowConfigType,sConfig} from "./function/utils"
-import {handleCurrentMsg}  from "./function/ImportParser"
+import {handleCurrentMsg,cleanCurrentMsg}  from "./function/ImportParser"
 import { runWorker } from "./function/worker";
 import {MenuType} from "./function/utils"
 import { addSceneSTL,startSceneOBJ} from "./function/threeScene" 
 import {STLLoader} from "three/addons/loaders/STLLoader.js" 
-import {analysisGzipDB,currentLocalDBConfig} from "./function/localdb"
+import {
+    myStorage,
+    analysisGzipDB,
+    currentLocalDBConfig,
+    gzipCodeFromLocalStorage} from "./function/localdb"
 //    import { getOutputFileNames } from "typescript";
 const { myConfig,solidConfig }: { myConfig: windowConfigType,solidConfig:sConfig  } = $props(); 
 
-
+let addClick:HTMLButtonElement;
 const analysisGzip =async ( fileName:string,data: ArrayBuffer)=>{    
     solidConfig.showMenu=0
     const p = fileName.split(".")[0] 
@@ -62,7 +66,7 @@ const textDecoder = new TextDecoder();
 <script lang="ts" module> 
 //export const fileList:string[] = $state([])
 //let show =$state(false)
-export let newPackageCode:string = `import modeling from './lib/modeling.esm.js';
+export let newPackageCode:string = `import modeling from '@jscad/modeling';
 export const main=(opt)=>{
     const option = Object.assign({size:10},opt)
     return [modeling.primitives.cube(option),option]
@@ -75,6 +79,10 @@ export const showMenu = MenuType.MainMenu | MenuType.Camera | MenuType.Gzip | Me
     //console.log(select.value)
     switch (select.value) {
         case "":
+            return;
+        case "new":
+            myConfig.in = ""
+            addClick.click();
             return;
         case "more":
             window.open("/more");
@@ -92,6 +100,7 @@ export const showMenu = MenuType.MainMenu | MenuType.Camera | MenuType.Gzip | Me
     }   
 }}>
     <option value="">--</option>
+    <option value="new">New project</option>
     {#each currentLocalDBConfig.paths as p}
         <option value={p} >{p}</option>
     {/each}
@@ -109,7 +118,7 @@ type="file" onchange={(event)=>{
     readfile(input.files[0])
     
 }} />
-<button onclick={()=>{
+<button bind:this={addClick} onclick={()=>{
     let fileName=""
     if (!myConfig.in){
         fileName="index"    
@@ -125,11 +134,22 @@ type="file" onchange={(event)=>{
         fileName += ".js"
     }
     if (!myConfig.in){
+        gzipCodeFromLocalStorage().then(data=>{
+            if (data){
+                myStorage.put(data.path,data.db)
+            }
+        })       
+        cleanCurrentMsg() 
+        window.localStorage.clear()
         myConfig.in = fileName;
         myConfig.name="SolidJSCAD"
         myConfig.func="main"
         myConfig.date = Date.now().toString()
         myConfig.files = [fileName]
+        myConfig.includeImport={
+    "@jscad/modeling": "./lib/modeling.esm.js",
+    "csgChange": "./lib/csgChange.js"
+  }
         //[func,in_,name,date]
         currentLocalDBConfig.path = [
                 myConfig.func,
@@ -137,7 +157,7 @@ type="file" onchange={(event)=>{
                 myConfig.name,
                 myConfig.date].join("_")
             
-        window.localStorage.setItem(currentLocalDBConfig.configName(),JSON.stringify(myConfig))
+        window.localStorage.setItem(currentLocalDBConfig.configName(),JSON.stringify(myConfig,null,2))
         window.localStorage.setItem(currentLocalDBConfig.getPathX()+fileName,newPackageCode)
         //mySolidTmp.update()
     }
@@ -145,7 +165,7 @@ type="file" onchange={(event)=>{
 
     //console.log(fileName)
     window.location.href = "/edit#"+currentLocalDBConfig.getPathX()+fileName
-    //window.open("/edit#"+mySolidConfig.getPathX()+fileName)
+    //window.open("/edit#"+currentLocalDBConfig.getPathX()+fileName)
 
  
 }}>+</button>

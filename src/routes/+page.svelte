@@ -37,22 +37,24 @@ const solidConfig:sConfig = $state({
                         solidConfig.postMessage
                     )
                 }) 
-            }else if ( solidConfig.workermsg.windowConfig.includeImport ){
-                const p = solidConfig.workermsg.windowConfig.includeImport[e.path]
-                if (p){
-                    fetch(p).then(res=>{
-                        if (!res.ok){
-                            return
-                        }
-                        res.arrayBuffer().then(db=>{
-                            handleCurrentMsg({
-                                name:e.path,
-                                db},
-                                solidConfig.postMessage
-                            )
-                        })
-                    })
+            }else{
+                let p = e.path
+                if ( solidConfig.workermsg.windowConfig.includeImport ){
+                    p= solidConfig.workermsg.windowConfig.includeImport[e.path]||p
                 }
+                fetch(p).then(res=>{
+                    if (!res.ok){
+                        return
+                    }
+                    res.arrayBuffer().then(db=>{
+                        handleCurrentMsg({
+                            name:e.path,
+                            db},
+                            solidConfig.postMessage
+                        )
+                    })
+                })
+                
             }
         }
         if (e.type==="end"){

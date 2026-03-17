@@ -145,6 +145,10 @@ export const GetUpdateFileList = ()=>{
     <button onclick={()=>{
     saveFileCode()
 }} style="position: absolute;right:0px;top:0px;z-index: 11;cursor: pointer;" >Save</button>
+{:else}
+<button onclick={()=>{
+    window.location.href="/"
+}} style="position: absolute;right:0px;top:0px;z-index: 11;cursor: pointer;" >view</button>
 {/if}
 </div> 
 
