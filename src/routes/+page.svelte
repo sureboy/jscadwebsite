@@ -7,6 +7,7 @@ import Menu ,{menuConfig} from '$lib/Menu.svelte'
 import { runWorker } from "$lib/function/worker";
 import { showMenu } from "$lib/LoadGzFile.svelte";
 import { onMount } from 'svelte'; 
+//import aboutUs from '$lib/aboutUs.svelte'
 import {
     changeSolidConfig,
     loadLocalDBList,
@@ -73,6 +74,7 @@ const solidConfig:sConfig = $state({
     },
 }) 
 const initMenu = (windowConfig:windowConfigType)=>{
+    solidConfig.isVscode = (window as any).vscode?true:false
     solidConfig.workermsg  = Object.assign(menuConfig,{windowConfig})
 }
 onMount(()=>{
@@ -103,6 +105,8 @@ onMount(()=>{
 <Menu  {solidConfig}  >
     <FileMenu {myConfig} {solidConfig} ></FileMenu> 
 </Menu> 
+
+ 
  
  
  

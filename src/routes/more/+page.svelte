@@ -3,6 +3,7 @@ import db from '$lib/assets/data.json' assert { type: 'json' };
 import List from '$lib/List.svelte' 
 import type {itemType} from '$lib/List.svelte'
 import {myStorage} from '$lib/function/localdb'
+    import ShowAds from '$lib/ShowAds.svelte';
 
 const getLocalDBList =async ()=>{
     const localList =[] as itemType[]
@@ -26,4 +27,5 @@ const getLocalDBList =async ()=>{
 <h1>Local</h1>
    <List list={localList} ></List>  
 {/await}
+<ShowAds ></ShowAds>
 </div>

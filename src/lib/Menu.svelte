@@ -8,8 +8,8 @@ import {onWindowResize,switchView } from "./function/threeScene"
 import { changeWorker,runWorker } from "./function/worker";  
 import {cleanCurrentMsg} from "./function/ImportParser";
 import {MenuType,getRemoteUrl} from "./function/utils";
-//import { onMount } from 'svelte';
-// $state(undefined)
+
+ 
 export const menuConfig = { 
         cameraType:"Perspective", 
         module:(
@@ -24,6 +24,14 @@ export const menuConfig = {
 const {children,solidConfig }:{children:any,solidConfig:sConfig}  = $props(); 
 //const {solidConfig}:{solidConfig:sConfig} = $props() 
 //solidConfig.workermsg = Object.assign()
+//import { onMount } from 'svelte'; 
+import { onMount } from 'svelte';
+
+let docUrl = $state("docs.solidjscad.com")
+// $state(undefined)
+onMount(()=>{
+    docUrl = `docs.solidjscad.${window.location.host.endsWith("cn")?"cn":"com"}`
+})
 const handleView = new Map<string,()=>void>()
 handleView.set("camera",()=>{
     solidConfig.workermsg.cameraType = toggleCamera()
@@ -73,8 +81,12 @@ handleView.set("show",()=>{
     }}/></div>    
     </Options> 
     {/if}
-    <a style="color:white;cursor: pointer;height:48px;text-align: left;line-height: 48px;" target="_blank" href="{getRemoteUrl(solidConfig.workermsg?.windowConfig?.serverIP)}more">more</a>
-    <a style="color:white;cursor: pointer;height:48px;text-align: left;line-height: 48px;" target="_blank" href="https://docs.solidjscad.com">Docs</a>
+    <a style="color:white;cursor: pointer;height:48px;text-align: left;line-height: 48px;" 
+     target="_blank" 
+     href="{getRemoteUrl(solidConfig.workermsg?.windowConfig?.serverIP)}more">More</a>
+    <a style="color:white;cursor: pointer;height:48px;text-align: left;line-height: 48px;"
+     target="_blank"
+    href="https://{docUrl}">Docs</a>
 
 </div>
 {/if}

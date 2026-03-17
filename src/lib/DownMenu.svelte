@@ -5,6 +5,7 @@
   import type { sConfig } from './function/utils';
   import CodeFrom from './CodeFrom.svelte'
   import {createPng} from './function/localImg'
+  import ShowAds from './ShowAds.svelte';
   const { solidConfig }:{ solidConfig:sConfig} = $props();
  
   const downSrcClick = ()=>{
@@ -125,6 +126,8 @@
       {/if}
   
     </div>
+    
+    <ShowAds {solidConfig}></ShowAds>
 </details>
 
 

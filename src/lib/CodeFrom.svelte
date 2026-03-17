@@ -5,7 +5,9 @@ import { currentLocalDBConfig,getCodeGz } from "./function/localdb";
 import type { sConfig } from './function/utils';
 import {CodeWorker} from "./function/worker" 
 import {getRemoteUrl} from './function/utils'
+    
 const { solidConfig }:{ solidConfig:sConfig} = $props();
+
 let showInputCode:{
     key?:string,
     QRUrl?:string,
@@ -34,8 +36,8 @@ const showCaptchaCode = (captchaCode:any[] )=>{
 const uploadCodeClick = ()=>{
     //console.log(Date.now().toString(36))
     //if (!currentLocalDBConfig.path)return;
-    if (!(window as any).vscode)
-      if (!confirm(`warning!!! The [${currentLocalDBConfig.path||solidConfig.workermsg.windowConfig.name}] will be uploaded to the server cloud.`))return
+    if (!solidConfig.isVscode)
+      if (!confirm(`warning!!! The [${currentLocalDBConfig.path||solidConfig.workermsg.windowConfig.name}] will be uploaded to the server cloud. Time limit: 1 month.`))return
     fetch(`${getRemoteUrl(solidConfig.workermsg.windowConfig.serverIP)}code?${Date.now().toString()}`).then(r=>{
       if (!r.ok)return
       r.json().then(db=>{
@@ -51,7 +53,12 @@ const ISOToTimestamp = (expiration:string)=>{
 
 const checkInputCode =async ( )=>{  
     //showInputCode.expiration
-
+    if (!solidConfig.isVscode){
+      const safe = document.getElementById("safe") 
+      if (!safe || !(safe as HTMLInputElement).checked){
+        return
+      }
+    }
     const u = new URLSearchParams({
         code:showInputCode.code,
         //expiration:ISOToTimestamp(showInputCode.expiration ) ,
@@ -107,6 +114,14 @@ const checkInputCode =async ( )=>{
   <p>
     <label>Email: <input type="email" bind:value={showInputCode.email} placeholder="dimon@solidjscad.com" /> </label>
   </p>
+  {#if !solidConfig.isVscode}
+ 
+  <p><input type="checkbox" id="safe" name="PrivacyPolicy" >
+    I have read and agree to the
+    <a target="_blank" href="https://docs.solidjscad.{window.location.host.endsWith("cn")?"cn":"com"}/UserAgreement">User Agreement and  </a> 
+    <a target="_blank" href="https://docs.solidjscad.{window.location.host.endsWith("cn")?"cn":"com"}/PrivacyPolicy">Privacy Policy</a>
+    (Must be checked to upload)</p>
+  {/if}
   <p><button onclick={(e)=>{
     if (showInputCode.code && showInputCode.code.length===8)
       checkInputCode()
@@ -119,4 +134,5 @@ const checkInputCode =async ( )=>{
 {#if showInputCode.QRUrl}
 <p><img src="{showInputCode.QRUrl}" alt="qr" /></p>
 
-{/if}
+
+ {/if}
