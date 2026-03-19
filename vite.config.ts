@@ -5,7 +5,8 @@ export default defineConfig({
 	plugins: [
 		sveltekit()
 	] ,
-	 define: {
-    'process.type':  'renderer', 
-  }
+	optimizeDeps: {
+    	exclude: ['manifold-3d']
+  	},
+ 
 });
