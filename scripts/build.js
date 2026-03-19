@@ -52,7 +52,7 @@ async function main() {
     backupAndExcludeRoutes();
     
     // 执行构建
-    fs.rmSync('./package-lock.json')
+    //fs.rmSync('./package-lock.json')
     console.log('🔨 开始构建...');
     execSync('vite build', { stdio: 'inherit' });
     
