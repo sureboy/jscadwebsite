@@ -38,8 +38,8 @@
 		"@typescript/vfs": "^1.6.2",
 		"@valtown/codemirror-ts": "^2.3.1",
 		"cloudflare": "^5.2.0",
-		"codemirror": "^6.0.2", 
-		"manifold-3d": "file:./src/lib/manifold-3d",
+		"codemirror": "^6.0.2",
+		"manifold-3d": "^3.4.0",
 		"qrcode": "^1.5.4",
 		"three": "^0.183.1"
 	}

@@ -6,8 +6,7 @@
   "bin": {
     "manifold-cad": "bin/manifold-cad"
   },
-  "scripts": {
-    "prebuild": "api-extractor run -c api-extractor-manifold.json",
+  "scripts": { 
     "build": "tsc && node ./esbuild.mjs",
     "build:wasm": "mkdir -p ../../buildWASM && cd ../../buildWASM && emcmake cmake -DCMAKE_BUILD_TYPE=MinSizeRel .. && emmake make",
     "build:all": "npm run build && npm run build:editor && npm run build:examples",

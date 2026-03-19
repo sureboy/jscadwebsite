@@ -2,7 +2,7 @@
   import { onMount, onDestroy } from 'svelte';
   import * as THREE from 'three';
   import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-  import manifold from 'manifold-3d';
+  import manifold from '$lib/manifold-3d';
 
   // 容器引用
   let container;
