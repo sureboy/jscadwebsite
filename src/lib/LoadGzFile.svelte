@@ -67,6 +67,25 @@ const textDecoder = new TextDecoder();
 //export const fileList:string[] = $state([])
 //let show =$state(false)
 export let newPackageCode:string = `import modeling from '@jscad/modeling';
+import  manifold from './lib/manifold/manifold.js';
+export const manifold_main=async (opt)=>{ 
+    const Manifold = await  manifold()
+    Manifold.setup()
+    const box = Manifold.Manifold.cube([2, 2, 2]);
+    const sphere = Manifold.Manifold.sphere(1.2, 48); 
+    const sphereTranslated = sphere.translate([0.8, 0.8, 0.8]); 
+    const result = box.subtract(sphereTranslated); 
+
+    // 5. 获取三角网格数据
+    const meshData = result.getMesh();
+
+    // 6. 提取顶点和索引
+    const vertices = meshData.vertProperties// as TypedArray; // Float32Array
+    const indices = meshData.triVerts //as TypedArray;        // Uint32Array
+
+const option = Object.assign({size:10},opt)
+    return {vertices,indices}
+}
 export const main=(opt)=>{
     const option = Object.assign({size:10},opt)
     return [modeling.primitives.cube(option),option]
