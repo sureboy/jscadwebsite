@@ -38,23 +38,35 @@ const solidConfig:sConfig = $state({
                     )
                 }) 
             }else{
-                let p = e.path
-                if ( solidConfig.workermsg.windowConfig.includeImport ){
-                    p= solidConfig.workermsg.windowConfig.includeImport[e.path]||p
-                }
-                fetch(p).then(res=>{
-                    if (!res.ok){
-                        return
-                    }
-                    res.arrayBuffer().then(db=>{
+                 
+                if ( solidConfig.workermsg.windowConfig.includeImport && solidConfig.workermsg.windowConfig.includeImport[e.path] ){
+                    //let  p= solidConfig.workermsg.windowConfig.includeImport[e.path] 
+                    //console.log(p)
+                    fetch(solidConfig.workermsg.windowConfig.includeImport[e.path]).then(res=>{
+                        if (!res.ok){
+                            return
+                        }
+                        res.arrayBuffer().then(db=>{
+                            handleCurrentMsg({
+                                name:e.path,
+                                db},
+                                solidConfig.postMessage
+                            )
+                        })
+                    }).catch(()=>{
                         handleCurrentMsg({
                             name:e.path,
-                            db},
+                            },
                             solidConfig.postMessage
                         )
-                    })
-                })
-                
+                    }) 
+                } else{
+                    handleCurrentMsg({
+                        name:e.path,
+                        },
+                        solidConfig.postMessage
+                    )
+                }             
             }
         }
         if (e.type==="end"){

@@ -15,10 +15,7 @@ var Module = (() => {
     var ENVIRONMENT_IS_NODE = typeof process == 'object' &&
         typeof process.versions == 'object' &&
         typeof process.versions.node == 'string' && process.type != 'renderer';
-    if (ENVIRONMENT_IS_NODE) {
-      const {createRequire} = await import('node:module');
-      var require = createRequire(import.meta.url)
-    }
+ 
     var _ManifoldInitialized = false;
     Module.setup = function() {
       if (_ManifoldInitialized) return;
@@ -620,33 +617,7 @@ var Module = (() => {
       return scriptDirectory + path
     }
     var readAsync, readBinary;
-    if (ENVIRONMENT_IS_NODE) {
-      var fs = require('fs');
-      var nodePath = require('path');
-      if (!import.meta.url.startsWith('data:')) {
-        scriptDirectory =
-            nodePath.dirname(require('url').fileURLToPath(import.meta.url)) +
-            '/'
-      }
-      readBinary = filename => {
-        filename = isFileURI(filename) ? new URL(filename) : filename;
-        var ret = fs.readFileSync(filename);
-        return ret
-      };
-      readAsync = async (filename, binary = true) => {
-        filename = isFileURI(filename) ? new URL(filename) : filename;
-        var ret = fs.readFileSync(filename, binary ? undefined : 'utf8');
-        return ret
-      };
-      if (!Module['thisProgram'] && process.argv.length > 1) {
-        thisProgram = process.argv[1].replace(/\\/g, '/')
-      }
-      arguments_ = process.argv.slice(2);
-      quit_ = (status, toThrow) => {
-        process.exitCode = status;
-        throw toThrow
-      }
-    } else if (ENVIRONMENT_IS_WEB || ENVIRONMENT_IS_WORKER) {
+    if (ENVIRONMENT_IS_WEB || ENVIRONMENT_IS_WORKER) {
       if (ENVIRONMENT_IS_WORKER) {
         scriptDirectory = self.location.href
       } else if (typeof document != 'undefined' && document.currentScript) {

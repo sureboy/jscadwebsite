@@ -61,6 +61,8 @@ const getCsgObj = (v, back) => {
       return CSGSides2LineSegmentsVertices(v);
     }else if (geometries.path2.isA(v)) {
       return CSG2LineVertices(v);
+    }else if (v.vertices&&v.indices){
+      return v
     }else{
       back({ options:v });
     }

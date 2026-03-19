@@ -68,9 +68,20 @@ const getBaseUrl =async (config:windowConfigType,postMessage?:(e:any)=>void)=>{
     const {func,options,code} = e.data
     if ( func){ 
       try{
-        csg.getCsgObjArray(src[e.data.func](options),(msg)=>{
-          self.postMessage(msg)
-        }) 
+        const res = src[e.data.func](options)
+        if (res.then){
+          res.then(db=>{
+            csg.getCsgObjArray(db,(msg)=>{
+              self.postMessage(msg)
+            })
+          })
+        }else{
+           csg.getCsgObjArray(res,(msg)=>{
+              self.postMessage(msg)
+           })
+        }
+ 
+         
       }catch(e){
         console.error(e)
         self.postMessage({ 
@@ -89,11 +100,20 @@ const getBaseUrl =async (config:windowConfigType,postMessage?:(e:any)=>void)=>{
   }
   self.postMessage({module})
   try{
-    csg.getCsgObjArray(src[module.basename](),(msg)=>{
-      self.postMessage(msg)
-    }) 
+    const res = src[module.basename]()
+    if (res.then){
+      res.then(db=>{
+        csg.getCsgObjArray(db,(msg)=>{
+          self.postMessage(msg)
+        })
+      })
+    }else{
+      csg.getCsgObjArray(res,(msg)=>{
+        self.postMessage(msg)
+      })
+    } 
   }catch(e){
-  console.error(e)
+    console.error(e)
     self.postMessage({ 
       error:{
             message:e.message||"",

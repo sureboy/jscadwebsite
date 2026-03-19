@@ -8,12 +8,12 @@ import {
     LineSegments,
     Color,
     Vector3,
-    
 } from "three";  
-import type {MeshPhongMaterialParameters,LineBasicMaterialParameters,TypedArray,Matrix4,Matrix4Tuple} from "three"  ;
+import type {
+  MeshPhongMaterialParameters,LineBasicMaterialParameters,TypedArray,Matrix4,Matrix4Tuple} from "three"  ;
 export interface csgObj {
-    polygons:TypedArray
-    list:TypedArray,
+    polygons?:TypedArray
+    list?:TypedArray,
     vertices:TypedArray;
     indices?:TypedArray; 
     normals?:TypedArray;
@@ -83,6 +83,7 @@ export function CSG2Three(obj:csgObj , { smooth = false }) {
     //console.log(geo, material)
     switch (objType) {
       case 'mesh':
+        geo.computeVertexNormals();
         mesh = new Mesh(geo, material);
         break;
      // case 'instance':
