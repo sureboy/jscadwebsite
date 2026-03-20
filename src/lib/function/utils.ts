@@ -38,6 +38,7 @@ export const MenuType  = {
 }
 
 export type sConfig = {
+  showAd?:boolean,
   isVscode?:boolean,
   worker?: Worker,
   baseUrl?:string,

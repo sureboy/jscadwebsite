@@ -1,6 +1,7 @@
 <script lang="ts" >
   import { onMount } from 'svelte';
   import {initSolidPage} from './lib/ShowSolid.svelte';
+  import {handleCurrentMsg} from './lib/function/ImportParser'
   //import {MenuType} from './lib/function/utils'    
   import HandlePage,{solidConfig,handleMsg} from './lib/HandleMessagePage.svelte';
   //import {HandleMessageClass} from './lib/function/handleMessage' 
@@ -14,6 +15,22 @@
   }
   //solidConfig.oldMenu =MenuType.MainMenu|MenuType.Src | MenuType.Camera | MenuType.Gzip | MenuType.Png | MenuType.Stl;//  1 | (1<<1) | (1<<2) | (1<<3);
   solidConfig.postMessage = (e:{type:string,path?:string})=>{ 
+    if (e.path &&
+    solidConfig.workermsg.windowConfig.includeImport && 
+    solidConfig.workermsg.windowConfig.includeImport[e.path] ){
+        setTimeout(()=>{
+            handleCurrentMsg({
+                name:e.path,
+                //db:window.localStorage.getItem(e.path)
+              },
+                solidConfig.postMessage
+            ).getUri=async()=> new URL(
+                  solidConfig.workermsg.windowConfig.includeImport[e.path]   ,
+                  new URL(import.meta.url).origin).toString(); 
+             
+        }) 
+        return
+    }
     //console.log("post",e)
     fetch(getUrl("api") ,{
       method:"POST",
@@ -23,7 +40,7 @@
       },
     }).then(res=>{
       res.json().then(db=>{
-        console.log("get",db)
+        //console.log("get",db)
         if (db.type){
           handleMsg.HandleMessage(DecodeDB(db),solidConfig.postMessage)
         }

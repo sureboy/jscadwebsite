@@ -25,6 +25,7 @@ const myConfig:windowConfigType  = $state({
     //pageType:"run"
 }) 
 const solidConfig:sConfig = $state({ 
+    showAd:true,
     showMenu:0,
     postMessage:(e:{type:string,path?:string})=>{ 
         if (e.path){

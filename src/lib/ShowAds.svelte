@@ -10,7 +10,7 @@ const helpTip = [
 ]
 const getRandomElement = arr => arr[Math.floor(Math.random() * arr.length)];
 </script>
-{#if (!solidConfig?.isVscode)}
+{#if (solidConfig?.showAd)}
 <p>{getRandomElement(helpTip)}</p>
 <p><img src="{getRemoteUrl(solidConfig?.isVscode?solidConfig.workermsg.windowConfig.serverIP:undefined)}wxq.jpeg" alt="qr" width="150" /></p>
 {/if}
