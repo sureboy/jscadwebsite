@@ -28,46 +28,19 @@ const solidConfig:sConfig = $state({
     showMenu:0,
     postMessage:(e:{type:string,path?:string})=>{ 
         if (e.path){
-            const db = window.localStorage.getItem(e.path)
-            if (db){
-                setTimeout(()=>{ 
-                    handleCurrentMsg({
-                        name:e.path,
-                        db},
-                        solidConfig.postMessage
-                    )
-                }) 
-            }else{
-                 
-                if ( solidConfig.workermsg.windowConfig.includeImport && solidConfig.workermsg.windowConfig.includeImport[e.path] ){
-                    //let  p= solidConfig.workermsg.windowConfig.includeImport[e.path] 
-                    //console.log(p)
-                    fetch(solidConfig.workermsg.windowConfig.includeImport[e.path]).then(res=>{
-                        if (!res.ok){
-                            return
-                        }
-                        res.arrayBuffer().then(db=>{
-                            handleCurrentMsg({
-                                name:e.path,
-                                db},
-                                solidConfig.postMessage
-                            )
-                        })
-                    }).catch(()=>{
-                        handleCurrentMsg({
-                            name:e.path,
-                            },
-                            solidConfig.postMessage
-                        )
-                    }) 
-                } else{
-                    handleCurrentMsg({
-                        name:e.path,
-                        },
-                        solidConfig.postMessage
-                    )
-                }             
-            }
+            const db = window.localStorage.getItem(e.path)||undefined
+            setTimeout(()=>{
+                const cur = handleCurrentMsg({
+                    name: e.path,db
+                    },
+                    solidConfig.postMessage
+                )
+                if (!db && solidConfig.workermsg.windowConfig.includeImport  ){ 
+                    cur.getUri =async ()=>new URL(
+                        solidConfig.workermsg.windowConfig.includeImport[e.path] ||e.path ,
+                        new URL(import.meta.url).origin).toString();
+                }  
+            })
         }
         if (e.type==="end"){
             console.log("show 3d solid module end",currentLocalDBConfig)

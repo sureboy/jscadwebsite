@@ -27,7 +27,6 @@ const consoleLogEnd=`}catch(e){
 };`;
 
 const getBaseUrl =async (config:windowConfigType,postMessage?:(e:any)=>void)=>{
- 
   let workerObj:currentObj
   if (config.worker){ 
     if (!config.worker.startsWith("./")){

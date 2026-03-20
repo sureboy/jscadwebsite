@@ -198,4 +198,5 @@ export const handleCurrentMsg =(
     if (waitGetMap.has(message.name)){
         waitGetMap.get(message.name)(cur);  
     }
+    return cur
 };
