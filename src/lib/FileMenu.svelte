@@ -1,13 +1,21 @@
 <script lang="ts">
     //import modeling from '@jscad/modeling';
-    import type {windowConfigType,sConfig} from "./function/utils"
+    import type {sConfig} from "./function/utils"
     import {currentLocalDBConfig,cleanSolidConfig} from "./function/localdb"
     import LoadGzFile   from "./LoadGzFile.svelte";
-    import {currentMap}  from "./function/ImportParser"
+    //import {currentMap}  from "./function/ImportParser"
     //import { onMount } from 'svelte';
     //import {CodeWorker} from "./function/worker"
-    const { myConfig,solidConfig }: { myConfig: windowConfigType,solidConfig:sConfig } = $props(); 
- 
+    const { solidConfig }: { solidConfig:sConfig } = $props();  
+    function *getFileList(){ 
+        if (window.localStorage.length>0){
+            for (let i=0;i<window.localStorage.length;i++){
+                const k = window.localStorage.key(i)
+                if (k)
+                    yield k
+            }
+        }      
+    }
 </script>
 {#if solidConfig.showMenu!==0}
 <details    >
@@ -15,10 +23,9 @@
         {currentLocalDBConfig.path}
     </summary>
     <div  style="color:white;text-align: center;" id="module_list"> 
-        {#each currentMap as [f] }
-        <a class="btn"  href="/edit#{currentLocalDBConfig.getPathX()+f}" target="_blank"   >  {f}</a>  
+        {#each getFileList()  as f } 
+        <a class="btn"  href="/edit#{f}"     >  {f.split("*")[1]}</a>   
         {/each}
-        <a class="btn"  href="/edit#{currentLocalDBConfig.configName()}" target="_blank"   >  {currentLocalDBConfig.name}</a>
         <button onclick={(e)=>{
             console.log(e)
             if (!window.confirm(`The current data will be clean!!`)){
@@ -29,12 +36,12 @@
          
     </div> 
     <div  style="color:white;text-align: center;" id="module_list"> 
-        <LoadGzFile {myConfig} {solidConfig}></LoadGzFile>
+        <LoadGzFile  {solidConfig}></LoadGzFile>
     </div> 
 </details>
 
 {:else}
-<LoadGzFile {myConfig} {solidConfig}></LoadGzFile>
+<LoadGzFile   {solidConfig}></LoadGzFile>
 {/if}
 <style> 
 .btn {

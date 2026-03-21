@@ -24,8 +24,8 @@ export type windowConfigType =mainConfigType & {
 }
 export type workerConfigType = {
   //pageType?:'run'|'gzData'|'stlData', 
-  windowConfig?:windowConfigType,
-  options?:Object;
+  windowConfig?:mainConfigType,//windowConfigType,
+  options?:Object,
 } &menuConfigType 
 export const MenuType  = {
   MainMenu:1,

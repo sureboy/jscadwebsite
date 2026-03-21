@@ -11,8 +11,8 @@ import {
     currentLocalDBConfig,
     gzipCodeFromLocalStorage} from "./function/localdb"
 //    import { getOutputFileNames } from "typescript";
-const { myConfig,solidConfig }: { myConfig: windowConfigType,solidConfig:sConfig  } = $props(); 
-
+const { solidConfig }: {  solidConfig:sConfig  } = $props(); 
+   //const myConfig = solidConfig.workermsg.windowConfig
 let addClick:HTMLButtonElement;
 const analysisGzip =async ( fileName:string,data: ArrayBuffer)=>{    
     solidConfig.showMenu=0
@@ -27,7 +27,7 @@ const analysisGzip =async ( fileName:string,data: ArrayBuffer)=>{
 const readfile = (file:File)=>{
     //console.log(file )
     const reader = new FileReader();
-const textDecoder = new TextDecoder();
+    const textDecoder = new TextDecoder();
     reader.onload = (e) => {
         switch (file.type){
             case "text/javascript":
@@ -99,7 +99,14 @@ export const showMenu = MenuType.MainMenu | MenuType.Camera | MenuType.Gzip | Me
         case "":
             return;
         case "new":
-            myConfig.in = ""
+            gzipCodeFromLocalStorage().then(data=>{
+                if (data){
+                    myStorage.put(data.path,data.db)
+                }
+            })       
+            cleanCurrentMsg() 
+            window.localStorage.clear()
+            solidConfig.workermsg.windowConfig = undefined
             addClick.click();
             return;
         case "more":
@@ -137,38 +144,35 @@ type="file" onchange={(event)=>{
     
 }} />
 <button bind:this={addClick} onclick={()=>{
-    let fileName=""
-    if (!myConfig.in){
-        fileName="index"    
-    }
-    fileName= prompt("input file name",fileName)
+    //let fileName=""
+    //const myConfig = solidConfig.workermsg.windowConfig
+  
+    const fileName= prompt("input file name",solidConfig.workermsg.windowConfig?"":"index")
     if (!fileName){
         return
     }
-    if (!fileName.startsWith("./")){
-        fileName = "./"+fileName
+    let file_n = fileName
+    if (!file_n.startsWith("./")){
+        file_n = "./"+file_n
     }
-    if (!fileName.endsWith(".js")){
-        fileName += ".js"
+    if (!file_n.endsWith(".js")){
+        file_n += ".js"
     }
-    if (!myConfig.in){
-        gzipCodeFromLocalStorage().then(data=>{
-            if (data){
-                myStorage.put(data.path,data.db)
+    if (!solidConfig.workermsg.windowConfig){
+
+        const myConfig = solidConfig.workermsg.windowConfig = {
+            in : fileName,
+            name:"SolidJSCAD",
+            func:"main",
+            date : Date.now().toString(),
+            //files : [file_n],
+            includeImport:{
+            "@jscad/modeling": "./lib/modeling.esm.js",
+            "csgChange": "./lib/csgChange.js",
+            "manifold-3d":"./lib/manifold/manifold.js"
             }
-        })       
-        cleanCurrentMsg() 
-        window.localStorage.clear()
-        myConfig.in = fileName;
-        myConfig.name="SolidJSCAD"
-        myConfig.func="main"
-        myConfig.date = Date.now().toString()
-        myConfig.files = [fileName]
-        myConfig.includeImport={
-    "@jscad/modeling": "./lib/modeling.esm.js",
-    "csgChange": "./lib/csgChange.js",
-    "manifold-3d":"./lib/manifold/manifold.js"
-  }
+        }
+        
         //[func,in_,name,date]
         currentLocalDBConfig.path = [
                 myConfig.func,
@@ -177,13 +181,13 @@ type="file" onchange={(event)=>{
                 myConfig.date].join("_")
             
         window.localStorage.setItem(currentLocalDBConfig.configName(),JSON.stringify(myConfig,null,2))
-        window.localStorage.setItem(currentLocalDBConfig.getPathX()+fileName,newPackageCode)
+        window.localStorage.setItem(currentLocalDBConfig.getPathX()+file_n,newPackageCode)
         //mySolidTmp.update()
     }
      
 
     //console.log(fileName)
-    window.location.href = "/edit#"+currentLocalDBConfig.getPathX()+fileName
+    window.location.href = "/edit#"+currentLocalDBConfig.getPathX()+file_n
     //window.open("/edit#"+currentLocalDBConfig.getPathX()+fileName)
 
  

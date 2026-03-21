@@ -53,7 +53,7 @@ const unzipDB = async(name:string,data:ArrayBuffer|Array<any>,solidConfig:sConfi
         return
     }
     let obj:windowConfigType|undefined = undefined
-    const files:string[] = []  
+    //const files:string[] = []  
     currentLocalDBConfig.path =name 
     currentLocalDBConfig.paths = await myStorage.keys() 
     cleanCurrentMsg() 
@@ -66,22 +66,12 @@ const unzipDB = async(name:string,data:ArrayBuffer|Array<any>,solidConfig:sConfi
             obj = JSON.parse(msg.db) as windowConfigType
             return
         }
-        files.push(msg.name)
+        //files.push(msg.name)
         handleCurrentMsg(msg,solidConfig.postMessage||undefined)
     }) 
-    if (obj){        
-        if (!obj.files)obj.files=files
-    }else{
-        const plist = name.split("_")
-        if (plist.length>=4){
-            const [func,in_,name,date] = plist
-            obj =  {
-            func,in:in_,name,date ,files,worker:"" 
-            }
-            window.localStorage.setItem(currentLocalDBConfig.configName(),JSON.stringify(obj))
-        }else{ 
-            throw new Error('config err'); 
-        }
+    if (!obj){   
+        cleanSolidConfig()     
+      
     }
     
     return obj
@@ -94,7 +84,8 @@ const initName =async ()=>{
     if (window.location.hash){
         const p = window.location.hash.slice(1)
         //window.location.hash=""
-        clearHash()
+        if (/\_|\./.test(p))
+            clearHash()
         return p
     }
     if (window.localStorage.length>0){
@@ -118,11 +109,16 @@ const reloadDB =async (solidConfig:sConfig )=>{
     if (conf){ 
         const obj = JSON.parse(conf) as windowConfigType
         if (obj.files && obj.files.length>0){
-        obj.files.forEach((name)=>{
-            handleCurrentMsg({
-                name ,
-                db:window.localStorage.getItem(SolidPath+name)},solidConfig.postMessage)
-        })}else{
+            obj.files.forEach((name)=>{
+                handleCurrentMsg(
+                    {
+                        name ,
+                        db:window.localStorage.getItem(SolidPath+name)
+                    },
+                    solidConfig.postMessage
+                )
+            })
+        }else{
             obj.files=[]
             for (let i = 0;i<window.localStorage.length;i++){
                 const key = window.localStorage.key(i)
@@ -137,15 +133,25 @@ const reloadDB =async (solidConfig:sConfig )=>{
         }
         return obj       
     }else{
-        const data = await gzipCodeFromLocalStorage()
-        if (data){
-            myStorage.put(data.path,data.db)
+        if (window.confirm("Do you need to save the current data?")){
+            const data = await gzipCodeFromLocalStorage()
+            if (data){
+                myStorage.put(data.path,data.db)
+            }
         }
     }
     console.log(name)
     const db = await myStorage.get(name) 
     if (db){
-        return await unzipDB(name,db,solidConfig)  
+        //try{
+            return await unzipDB(name,db,solidConfig)  
+        //}catch(e){
+            //cleanSolidConfig()
+            //myStorage.del(name)
+            //console.error(e)
+            //return undefined
+        //}
+        
     }   
     const data =  await fetchGZBuffer(name)
     if (data)
@@ -223,13 +229,13 @@ export const getCodeGz =async (solidConfig:sConfig)=>{
     const current =await getCurrent(solidConfig.workermsg.windowConfig.worker||"./worker.js",solidConfig.postMessage)  
     console.log(solidConfig.workermsg?.windowConfig)
     let codeSrc = ""
-    solidConfig.workermsg.windowConfig.files = []
+    //solidConfig.workermsg.windowConfig.files = []
     await getCurrentCode( current,(name:string,code:string)=>{ 
         if (solidConfig.workermsg?.windowConfig?.includeImport && 
             solidConfig.workermsg?.windowConfig?.includeImport[name]){
                 return
             }
-        solidConfig.workermsg.windowConfig.files.push(name)
+        //solidConfig.workermsg.windowConfig.files.push(name)
     codeSrc +=`
 /**${name}*/
 ${code}

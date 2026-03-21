@@ -1,5 +1,5 @@
 <script lang="ts">
-import type {windowConfigType,sConfig} from "$lib/function/utils" 
+import type {sConfig} from "$lib/function/utils" 
 import ShowSolid,{initSolidPage}  from '$lib/ShowSolid.svelte';
 import { handleCurrentMsg }  from "$lib/function/ImportParser" 
 import FileMenu from "$lib/FileMenu.svelte";
@@ -14,21 +14,12 @@ import {
     currentLocalDBConfig
 } from "$lib/function/localdb" 
 import {imgStorage,createPng} from "$lib/function/localImg"
-const myConfig:windowConfigType  = $state({
-    port:0,
-    name:"",
-    func:"",
-    in:"",
-    src:"",
-    worker:"",
-    files:[]
-    //pageType:"run"
-}) 
 const solidConfig:sConfig = $state({ 
     showAd:true,
     showMenu:0,
     postMessage:(e:{type:string,path?:string})=>{ 
         if (e.path){
+            console.log(e.path)
             const db = window.localStorage.getItem(e.path)||undefined
             setTimeout(()=>{
                 const cur = handleCurrentMsg({
@@ -55,43 +46,54 @@ const solidConfig:sConfig = $state({
                     })
                 })
             }).catch(e=>{
-                
                 console.log("get err",e)
             })
         }
     },
 }) 
-const initMenu = (windowConfig:windowConfigType)=>{
+const initMenu = ( )=>{
     solidConfig.isVscode = (window as any).vscode?true:false
-    solidConfig.workermsg  = Object.assign(menuConfig,{windowConfig})
+    solidConfig.workermsg  = Object.assign(menuConfig,{windowConfig:{
+    port:0,
+    name:"",
+    func:"",
+    in:"",
+    src:"",
+    worker:"",
+    files:[]
+    //pageType:"run"
+}})
 }
 onMount(()=>{
     initSolidPage(solidConfig)
     //window.localStorage.getItem("")
-    initMenu(myConfig)
+    initMenu()
     loadLocalDBList().then(()=>{
         changeSolidConfig(solidConfig,showMenu) 
     }) 
     window.addEventListener("storage",(e)=>{
-        console.log("storage",e) 
+        //console.log("storage",e) 
         if (e.newValue 
             && e.key.startsWith(currentLocalDBConfig.getPathX()) 
             && !e.key.endsWith(currentLocalDBConfig.name)
         ){
-            handleCurrentMsg({name:e.key.split("*")[1] ,db:e.newValue},solidConfig.postMessage)
-            solidConfig.showMenu=showMenu
+            //console.log("save run")
+            const name = e.key.split("*")[1]
+            handleCurrentMsg({name,db:e.newValue},solidConfig.postMessage)
+            
+            solidConfig.showMenu=showMenu 
             runWorker(solidConfig) 
         } 
     }) 
 })
  
 </script>
-<svelte:head><title>{myConfig.name||"solidJSCAD"}</title></svelte:head>
+<svelte:head><title>{solidConfig.workermsg?.windowConfig?.name||"solidJSCAD"}</title></svelte:head>
 <ShowSolid></ShowSolid> 
  
  
 <Menu  {solidConfig}  >
-    <FileMenu {myConfig} {solidConfig} ></FileMenu> 
+    <FileMenu {solidConfig} ></FileMenu> 
 </Menu> 
 
  

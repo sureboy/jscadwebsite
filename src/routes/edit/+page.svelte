@@ -1,6 +1,7 @@
 <!-- src/routes/+page.svelte -->
 <script lang="ts" >
-    import CodeEditor ,{codeFile,initEdit} from '$lib/components/CodeEditor.svelte';
+  import {codeFile} from '$lib/function/menuPanel'
+    import CodeEditor ,{initEdit} from '$lib/CodeEditor.svelte';
     import { onMount } from 'svelte';
     
     //let codeFile = $state({title:"edit",value:"test"});
