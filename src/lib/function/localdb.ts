@@ -14,7 +14,7 @@ export const myStorage = new IndexedDBStorage('solidjscad', 'gzfile');
  
 //export const tmpSolidConfig ={tmp:"solidjscad.json",conf:{}}
 export const  currentLocalDBConfig:{
-    paths?:string[],
+    //paths?:string[],
     name:string,
     path?:string,
     configName():string,
@@ -55,7 +55,7 @@ const unzipDB = async(name:string,data:ArrayBuffer|Array<any>,solidConfig:sConfi
     let obj:windowConfigType|undefined = undefined
     //const files:string[] = []  
     currentLocalDBConfig.path =name 
-    currentLocalDBConfig.paths = await myStorage.keys() 
+    //currentLocalDBConfig.paths = await myStorage.keys() 
     cleanCurrentMsg() 
     window.localStorage.clear()
     //mySolidTmp.update()
@@ -101,39 +101,21 @@ const reloadDB =async (solidConfig:sConfig )=>{
     const name = currentLocalDBConfig.path
     if (!name){ 
         return undefined
-    }
-    
-    const SolidPath =currentLocalDBConfig.getPathX()// name +"*"
-    const confPath =currentLocalDBConfig.configName()// SolidPath+currentLocalDBConfig.name
+    } 
+    const confPath = currentLocalDBConfig.configName() 
     const conf  = window.localStorage.getItem(confPath)
     if (conf){ 
-        const obj = JSON.parse(conf) as windowConfigType
-        if (obj.files && obj.files.length>0){
-            obj.files.forEach((name)=>{
-                handleCurrentMsg(
-                    {
-                        name ,
-                        db:window.localStorage.getItem(SolidPath+name)
-                    },
-                    solidConfig.postMessage
-                )
-            })
-        }else{
-            obj.files=[]
-            for (let i = 0;i<window.localStorage.length;i++){
-                const key = window.localStorage.key(i)
-                if (key.startsWith(SolidPath) && key !== confPath){
-                    obj.files.push(key.split("*")[1]) 
-                    handleCurrentMsg({
-                        name ,
-                        db:window.localStorage.getItem(key)},solidConfig.postMessage)
-                }
-            }
-            window.localStorage.setItem(confPath,JSON.stringify(obj,null,2))
-        }
+        const obj = JSON.parse(conf) as windowConfigType 
+        for (let i = 0;i<window.localStorage.length;i++){
+            const key = window.localStorage.key(i) 
+                handleCurrentMsg({
+                    name:key.split("*")[1] ,
+                    db:window.localStorage.getItem(key)
+                },solidConfig.postMessage) 
+        } 
         return obj       
-    }else{
-        if (window.confirm("Do you need to save the current data?")){
+    }else if (window.localStorage.length>0){
+        if (window.confirm(`Save the [${window.localStorage.key(0).split("*")[0]}] ?`)){
             const data = await gzipCodeFromLocalStorage()
             if (data){
                 myStorage.put(data.path,data.db)
@@ -142,16 +124,8 @@ const reloadDB =async (solidConfig:sConfig )=>{
     }
     console.log(name)
     const db = await myStorage.get(name) 
-    if (db){
-        //try{
-            return await unzipDB(name,db,solidConfig)  
-        //}catch(e){
-            //cleanSolidConfig()
-            //myStorage.del(name)
-            //console.error(e)
-            //return undefined
-        //}
-        
+    if (db){ 
+        return await unzipDB(name,db,solidConfig)   
     }   
     const data =  await fetchGZBuffer(name)
     if (data)
@@ -174,8 +148,8 @@ export const changeSolidConfig = (solidConfig:sConfig,showMenu:number)=>{
  
 export const loadLocalDBList  =async ( )=>{
     //solidConfig_ = solidConfig
-    currentLocalDBConfig.path =await initName()
-    currentLocalDBConfig.paths = await myStorage.keys() 
+    //currentLocalDBConfig.paths = await myStorage.keys() 
+    currentLocalDBConfig.path = await initName() 
 }
 export const gzipCodeFromLocalStorage =async ()=>{
     if (window.localStorage.length===0){
@@ -225,7 +199,6 @@ export const getCodeGz_ =async (solidConfig:sConfig)=>{
 }
 */
 export const getCodeGz =async (solidConfig:sConfig)=>{  
-    
     const current =await getCurrent(solidConfig.workermsg.windowConfig.worker||"./worker.js",solidConfig.postMessage)  
     console.log(solidConfig.workermsg?.windowConfig)
     let codeSrc = ""

@@ -22,8 +22,7 @@ const analysisGzip =async ( fileName:string,data: ArrayBuffer)=>{
     Object.assign(solidConfig.workermsg,{windowConfig}) 
     solidConfig.showMenu=showMenu
     runWorker(solidConfig ); 
-}
-
+} 
 const readfile = (file:File)=>{
     //console.log(file )
     const reader = new FileReader();
@@ -126,9 +125,15 @@ export const showMenu = MenuType.MainMenu | MenuType.Camera | MenuType.Gzip | Me
 }}>
     <option value="">--</option>
     <option value="new">New project</option>
-    {#each currentLocalDBConfig.paths as p}
+    {#await myStorage.keys() then paths }
+        
+   
+        
+    
+    {#each paths as p}
         <option value={p} >{p}</option>
     {/each}
+    {/await}
     <option value="more">...more</option>
     
 </select>
