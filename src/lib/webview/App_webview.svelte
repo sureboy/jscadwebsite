@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { initSolidPage} from './lib/ShowSolid.svelte';
-    import {handleCurrentMsg} from './lib/function/ImportParser'
+  import { initSolidPage} from '../components/ShowSolid.svelte';
+    import {handleCurrentMsg} from '../function/ImportParser'
   //import {HandleMessageClass} from './lib/function/handleMessage' 
   import HandlePage,
   { 
@@ -9,7 +9,7 @@
     //HandleMessage,
     //Direction,
     solidConfig  
-  } from './lib/HandleMessagePage.svelte'; 
+  } from '../webview/HandleMessagePage.svelte'; 
 
   solidConfig.showMenu = -1
   onMount(() => {    
@@ -18,8 +18,8 @@
     solidConfig.postMessage =(e:{type:string,path?:string})=>{
       console.log("new post msg")
         if (e.path &&
-    solidConfig.workermsg.windowConfig.includeImport && 
-    solidConfig.workermsg.windowConfig.includeImport[e.path]   ){
+    //solidConfig.includeImport && 
+    solidConfig.includeImport[e.path]   ){
        setTimeout(()=>{
             handleCurrentMsg({
                 name:e.path,
@@ -27,8 +27,10 @@
               },
                 solidConfig.postMessage
             ).getUri=async()=> new URL(
-                  solidConfig.workermsg.windowConfig.includeImport[e.path]   ,
-                  `http://localhost:${solidConfig.workermsg.windowConfig.port}`).toString();
+                  solidConfig.includeImport[e.path]   ,
+                  new URL(import.meta.url).origin
+                  //`http://localhost:${solidConfig.workermsg.windowConfig.port}`
+                ).toString();
              
         }) 
       return

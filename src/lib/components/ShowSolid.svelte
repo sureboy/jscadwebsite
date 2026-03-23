@@ -1,7 +1,7 @@
 <script lang="ts" module >
 import { createCanvasElement } from "three";
-import {onWindowResize } from "./function/threeScene" 
-import type { sConfig } from './function/utils';
+import {onWindowResize } from "../function/threeScene" 
+import type { sConfig } from '../function/utils';
 
 let container:HTMLElement;  
 

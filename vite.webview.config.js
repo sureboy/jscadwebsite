@@ -11,7 +11,7 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       input: {
-        main: path.resolve(__dirname, 'src/main.js')
+        main: path.resolve(__dirname, 'src/lib/webview/main.js')
       },
       output: {
         dir:outDir,
@@ -25,7 +25,7 @@ export default defineConfig({
       plugins: [
         copy({
           targets: [
-            { src: 'src/index.html', dest: outDir }  // 将 index.html 复制到 dist 目录
+            { src: 'src/lib/webview/index.html', dest: outDir }  // 将 index.html 复制到 dist 目录
           ],
           hook: 'writeBundle',
         })

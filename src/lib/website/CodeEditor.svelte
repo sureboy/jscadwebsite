@@ -7,7 +7,7 @@ import {  basicSetup } from 'codemirror';
 import { EditorView, keymap } from '@codemirror/view';
 import { javascript,snippets } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark'; 
-import {helpPanel,codeFile} from '$lib/function/menuPanel'
+import {helpPanel,codeFile} from '$lib/website/menuPanel'
 //import {indentWithTab} from "@codemirror/commands"
 
  

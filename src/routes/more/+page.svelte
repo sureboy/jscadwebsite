@@ -1,9 +1,9 @@
 <script lang="ts">
 import db from '$lib/assets/data.json' assert { type: 'json' }; 
-import List from '$lib/List.svelte' 
-import type {itemType} from '$lib/List.svelte'
-import {myStorage} from '$lib/function/localdb'
-    import ShowAds from '$lib/ShowAds.svelte';
+import List from '$lib/website/List.svelte' 
+import type {itemType} from '$lib/website/List.svelte'
+import {myStorage} from '$lib/website/localdb'
+import ShowAds from '$lib/components/ShowAds.svelte';
 
 const getLocalDBList =async ()=>{
     const localList =[] as itemType[]

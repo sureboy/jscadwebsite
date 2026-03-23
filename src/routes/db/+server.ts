@@ -1,5 +1,5 @@
 import type { RequestHandler } from './$types';  
-import {kvdbGet} from '$lib/function/kvdb'
+import {kvdbGet} from '$lib/website/kvdb'
 import { error } from '@sveltejs/kit';
 export const GET:RequestHandler=async (e) => {
     //e.platform?.env.solidtmp

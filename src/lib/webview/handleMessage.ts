@@ -1,9 +1,9 @@
-import type { sConfig,windowConfigType,menuConfigType} from './utils';
-import type {messageObj} from "./ImportParser"
-import { runWorker } from "./worker";
-import { addSceneSTL} from "./threeScene" 
-import {gzipToString,srcStringToFile,MenuType} from "./utils"
-import {delCurrentMsg,handleCurrentMsg,getCurrent,getCurrentCode}  from "./ImportParser"
+import type { sConfig,menuConfigType} from '../function/utils';
+import type {messageObj} from "../function/ImportParser"
+import { runWorker, getWorkerName } from "../function/worker";
+import { addSceneSTL} from "../function/threeScene" 
+import {gzipToString,srcStringToFile,MenuType} from "../function/utils"
+import {delCurrentMsg,handleCurrentMsg,getCurrent,getCurrentCode}  from "../function/ImportParser"
 import {STLLoader} from "three/addons/loaders/STLLoader.js" 
 type  handlePostMsg = (msg:any,postMessage?: (e: {name:string,db:string|ArrayBuffer,open:boolean}) => void)=>void
 export  class HandleMessageClass {
@@ -33,7 +33,7 @@ export  class HandleMessageClass {
     }
     begin:{name:string,fn:handlePostMsg} ={
         name:"begin",
-        fn:(msg:{config:windowConfigType} ,
+        fn:(msg:{config:menuConfigType} ,
         postMessage?: (e: any) => void) =>{ 
             //console.log("begin",this.solidConfig)
             if (!this.solidConfig.workermsg){
@@ -68,7 +68,7 @@ export  class HandleMessageClass {
         fn:(msg:{name?:string},postMessage?: (e: any) => void) =>{
             //console.log("getsrc",solidConfig.workermsg.worker)
             //console.log("getsrc")
-            getCurrent(this.solidConfig.workermsg.windowConfig.worker,postMessage).then(
+            getCurrent(getWorkerName(this.solidConfig.workermsg.windowConfig),postMessage).then(
             current=>{
                 console.log("getsrc",current)
                 getCurrentCode(current,(name:string,db:string)=>{ 

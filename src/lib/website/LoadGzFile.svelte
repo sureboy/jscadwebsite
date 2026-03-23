@@ -1,15 +1,15 @@
 <script lang="ts"> 
-import type {windowConfigType,sConfig} from "./function/utils"
-import {handleCurrentMsg,cleanCurrentMsg}  from "./function/ImportParser"
-import { runWorker } from "./function/worker";
-import {MenuType} from "./function/utils"
-import { addSceneSTL,startSceneOBJ} from "./function/threeScene" 
+import type {sConfig} from "../function/utils"
+import {handleCurrentMsg,cleanCurrentMsg}  from "../function/ImportParser"
+import { runWorker } from "../function/worker";
+import {MenuType} from "../function/utils"
+import { addSceneSTL,startSceneOBJ} from "../function/threeScene" 
 import {STLLoader} from "three/addons/loaders/STLLoader.js" 
 import {
     myStorage,
     analysisGzipDB,
     currentLocalDBConfig,
-    gzipCodeFromLocalStorage} from "./function/localdb"
+    gzipCodeFromLocalStorage} from "./localdb"
 //    import { getOutputFileNames } from "typescript";
 const { solidConfig }: {  solidConfig:sConfig  } = $props(); 
    //const myConfig = solidConfig.workermsg.windowConfig
@@ -17,8 +17,13 @@ let addClick:HTMLButtonElement;
 const analysisGzip =async ( fileName:string,data: ArrayBuffer)=>{    
     solidConfig.showMenu=0
     const p = fileName.split(".")[0] 
+    console.log(fileName,p)
     let windowConfig =await analysisGzipDB(p,data,solidConfig) 
-    if (!windowConfig)return 
+    console.log(windowConfig)
+    if (!windowConfig){
+        
+        return
+    } 
     Object.assign(solidConfig.workermsg,{windowConfig}) 
     solidConfig.showMenu=showMenu
     runWorker(solidConfig ); 
@@ -170,12 +175,13 @@ type="file" onchange={(event)=>{
             name:"SolidJSCAD",
             func:"main",
             date : Date.now().toString(),
+            /*
             //files : [file_n],
             includeImport:{
             "@jscad/modeling": "./lib/modeling.esm.js",
             "csgChange": "./lib/csgChange.js",
             "manifold-3d":"./lib/manifold/manifold.js"
-            }
+            }*/
         }
         
         //[func,in_,name,date]

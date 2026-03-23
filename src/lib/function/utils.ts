@@ -6,20 +6,25 @@ export type menuConfigType = {
       basename: string;
   }) => void;
 }
-type mainConfigType = {
+export const includeImport = {
+  "@jscad/modeling": "./lib/modeling.esm.js",
+  "csgChange": "./lib/csgChange.js",
+  "manifold-3d":"./lib/manifold/manifold.js"
+}
+export type mainConfigType = {
   src?:string,
   name: string,
   func?: string,
   in?: string,
   date?:string,
   port?:number,
-  worker?:string,
-  webview?:boolean,
-  webUI?:string,
-  serverIP?:string[],
-  includeImport?:{ [key: string]: string }
+  //worker?:string,
+  //webview?:boolean,
+  //webUI?:string,
+  //serverIP?:string[],
+  //includeImport?:{ [key: string]: string }
 }
-export type windowConfigType =mainConfigType & {
+type windowConfigType =mainConfigType & {
   files:string[];
 }
 export type workerConfigType = {
@@ -38,6 +43,7 @@ export const MenuType  = {
 }
 
 export type sConfig = {
+  includeImport:{ [key: string]: string }
   showAd?:boolean,
   isVscode?:boolean,
   worker?: Worker,

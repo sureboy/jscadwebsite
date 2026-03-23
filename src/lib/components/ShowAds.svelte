@@ -1,6 +1,6 @@
 <script lang="ts">
-import type { sConfig } from './function/utils'; 
-import {getRemoteUrl} from './function/utils'
+import type { sConfig } from '../function/utils'; 
+import {getRemoteUrl} from '../function/utils'
 
 const { solidConfig }:{ solidConfig?:sConfig} = $props();
 const helpTip = [

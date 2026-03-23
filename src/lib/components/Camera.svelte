@@ -13,7 +13,7 @@ export function toggleCamera() {
 }
 </script>
 <script lang="ts" >
-  import { HelperGroupChange} from "./function/threeScene" 
+  import { HelperGroupChange} from "../function/threeScene" 
   let {Clickhandle}:{Clickhandle:(name:string)=>void} = $props()
 
   let inputCheckBoxStruct = HelperGroupChange(3)

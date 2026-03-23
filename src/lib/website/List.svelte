@@ -10,7 +10,7 @@
     }
 </script>
 <script lang="ts">
-import {imgStorage} from "$lib/function/localImg"
+import {imgStorage} from "$lib/website/localImg"
 
 
 let { list }: { list:itemType[]}  = $props();

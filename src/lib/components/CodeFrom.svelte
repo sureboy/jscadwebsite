@@ -1,10 +1,10 @@
 <script lang="ts">
 import QRCode from 'qrcode';
 import modeling from '@jscad/modeling'; 
-import { currentLocalDBConfig,getCodeGz } from "./function/localdb";
-import type { sConfig } from './function/utils';
-import {CodeWorker} from "./function/worker" 
-import {getRemoteUrl} from './function/utils'
+//import { currentLocalDBConfig,getCodeGz } from "../website/localdb";
+import type { sConfig } from '../function/utils';
+import {CodeWorker,getCodeGz} from "../function/worker" 
+import {getRemoteUrl} from '../function/utils'
     
 const { solidConfig }:{ solidConfig:sConfig} = $props();
 
@@ -37,7 +37,7 @@ const uploadCodeClick = ()=>{
     //console.log(Date.now().toString(36))
     //if (!currentLocalDBConfig.path)return;
     if (!solidConfig.isVscode)
-      if (!confirm(`warning!!! The [${currentLocalDBConfig.path||solidConfig.workermsg.windowConfig.name}] will be uploaded to the server cloud. Time limit: 1 month.`))return
+      if (!confirm(`warning!!! The [${solidConfig.workermsg.windowConfig.name}] will be uploaded to the server cloud. Time limit: 1 month.`))return
     fetch(`${getRemoteUrl(solidConfig.workermsg.windowConfig.serverIP)}code?${Date.now().toString()}`).then(r=>{
       if (!r.ok)return
       r.json().then(db=>{

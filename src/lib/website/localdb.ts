@@ -1,14 +1,14 @@
 import {gzipToString,srcStringToFile,
-    clearHash,stringToGzip,fetchGZBuffer
-} from "./utils"
-import type {windowConfigType,sConfig} from "./utils"
+    clearHash,stringToGzip,fetchGZBuffer,includeImport
+} from "../function/utils"
+import type {mainConfigType,sConfig} from "../function/utils"
 import {
     handleCurrentMsg,
     cleanCurrentMsg,
     getCurrent,
     getCurrentCode
-}  from "./ImportParser"
-import { runWorker } from "./worker";
+}  from "../function/ImportParser"
+import { runWorker,getWorkerName } from "../function/worker";
 import {IndexedDBStorage} from "./IndexedDBStorage"
 export const myStorage = new IndexedDBStorage('solidjscad', 'gzfile');
  
@@ -49,10 +49,12 @@ const unzipDB = async(name:string,data:ArrayBuffer|Array<any>,solidConfig:sConfi
             v =new TextDecoder().decode(data)
         }
     }    
-    if (!v ){         
+    if (!v ){      
+        //console.log("gzipTostring err")   
         return
     }
-    let obj:windowConfigType|undefined = undefined
+    console.log(v)
+    let obj:mainConfigType|undefined = undefined
     //const files:string[] = []  
     currentLocalDBConfig.path =name 
     //currentLocalDBConfig.paths = await myStorage.keys() 
@@ -63,14 +65,14 @@ const unzipDB = async(name:string,data:ArrayBuffer|Array<any>,solidConfig:sConfi
         window.localStorage.setItem(currentLocalDBConfig.getPathX()+msg.name,msg.db) 
         //window.localStorage.setItem( msg.name,msg.db) 
         if (msg.name===currentLocalDBConfig.name){
-            obj = JSON.parse(msg.db) as windowConfigType
+            obj = JSON.parse(msg.db) as mainConfigType
             return
         }
         //files.push(msg.name)
         handleCurrentMsg(msg,solidConfig.postMessage||undefined)
     }) 
     if (!obj){   
-        cleanSolidConfig()     
+        //cleanSolidConfig()     
       
     }
     
@@ -105,7 +107,7 @@ const reloadDB =async (solidConfig:sConfig )=>{
     const confPath = currentLocalDBConfig.configName() 
     const conf  = window.localStorage.getItem(confPath)
     if (conf){ 
-        const obj = JSON.parse(conf) as windowConfigType 
+        const obj = JSON.parse(conf) as mainConfigType 
         for (let i = 0;i<window.localStorage.length;i++){
             const key = window.localStorage.key(i) 
                 handleCurrentMsg({
@@ -140,7 +142,7 @@ export const changeSolidConfig = (solidConfig:sConfig,showMenu:number)=>{
             window.alert("not data")
             return
         }
-        Object.assign(solidConfig.workermsg,{windowConfig}) 
+        Object.assign(solidConfig.workermsg.windowConfig,windowConfig,{includeImport}) 
         solidConfig.showMenu=showMenu 
         runWorker(solidConfig)
     })
@@ -170,73 +172,4 @@ ${src}`
     return {db :await stringToGzip(codeSrc),path}
 }
  
-export const getCodeGzFromLocalStorage_ =()=>{
-    const confStr = window.localStorage.getItem(currentLocalDBConfig.configName())
-    if (!confStr)return
-    const conf = JSON.parse(confStr) as windowConfigType
-    if (!conf.files)return;
-    const p = currentLocalDBConfig.getPathX()
-    let codeSrc = `
-/**${currentLocalDBConfig.name}*/
-${confStr}
-` 
-    conf.files.forEach((name)=>{
-        const code = window.localStorage.getItem(p+name)
-        codeSrc +=`
-/**${name}*/
-${code}
-`
-    })
-    return stringToGzip(codeSrc)
-}
-/*
-export const getCodeGz_ =async (solidConfig:sConfig)=>{ 
-    const data =await gzipCodeFromLocalStorage()
-    if (data)
-        return new Blob(data.db, { type: 'application/gzip' })
-    else
-        return await getCodeGz (solidConfig)
-}
-*/
-export const getCodeGz =async (solidConfig:sConfig)=>{  
-    const current =await getCurrent(solidConfig.workermsg.windowConfig.worker||"./worker.js",solidConfig.postMessage)  
-    console.log(solidConfig.workermsg?.windowConfig)
-    let codeSrc = ""
-    //solidConfig.workermsg.windowConfig.files = []
-    await getCurrentCode( current,(name:string,code:string)=>{ 
-        if (solidConfig.workermsg?.windowConfig?.includeImport && 
-            solidConfig.workermsg?.windowConfig?.includeImport[name]){
-                return
-            }
-        //solidConfig.workermsg.windowConfig.files.push(name)
-    codeSrc +=`
-/**${name}*/
-${code}
-`  
-    })
-
-    codeSrc +=`
-/**${currentLocalDBConfig.name}*/
-${JSON.stringify(solidConfig.workermsg.windowConfig,null,2)}
-`
-//${window.localStorage.getItem(currentLocalDBConfig.configName())}
-//` 
-console.log("getCodeGz",solidConfig.workermsg.windowConfig)
-    const chunks = await stringToGzip(codeSrc)
-    return new Blob(chunks, { type: 'application/gzip' });
-}
-/*
-const postSrcMsg = (solidConfig:sConfig,e:{ path?:string})=>{
-    if (e.path){
-
-    fetch( 
-        e.path.replace(/^\.\//,`./${solidConfig.workermsg.windowConfig.src}/`) )
-        .then(f=>{
-            f.text().then(db=>{
-                handleCurrentMsg({name:e.path,db},(e)=>{
-                    postSrcMsg(solidConfig,e)
-                })
-            })
-        })
-    }
-}*/
+  

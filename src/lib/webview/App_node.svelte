@@ -1,9 +1,9 @@
 <script lang="ts" >
   import { onMount } from 'svelte';
-  import {initSolidPage} from './lib/ShowSolid.svelte';
-  import {handleCurrentMsg} from './lib/function/ImportParser'
+  import {initSolidPage} from '../components/ShowSolid.svelte';
+  import {handleCurrentMsg} from '../function/ImportParser'
   //import {MenuType} from './lib/function/utils'    
-  import HandlePage,{solidConfig,handleMsg} from './lib/HandleMessagePage.svelte';
+  import HandlePage,{solidConfig,handleMsg} from './HandleMessagePage.svelte';
   //import {HandleMessageClass} from './lib/function/handleMessage' 
   // const handleMsg =new HandleMessageClass(solidConfig)
   type msgType = {type:number,msg?:{name:string,db?:string|ArrayBuffer}}
@@ -15,9 +15,8 @@
   }
   //solidConfig.oldMenu =MenuType.MainMenu|MenuType.Src | MenuType.Camera | MenuType.Gzip | MenuType.Png | MenuType.Stl;//  1 | (1<<1) | (1<<2) | (1<<3);
   solidConfig.postMessage = (e:{type:string,path?:string})=>{ 
-    if (e.path &&
-    solidConfig.workermsg.windowConfig.includeImport && 
-    solidConfig.workermsg.windowConfig.includeImport[e.path] ){
+    if (e.path && 
+    solidConfig.includeImport[e.path] ){
         setTimeout(()=>{
             handleCurrentMsg({
                 name:e.path,
@@ -25,7 +24,7 @@
               },
                 solidConfig.postMessage
             ).getUri=async()=> new URL(
-                  solidConfig.workermsg.windowConfig.includeImport[e.path]   ,
+                  solidConfig.includeImport[e.path]   ,
                   new URL(import.meta.url).origin).toString(); 
              
         }) 

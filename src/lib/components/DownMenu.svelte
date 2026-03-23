@@ -1,10 +1,10 @@
 <script lang="ts" >
-  import { Exporter} from "./function/threeScene" 
-  import {getCodeGz} from "./function/localdb"   
-  import { MenuType } from "./function/utils";
-  import type { sConfig } from './function/utils';
+  import { Exporter} from "../function/threeScene" 
+  import {getCodeGz} from "../function/worker"   
+  import { MenuType } from "../function/utils";
+  import type { sConfig } from '../function/utils';
   import CodeFrom from './CodeFrom.svelte'
-  import {createPng} from './function/localImg'
+  import {createPng} from '../website/localImg'
   import ShowAds from './ShowAds.svelte';
   const { solidConfig }:{ solidConfig:sConfig} = $props();
  

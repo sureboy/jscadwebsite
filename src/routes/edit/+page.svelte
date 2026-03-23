@@ -1,7 +1,7 @@
 <!-- src/routes/+page.svelte -->
 <script lang="ts" >
-  import {codeFile} from '$lib/function/menuPanel'
-  import CodeEditor ,{initEdit} from '$lib/CodeEditor.svelte';
+  import {codeFile} from '$lib/website/menuPanel'
+  import CodeEditor ,{initEdit} from '$lib/website/CodeEditor.svelte';
   import { onMount } from 'svelte';
   onMount(() => {
     if (window.location.hash){

@@ -1,13 +1,13 @@
 <script lang="ts" module >
-import type { sConfig,menuConfigType } from './function/utils';
+import type { sConfig,menuConfigType } from '../function/utils';
 import Options from "./OptionsMenu.svelte"
 import DownMenu from "./DownMenu.svelte";
 import MainMenu,{moduleInit} from "./MainMenu.svelte"; 
 import Camera,{toggleCamera,initView} from "./Camera.svelte"; 
-import {onWindowResize,switchView } from "./function/threeScene" 
-import { changeWorker,runWorker } from "./function/worker";  
-import {cleanCurrentMsg} from "./function/ImportParser";
-import {MenuType,getRemoteUrl} from "./function/utils";
+import {onWindowResize,switchView } from "../function/threeScene" 
+import { changeWorker,runWorker } from "../function/worker";  
+import {cleanCurrentMsg} from "../function/ImportParser";
+import {MenuType,getRemoteUrl} from "../function/utils";
 
  
 export const menuConfig = { 

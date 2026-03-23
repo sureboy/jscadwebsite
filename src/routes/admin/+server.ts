@@ -1,6 +1,6 @@
 import type { RequestHandler } from './$types'; 
 import { json,error } from '@sveltejs/kit';
-import {kvdbGet,kvdbDel} from '$lib/function/kvdb'
+import {kvdbGet,kvdbDel} from '$lib/website/kvdb'
 import * as fs from "fs"
 import * as path from "path"
 import listdb from '$lib/assets/data.json' assert { type: 'json' }; 

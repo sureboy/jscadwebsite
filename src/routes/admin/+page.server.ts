@@ -1,5 +1,5 @@
 import type { PageServerLoad } from './$types';  
-import {kvdbList} from '$lib/function/kvdb'
+import {kvdbList} from '$lib/website/kvdb'
 import db from '$lib/assets/data.json' assert { type: 'json' }; 
 const items = db.list.map(l=>l.update)
 export const load: PageServerLoad = async ({ params,url,platform }) => { 

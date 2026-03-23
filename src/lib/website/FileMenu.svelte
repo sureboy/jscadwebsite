@@ -1,7 +1,7 @@
 <script lang="ts">
     //import modeling from '@jscad/modeling';
-    import type {sConfig} from "./function/utils"
-    import {currentLocalDBConfig,cleanSolidConfig} from "./function/localdb"
+    import type {sConfig} from "../function/utils"
+    import {currentLocalDBConfig,cleanSolidConfig} from "./localdb"
     import LoadGzFile   from "./LoadGzFile.svelte";
     //import {currentMap}  from "./function/ImportParser"
     //import { onMount } from 'svelte';
@@ -11,10 +11,12 @@
         if (window.localStorage.length>0){
             for (let i=0;i<window.localStorage.length;i++){
                 const k = window.localStorage.key(i)
-                if (k)
-                    yield k
+                if (k){
+                    const [_,name] = k.split("*") 
+                    yield  [k,name]
+                }
             }
-        }      
+        }   
     }
 </script>
 {#if solidConfig.showMenu!==0}
@@ -23,8 +25,8 @@
         {currentLocalDBConfig.path}
     </summary>
     <div  style="color:white;text-align: center;" id="module_list"> 
-        {#each getFileList()  as f } 
-        <a class="btn"  href="/edit#{f}"     >  {f.split("*")[1]}</a>   
+        {#each getFileList()  as [k,name] } 
+        <a class="btn"  href="/edit#{k}"     >  {name}</a>   
         {/each}
         <button onclick={(e)=>{
             console.log(e)

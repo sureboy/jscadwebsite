@@ -1,5 +1,5 @@
 <script lang="ts" >
-  import favicon from './lib/assets/logo.png';
+  import favicon from '../assets/logo.png';
   import App_node  from './App_node.svelte';
   import App_webview  from './App_webview.svelte' 
 </script>

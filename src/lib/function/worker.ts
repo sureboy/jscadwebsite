@@ -1,10 +1,9 @@
-import {getCurrent,handleCurrentMsg,objUrlMap} from "./ImportParser";
-import type {currentObj} from "./ImportParser"
+import {getCurrent,handleCurrentMsg,objUrlMap,getCurrentCode} from "./ImportParser";
+//import type {currentObj} from "./ImportParser"
 import {onWindowResize,startSceneOBJ,addSceneOBJ} from "./threeScene" ;
 import { CSG2Three } from "./csg2Three";
-import type { sConfig,windowConfigType } from './utils';
-//import * as path from "path"
-
+import type { sConfig,mainConfigType } from './utils';  
+import {stringToGzip} from './utils';
 const consoleLog = `
 const originalLog = console.log; 
 console.log = (...e)=>{
@@ -25,39 +24,17 @@ const consoleLogEnd=`}catch(e){
       end:true
     });
 };`;
-
-const getBaseUrl =async (config:windowConfigType,postMessage?:(e:any)=>void)=>{
-  let workerObj:currentObj
-  if (config.worker){ 
-    if (!config.worker.startsWith("./")){
-      config.worker = "./"+config.worker;
-    }
-    if (!config.worker.endsWith(".js")){
-      config.worker += ".js";
-    }
-    workerObj =await getCurrent(config.worker,postMessage)
-    if (workerObj.srcList.length>0 ){
-      return await workerObj.getUri()
-    }
-  }else{
-    config.worker = "./worker.js"
-  } 
-  
-  //console.log("worker",config)
-  let indexName = config.in;
+const getWorkerCode = (config:mainConfigType)=>{
+let indexName = config.in;
   if (!indexName.startsWith("./")){
     indexName = "./"+indexName;
   }
   if (!indexName.endsWith(".js")){
     indexName += ".js";
   }
-  
-  let csgObjUrl =  "./lib/csgChange.js";
-  if (config.includeImport && config.includeImport["csgChange"]){
-    csgObjUrl = "csgChange"
-    console.log(config)
-  }
-  const db = `${consoleLog} 
+
+  const   csgObjUrl = "csgChange"
+  return  `${consoleLog} 
   const csg = await import( '${csgObjUrl}' )
   const src = await import("${indexName}")
   const main = "${config.func}";
@@ -121,10 +98,22 @@ const getBaseUrl =async (config:windowConfigType,postMessage?:(e:any)=>void)=>{
     });
   }     
 ${consoleLogEnd}`; 
-console.log(db)
-  handleCurrentMsg({name:config.worker,db},postMessage) 
-  return workerObj?workerObj.getUri():(await getCurrent(config.worker,postMessage)).getUri()
-  //return (await getCurrent(config.worker,postMessage)).getUri()
+}
+export const getWorkerName = (config:mainConfigType)=>`./worker.js`
+const getBaseUrl =async (config:mainConfigType,postMessage?:(e:any)=>void)=>{ 
+  const workerUrl = getWorkerName(config)
+  const workerObj =await getCurrent(
+    workerUrl,
+    (e)=>{ 
+    setTimeout(()=>{
+      //const db= getWorkerCode(config)
+      handleCurrentMsg({
+        name:workerUrl,
+        db:getWorkerCode(config)
+      },postMessage) 
+    }) 
+  })
+  return workerObj.getUri() 
 };
 
 export const changeWorker = (conf:sConfig  )=>{
@@ -178,7 +167,7 @@ export const runWorker =async ( conf:sConfig  )=>{
   
   conf.showMenu = 1;
   //if (!conf.baseUrl){
-  conf.baseUrl = await getBaseUrl(conf.workermsg.windowConfig,conf.postMessage) ;
+  conf.baseUrl = await getBaseUrl(conf.workermsg?.windowConfig,conf.postMessage) ;
   //}
   conf.worker = new Worker(conf.baseUrl,{type: "module"});
   conf.worker.onerror = e=>{
@@ -263,3 +252,30 @@ export const runWorker =async ( conf:sConfig  )=>{
     }    
   };  
 };
+export const getCodeGz =async (solidConfig:sConfig)=>{  
+    const current =await getCurrent(
+        getWorkerName(solidConfig.workermsg.windowConfig),
+        solidConfig.postMessage)  
+    console.log(solidConfig.workermsg?.windowConfig)
+    let codeSrc = ""
+    //solidConfig.workermsg.windowConfig.files = []
+    await getCurrentCode( current,(name:string,code:string)=>{ 
+        if (solidConfig.includeImport[name]){
+            return
+        }
+        //solidConfig.workermsg.windowConfig.files.push(name)
+    codeSrc +=`
+/**${name}*/
+${code}
+`  
+    })
+
+    codeSrc +=`
+/**solidjscad.json*/
+${JSON.stringify(solidConfig.workermsg.windowConfig,null,2)}
+`
+
+//console.log("getCodeGz",solidConfig.workermsg.windowConfig)
+    const chunks = await stringToGzip(codeSrc)
+    return new Blob(chunks, { type: 'application/gzip' });
+}

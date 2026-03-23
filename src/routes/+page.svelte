@@ -1,35 +1,37 @@
 <script lang="ts">
 import type {sConfig} from "$lib/function/utils" 
-import ShowSolid,{initSolidPage}  from '$lib/ShowSolid.svelte';
+import {includeImport} from "$lib/function/utils"
+import ShowSolid,{initSolidPage}  from '$lib/components/ShowSolid.svelte';
 import { handleCurrentMsg }  from "$lib/function/ImportParser" 
-import FileMenu from "$lib/FileMenu.svelte";
-import Menu ,{menuConfig} from '$lib/Menu.svelte'
+import FileMenu from "$lib/website/FileMenu.svelte";
+import Menu ,{menuConfig} from '$lib/components/Menu.svelte'
 import { runWorker } from "$lib/function/worker";
-import { showMenu } from "$lib/LoadGzFile.svelte";
+import { showMenu } from "$lib/website/LoadGzFile.svelte";
 import { onMount } from 'svelte'; 
 //import aboutUs from '$lib/aboutUs.svelte'
 import {
     changeSolidConfig,
     loadLocalDBList,
     currentLocalDBConfig
-} from "$lib/function/localdb" 
-import {imgStorage,createPng} from "$lib/function/localImg"
+} from "$lib/website/localdb" 
+import {imgStorage,createPng} from "$lib/website/localImg"
 const solidConfig:sConfig = $state({ 
+    includeImport,
     showAd:true,
     showMenu:0,
     postMessage:(e:{type:string,path?:string})=>{ 
         if (e.path){
             console.log(e.path)
-            const db = window.localStorage.getItem(e.path)||undefined
+            //const db = window.localStorage.getItem(e.path)||undefined
             setTimeout(()=>{
                 const cur = handleCurrentMsg({
-                    name: e.path,db
+                    name: e.path
                     },
                     solidConfig.postMessage
                 )
-                if (!db && solidConfig.workermsg.windowConfig.includeImport  ){ 
+                if (solidConfig.includeImport  ){ 
                     cur.getUri =async ()=>new URL(
-                        solidConfig.workermsg.windowConfig.includeImport[e.path] ||e.path ,
+                        solidConfig.includeImport[e.path] ||e.path ,
                         new URL(import.meta.url).origin).toString();
                 }  
             })
@@ -60,7 +62,7 @@ const initMenu = ( )=>{
     in:"",
     src:"",
     worker:"",
-    files:[]
+    includeImport 
     //pageType:"run"
 }})
 }
