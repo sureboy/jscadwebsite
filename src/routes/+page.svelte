@@ -54,7 +54,7 @@ const solidConfig:sConfig = $state({
     },
 }) 
 const initMenu = ( )=>{
-    solidConfig.isVscode = (window as any).vscode?true:false
+    //solidConfig.isVscode = (window as any).vscode?true:false
     solidConfig.workermsg  = Object.assign(menuConfig,{windowConfig:{
     port:0,
     name:"",

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { initSolidPage} from '../components/ShowSolid.svelte';
-    import {handleCurrentMsg} from '../function/ImportParser'
+  import {handleCurrentMsg} from '../function/ImportParser'
   //import {HandleMessageClass} from './lib/function/handleMessage' 
   import HandlePage,
   { 
@@ -15,6 +15,7 @@
   onMount(() => {    
     initSolidPage(solidConfig) 
     const vscode =  (window as any).vscode
+    //solidConfig.Vscode = vscode
     solidConfig.postMessage =(e:{type:string,path?:string})=>{
       console.log("new post msg")
         if (e.path &&

@@ -83,7 +83,7 @@ handleView.set("show",()=>{
     {/if}
     <a style="color:white;cursor: pointer;height:48px;text-align: left;line-height: 48px;" 
      target="_blank" 
-     href="{getRemoteUrl(solidConfig.workermsg?.windowConfig?.serverIP)}more">More</a>
+     href="{getRemoteUrl(solidConfig.showAd?undefined:["https://solidjscad.com"])}more">More</a>
     <a style="color:white;cursor: pointer;height:48px;text-align: left;line-height: 48px;"
      target="_blank"
     href="https://{docUrl}">Docs</a>

@@ -6,7 +6,7 @@ import type { sConfig } from '../function/utils';
 import {includeImport} from '../function/utils';
 export const solidConfig:sConfig=$state( { 
   includeImport,
-  isVscode: (window as any).vscode?true:false,
+  //isVscode: (window as any).vscode?true:false,
   showMenu:0,workermsg:menuConfig} ) 
 //   this.solidConfig.workermsg = Object.assign( this.menuConfig,{windowConfig:msg.config} )  
 export const handleMsg =new HandleMessageClass(solidConfig)

@@ -45,7 +45,7 @@ export const MenuType  = {
 export type sConfig = {
   includeImport:{ [key: string]: string }
   showAd?:boolean,
-  isVscode?:boolean,
+  //Vscode?:any,
   worker?: Worker,
   baseUrl?:string,
   oldMenu?:number,

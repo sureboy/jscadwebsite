@@ -12,5 +12,5 @@ const getRandomElement = arr => arr[Math.floor(Math.random() * arr.length)];
 </script>
 {#if (solidConfig?.showAd)}
 <p>{getRandomElement(helpTip)}</p>
-<p><img src="{getRemoteUrl(solidConfig?.isVscode?solidConfig.workermsg.windowConfig.serverIP:undefined)}wxq.jpeg" alt="qr" width="150" /></p>
+<p><img src="{getRemoteUrl(solidConfig.showAd?undefined:["https://solidjscad.com"])}wxq.jpeg" alt="qr" width="150" /></p>
 {/if}
