@@ -24,18 +24,18 @@ const consoleLogEnd=`}catch(e){
       end:true
     });
 };`;
-const getWorkerCode = (config:mainConfigType)=>{
-let indexName = config.in;
+const getWorkerCode = (config:mainConfigType,postMessage?:(e:any)=>void)=>{
+  let indexName = config.in;
   if (!indexName.startsWith("./")){
     indexName = "./"+indexName;
   }
   if (!indexName.endsWith(".js")){
     indexName += ".js";
   }
-
-  const   csgObjUrl = "csgChange"
+  //const   csgObjUrl = "./lib/csgChange.js"
+  //getCurrent(csgObjUrl,postMessage)
   return  `${consoleLog} 
-  const csg = await import( '${csgObjUrl}' )
+  const csg = await import( 'csgChange' )
   const src = await import("${indexName}")
   const main = "${config.func}";
   const list = Object.keys(src)
@@ -56,8 +56,6 @@ let indexName = config.in;
               self.postMessage(msg)
            })
         }
- 
-         
       }catch(e){
         console.error(e)
         self.postMessage({ 
@@ -109,7 +107,7 @@ const getBaseUrl =async (config:mainConfigType,postMessage?:(e:any)=>void)=>{
       //const db= getWorkerCode(config)
       handleCurrentMsg({
         name:workerUrl,
-        db:getWorkerCode(config)
+        db:getWorkerCode(config,postMessage)
       },postMessage) 
     }) 
   })

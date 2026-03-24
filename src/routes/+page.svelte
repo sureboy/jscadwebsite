@@ -21,20 +21,31 @@ const solidConfig:sConfig = $state({
     showMenu:0,
     postMessage:(e:{type:string,path?:string})=>{ 
         if (e.path){
-            console.log(e.path)
-            //const db = window.localStorage.getItem(e.path)||undefined
-            setTimeout(()=>{
-                const cur = handleCurrentMsg({
+            console.log(e.path) 
+            //if (solidConfig.includeImport[e.path]){
+                setTimeout(()=>{
+                    handleCurrentMsg({
                     name: e.path
                     },
                     solidConfig.postMessage
-                )
-                if (solidConfig.includeImport  ){ 
-                    cur.getUri =async ()=>new URL(
-                        solidConfig.includeImport[e.path] ||e.path ,
-                        new URL(import.meta.url).origin).toString();
-                }  
-            })
+                ).getUri =async ()=>new URL(
+                    solidConfig.includeImport[e.path] ||e.path ,
+                    new URL(import.meta.url).origin).toString();
+                })
+                /*
+            }else{
+                console.log("req",e)
+                fetch(e.path).then(res=>{
+                    res.arrayBuffer().catch(db=>{
+                        handleCurrentMsg({
+                            name: e.path,
+                            db 
+                        },
+                        solidConfig.postMessage
+                        )
+                    })                        
+                })
+            }  */   
         }
         if (e.type==="end"){
             console.log("show 3d solid module end",currentLocalDBConfig)
@@ -56,13 +67,13 @@ const solidConfig:sConfig = $state({
 const initMenu = ( )=>{
     //solidConfig.isVscode = (window as any).vscode?true:false
     solidConfig.workermsg  = Object.assign(menuConfig,{windowConfig:{
-    port:0,
+    //port:0,
     name:"",
     func:"",
     in:"",
     src:"",
-    worker:"",
-    includeImport 
+    //worker:"",
+    //includeImport 
     //pageType:"run"
 }})
 }

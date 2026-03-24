@@ -1,6 +1,6 @@
  
 <script lang="ts" module  >
-import {  onDestroy } from 'svelte';
+//import {  onDestroy } from 'svelte';
 import { autocompletion,CompletionContext } from '@codemirror/autocomplete'; 
 import { EditorState } from '@codemirror/state';
 import {  basicSetup } from 'codemirror';
@@ -88,11 +88,9 @@ export const initEdit =() => {
         }        
     });
     */
-    onDestroy(() => {
-        //destroyEditor();
-        editorView.destroy()
-        window.removeEventListener('resize', handleResize)
-    });
+
+    return editorView
+     
 }
  
 export const GetUpdateFileList = ()=>{

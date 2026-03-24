@@ -17,16 +17,16 @@ export type mainConfigType = {
   func?: string,
   in?: string,
   date?:string,
-  port?:number,
+  //port?:number,
   //worker?:string,
   //webview?:boolean,
   //webUI?:string,
   //serverIP?:string[],
   //includeImport?:{ [key: string]: string }
 }
-type windowConfigType =mainConfigType & {
-  files:string[];
-}
+//type windowConfigType =mainConfigType & {
+//  files:string[];
+//}
 export type workerConfigType = {
   //pageType?:'run'|'gzData'|'stlData', 
   windowConfig?:mainConfigType,//windowConfigType,

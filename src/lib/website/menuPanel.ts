@@ -1,7 +1,7 @@
 import {showPanel,EditorView,keymap} from "@codemirror/view"
 import {StateField, StateEffect} from "@codemirror/state"   
 import {indentWithTab} from "@codemirror/commands"
-export const codeFile:{title:string,value:string} = {title:"edit",value:"console.log('Hello, CodeMirror!')"} 
+export const codeFile:{title:string,value:string,isLocal?:boolean} = {title:"edit",value:"console.log('Hello, CodeMirror!')"} 
 
 
 const saveFileCode = ()=>{
@@ -12,6 +12,9 @@ const saveFileCode = ()=>{
         return;
     }
     console.log("save code")
+    if (!codeFile.isLocal){
+      if (!window.confirm("Save to local?"))return;
+    }
     window.localStorage.setItem(codeFile.title,codeFile.value)
     //const updateFileList = (window.localStorage.getItem("updateFileList") ||"").split(",")
     //const updateFileList = updateFileListKey.split(",")
@@ -67,13 +70,7 @@ const helpPanelState = StateField.define<boolean>({
 const saveCommand = (view:any) => {
     saveFileCode();
     return true;
-    /*
-  const content = view.state.doc.toString();
-  // 在这里实现你的保存逻辑，例如保存到 localStorage
-  localStorage.setItem('saved_code', content);
-  console.log('代码已保存', content.length, '字符');
-  // 可选：返回 true 表示命令已处理，防止继续传播
-  return true;*/
+    
 };
 const helpKeymap = [{
   key: "F1",
