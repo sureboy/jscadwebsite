@@ -24,7 +24,7 @@ const consoleLogEnd=`}catch(e){
       end:true
     });
 };`;
-const getWorkerCode = (config:mainConfigType,postMessage?:(e:any)=>void)=>{
+const getWorkerCode = (config:mainConfigType )=>{
   let indexName = config.in;
   if (!indexName.startsWith("./")){
     indexName = "./"+indexName;
@@ -90,27 +90,40 @@ const getWorkerCode = (config:mainConfigType,postMessage?:(e:any)=>void)=>{
     console.error(e)
     self.postMessage({ 
       error:{
-            message:e.message||"",
-            stack:e.stack||""
-          }, 
+        message:e.message||"",
+        stack:e.stack||""
+      }, 
     });
-  }     
+  }
 ${consoleLogEnd}`; 
 }
-export const getWorkerName = (config:mainConfigType)=>`./worker.js`
-const getBaseUrl =async (config:mainConfigType,postMessage?:(e:any)=>void)=>{ 
-  const workerUrl = getWorkerName(config)
+export const getWorkerName = (config?:mainConfigType)=>`./worker.js`
+const getBaseUrl =async (conf:sConfig)=>{ 
+  const workerUrl = getWorkerName(conf.workermsg.windowConfig)
   const workerObj =await getCurrent(
     workerUrl,
     (e)=>{ 
-    setTimeout(()=>{
-      //const db= getWorkerCode(config)
-      handleCurrentMsg({
-        name:workerUrl,
-        db:getWorkerCode(config,postMessage)
-      },postMessage) 
-    }) 
+      if (conf.showAd){
+        setTimeout(()=>{
+          //const db= getWorkerCode(config)
+          handleCurrentMsg({
+            name:workerUrl,
+            db:getWorkerCode(conf.workermsg.windowConfig )
+          },conf.postMessage) 
+        }) 
+      }else{
+        conf.postMessage(e)
+        //fetch()
+      }
   })
+  if (!workerObj.db) {
+    const msg = {
+      name:workerUrl,
+      db:getWorkerCode(conf.workermsg.windowConfig)
+    }
+    conf.postMessage({type:"src",msg})
+    handleCurrentMsg(msg,conf.postMessage) 
+  }
   return workerObj.getUri() 
 };
 
@@ -165,7 +178,7 @@ export const runWorker =async ( conf:sConfig  )=>{
   
   conf.showMenu = 1;
   //if (!conf.baseUrl){
-  conf.baseUrl = await getBaseUrl(conf.workermsg?.windowConfig,conf.postMessage) ;
+  conf.baseUrl = await getBaseUrl(conf) ;
   //}
   conf.worker = new Worker(conf.baseUrl,{type: "module"});
   conf.worker.onerror = e=>{
