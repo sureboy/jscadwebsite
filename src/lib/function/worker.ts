@@ -40,19 +40,20 @@ const getWorkerCode = (config:mainConfigType )=>{
   const main = "${config.func}";
   const list = Object.keys(src)
   const module = {list,basename:main?main:list[0]}
-  self.onmessage = (e)=>{
-    const {func,options,code} = e.data
+  let tmpDB
+  self.onmessage = (e)=>{ 
+    const {func,options} = e.data
     if ( func){ 
       try{
-        const res = src[e.data.func](options)
-        if (res.then){
-          res.then(db=>{
+        tmpDB = src[e.data.func](options)
+        if (tmpDB.then){
+          tmpDB.then(db=>{
             csg.getCsgObjArray(db,(msg)=>{
               self.postMessage(msg)
             })
           })
         }else{
-           csg.getCsgObjArray(res,(msg)=>{
+           csg.getCsgObjArray(tmpDB,(msg)=>{
               self.postMessage(msg)
            })
         }
@@ -66,23 +67,18 @@ const getWorkerCode = (config:mainConfigType )=>{
         });
       }      
     }
-    if (code){
-      csg.getCsgObjArray(code,(msg)=>{
-        self.postMessage(msg)
-      })
-    }
   }
   self.postMessage({module})
   try{
-    const res = src[module.basename]()
-    if (res.then){
-      res.then(db=>{
+    tmpDB = src[module.basename]()
+    if (tmpDB.then){
+      tmpDB.then(db=>{
         csg.getCsgObjArray(db,(msg)=>{
           self.postMessage(msg)
         })
       })
     }else{
-      csg.getCsgObjArray(res,(msg)=>{
+      csg.getCsgObjArray(tmpDB,(msg)=>{
         self.postMessage(msg)
       })
     } 
@@ -160,6 +156,74 @@ export const CodeWorker = (conf:sConfig,code:any  )=>{
   console.log("code worker")
   conf.worker.postMessage({code});
 };
+export const HandleMsgToShow = (conf:sConfig,msg:{
+  start:boolean,
+  ver:any,
+  module:any,
+  tmpDB:any,
+  end:boolean,options:any,log:any,error:any
+})=>{
+
+  if (msg.start ){
+    try{
+      startSceneOBJ(conf.el);
+    }catch(err){
+      console.error(err);
+      if (conf.postMessage){
+      conf.postMessage({
+        type:'initError',
+        msg:err.error
+      });}
+    }
+    
+  }
+  if (msg.ver){
+    addSceneOBJ(conf.el, CSG2Three(msg.ver,{}) );
+    //console.log("update",(Date.now()-tmpDate) /1000)
+  }
+  if (msg.module){
+    conf.workermsg.module(msg.module);
+  }
+  if (msg.end ){
+
+    //console.log("cameraType",conf.workermsg.cameraType);
+    onWindowResize(conf.el!,conf.workermsg?.cameraType||"Perspective" )	;
+    if (conf.postMessage){
+    conf.postMessage({
+      type:'end'
+    });}
+    conf.showMenu =conf.oldMenu;// 1 | (1<<1) | (1<<2) | (1<<3);
+
+  }
+  if (msg.options){
+    //console.log("options",msg.options)
+    conf.workermsg.options =msg.options //Object.assign(conf.workermsg.options||{},msg.options);
+    //console.log(msg.options);
+  }
+  if (msg.log){
+    if (conf.postMessage){
+    conf.postMessage({
+      type:'log',
+      msg:msg.log
+    });
+  }
+  }
+  if (msg.error){
+    if (conf.postMessage){
+      /*
+      if (msg.error.stack && typeof msg.error.stack === "string"){
+        objUrlMap.forEach((v,k)=>{
+          msg.error.stack = (msg.error.stack as string).replaceAll(k,path.join(conf.workermsg.windowConfig.src,v))
+        })
+      }*/
+      conf.postMessage({
+        type:'error',
+        msg:msg.error,
+        urlMap:Object.fromEntries(objUrlMap),
+      });
+    }
+  }  
+}
 export const runWorker =async ( conf:sConfig  )=>{
   if (conf.worker){
     conf.worker.terminate();
@@ -200,67 +264,9 @@ export const runWorker =async ( conf:sConfig  )=>{
     }
   };  
   conf.worker.onmessage = function(e) {
-    const msg = e.data;
-    console.log(msg)
-    if (msg.start ){
-      try{
-        startSceneOBJ(conf.el);
-      }catch(err){
-        console.error(err);
-        if (conf.postMessage){
-        conf.postMessage({
-          type:'initError',
-          msg:err.error
-        });}
-      }
-      
-    }
-    if (msg.ver){
-      addSceneOBJ(conf.el, CSG2Three(msg.ver,{}) );
-      //console.log("update",(Date.now()-tmpDate) /1000)
-    }
-    if (msg.module){
-      conf.workermsg.module(msg.module);
-    }
-    if (msg.end ){
-
-      //console.log("cameraType",conf.workermsg.cameraType);
-      onWindowResize(conf.el!,conf.workermsg?.cameraType||"Perspective" )	;
-      if (conf.postMessage){
-      conf.postMessage({
-        type:'end'
-      });}
-      conf.showMenu =conf.oldMenu;// 1 | (1<<1) | (1<<2) | (1<<3);
-
-    }
-    if (msg.options){
-      //console.log("options",msg.options)
-      conf.workermsg.options =msg.options //Object.assign(conf.workermsg.options||{},msg.options);
-      //console.log(msg.options);
-    }
-    if (msg.log){
-      if (conf.postMessage){
-      conf.postMessage({
-        type:'log',
-        msg:msg.log
-      });
-    }
-    }
-    if (msg.error){
-      if (conf.postMessage){
-        /*
-        if (msg.error.stack && typeof msg.error.stack === "string"){
-          objUrlMap.forEach((v,k)=>{
-            msg.error.stack = (msg.error.stack as string).replaceAll(k,path.join(conf.workermsg.windowConfig.src,v))
-          })
-        }*/
-        conf.postMessage({
-          type:'error',
-          msg:msg.error,
-          urlMap:Object.fromEntries(objUrlMap),
-        });
-      }
-    }    
+    //const msg = e.data;
+    HandleMsgToShow(conf, e.data)
+       
   };  
 };
 export const getCodeGz =async (solidConfig:sConfig)=>{  

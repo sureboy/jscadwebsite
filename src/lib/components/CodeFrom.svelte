@@ -3,8 +3,9 @@ import QRCode from 'qrcode';
 import modeling from '@jscad/modeling'; 
 //import { currentLocalDBConfig,getCodeGz } from "../website/localdb";
 import type { sConfig } from '../function/utils';
-import {CodeWorker,getCodeGz} from "../function/worker" 
+import {HandleMsgToShow,getCodeGz} from "../function/worker" 
 import {getRemoteUrl} from '../function/utils'
+import {getCsgObjArray} from '../function/csgChange'
     
 const { solidConfig }:{ solidConfig:sConfig} = $props();
 
@@ -36,13 +37,22 @@ const showCaptchaCode = (captchaCode:any[] )=>{
 const uploadCodeClick = ()=>{
     //console.log(Date.now().toString(36))
     //if (!currentLocalDBConfig.path)return;
-    if (!solidConfig.isVscode)
-      if (!confirm(`warning!!! The [${solidConfig.workermsg.windowConfig.name}] will be uploaded to the server cloud. Time limit: 1 month.`))return
-    fetch(`${getRemoteUrl(solidConfig.workermsg.windowConfig.serverIP)}code?${Date.now().toString()}`).then(r=>{
+  
+    try{
+      if (!(window as any).vscode && !(window as any).confirm(`warning!!! The [${solidConfig.workermsg.windowConfig.name}] will be uploaded to the server cloud. Time limit: 1 month.`))return
+    }catch(e){
+      console.log(e)
+    }
+      
+    fetch(`${getRemoteUrl()}code?${Date.now().toString()}`).then(r=>{
       if (!r.ok)return
       r.json().then(db=>{
         //console.log(db)
-        CodeWorker(solidConfig,showCaptchaCode(db.code))
+        getCsgObjArray(showCaptchaCode(db.code),(e)=>{
+          //console.log(e)
+          HandleMsgToShow(solidConfig,e)
+        })
+        //CodeWorker(solidConfig,showCaptchaCode(db.code))
         showInputCode.key = db.key 
       })
     }) 
@@ -53,7 +63,7 @@ const ISOToTimestamp = (expiration:string)=>{
 
 const checkInputCode =async ( )=>{  
     //showInputCode.expiration
-    if (!solidConfig.isVscode){
+    if (solidConfig.showAd){
       const safe = document.getElementById("safe") 
       if (!safe || !(safe as HTMLInputElement).checked){
         return
@@ -67,7 +77,7 @@ const checkInputCode =async ( )=>{
         title:`${solidConfig.workermsg.windowConfig.func}_${solidConfig.workermsg.windowConfig.in}_${solidConfig.workermsg.windowConfig.name}`
     })
     showInputCode.key=""
-    fetch(`${getRemoteUrl(solidConfig.workermsg.windowConfig.serverIP)}code?${u}`,{
+    fetch(`${getRemoteUrl()}code?${u}`,{
     method: "POST",body:await getCodeGz(solidConfig) }).then(r=>{
         if (!r.ok)return
         r.json().then(db=>{
@@ -75,7 +85,7 @@ const checkInputCode =async ( )=>{
           alert(JSON.stringify(db))
           return
         }
-        showInputCode.url =`${getRemoteUrl(solidConfig.workermsg.windowConfig.serverIP)}#${db.k}`
+        showInputCode.url =`https://solidjscad.${window.location.host.endsWith("cn")?"cn":"com"}#${db.k}`
         QRCode.toDataURL(showInputCode.url, {
           width: 200, 
           color: {
@@ -114,7 +124,7 @@ const checkInputCode =async ( )=>{
   <p>
     <label>Email: <input type="email" bind:value={showInputCode.email} placeholder="dimon@solidjscad.com" /> </label>
   </p>
-  {#if !solidConfig.isVscode}
+  {#if solidConfig.showAd}
  
   <p><input type="checkbox" id="safe" name="PrivacyPolicy" >
     I have read and agree to the

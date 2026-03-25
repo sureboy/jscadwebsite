@@ -17,7 +17,8 @@ export const menuConfig = {
             basename: string;}
         )=>{ 
             moduleInit(m)
-        }
+        },
+         
     } as menuConfigType 
 </script>
 <script lang="ts">

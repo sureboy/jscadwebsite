@@ -5,6 +5,7 @@ export type menuConfigType = {
       list: string[];
       basename: string;
   }) => void;
+  //downHandle:(db:any)=>void
 }
 export const includeImport = {
   "@jscad/modeling": "./lib/modeling.esm.js",
@@ -31,6 +32,7 @@ export type workerConfigType = {
   //pageType?:'run'|'gzData'|'stlData', 
   windowConfig?:mainConfigType,//windowConfigType,
   options?:Object,
+  
 } &menuConfigType 
 export const MenuType  = {
   MainMenu:1,
@@ -56,6 +58,14 @@ export type sConfig = {
 }  
 export const getRemoteUrl = (serverIP?: string[])=>{
   //return "/"
+  //if ((window as any).serverIP)
+  try{
+    serverIP = (window as any)?.serverIP
+  }catch(e){
+    console.error(e)
+    serverIP = undefined;
+  }
+  
   if (! serverIP || serverIP.length===0){
     return "/"
   }else{

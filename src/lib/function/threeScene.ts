@@ -23,6 +23,8 @@ import {
 //import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import {STLExporter} from "three/addons/exporters/STLExporter.js" ;
+import { exportTo3MF } from 'three-3mf-exporter';
+//import {STLExporter} from "three/addons/exporters/STLExporter.js" ;
 //const cube = new Mesh();
 //const loader = new STLLoader()
 
@@ -118,8 +120,10 @@ const getSize = (obj?:Object3D)=>{
 	//const sceneSize = getSceneSize(obj);
 	return getSceneSize(obj).length() || 10;
 };
-const ExporterSTL =new STLExporter();
-export const Exporter  = ()=> ExporterSTL.parse(group,{binary: true});
+//const ExporterSTL =new STLExporter();
+export const Exporter3mf  = ()=> exportTo3MF(group);
+
+export const Exporter  = ()=> new STLExporter().parse(group,{binary: true});
 //let viewDistance = 1;
 let QviewDistance = 15;
 let isOrthographic = false;

@@ -1,11 +1,12 @@
 <script lang="ts" >
-  import { Exporter} from "../function/threeScene" 
+  import { Exporter,Exporter3mf} from "../function/threeScene" 
   import {getCodeGz} from "../function/worker"   
   import { MenuType } from "../function/utils";
   import type { sConfig } from '../function/utils';
   import CodeFrom from './CodeFrom.svelte'
   import {createPng} from '../website/localImg'
   import ShowAds from './ShowAds.svelte';
+
   const { solidConfig }:{ solidConfig:sConfig} = $props();
  
   const downSrcClick = ()=>{
@@ -28,56 +29,21 @@
       //screenImgList.add(href)
       URL.revokeObjectURL(href);  
     })
-    /*
-    const screenCanvas = document.createElement('canvas');
-    const ctx = screenCanvas.getContext("2d")
-    const img = new Image()
-    img.src = solidConfig.el.toDataURL()
-    img.onload = ()=>{
-    screenCanvas.width  = img.width
-    screenCanvas.height = img.height
-    ctx.drawImage(img,0,0)
-    const imagedata = ctx.getImageData(0, 0, img.width, img.height)
-    let imgData = imagedata.data
-    let minX = img.width;
-    let minY = img.height;
-    let maxX = -1;
-    let maxY = -1;
-    for (let y = 0; y < img.height; y++) {
-      for (let x = 0; x < img.width; x++) {
-        const index = (y * img.width + x) * 4; 
-        const red = imgData[index];
-        const green = imgData[index + 1];
-        const blue = imgData[index + 2]; 
-        if (red === 0 && green === 0 && blue === 0) {
-            continue
-        } else {
-            minX = Math.min(minX, x);
-            minY = Math.min(minY, y);
-            maxX = Math.max(maxX, x);
-            maxY = Math.max(maxY, y);
-        }
-      }
-    }
-    const croppedWidth = maxX - minX + 1;
-    const croppedHeight = maxY - minY + 1;
-    screenCanvas.width = croppedWidth;
-    screenCanvas.height = croppedHeight; 
-    //console.log(minX, minY, maxX, maxY,croppedWidth,croppedHeight)
-    ctx.drawImage(img, minX, minY, croppedWidth, croppedHeight, 0, 0, croppedWidth, croppedHeight);
-    
-    let aTag = document.createElement('a'); 
-    aTag.download = `${solidConfig.workermsg.windowConfig.func}_${solidConfig.workermsg.windowConfig.in.split(".").shift()}_${solidConfig.workermsg.windowConfig.name}_${Date.now()}.png`; //e.detail.name+"_screen.png";
-    let href =screenCanvas.toDataURL()
-    //console.log(href)
-    //screenImgList.push(href)
-    aTag.href = href;
-    aTag.click();
-    //screenImgList.add(href)
-    URL.revokeObjectURL(href);  	
-    URL.revokeObjectURL(img.src); 
-  } 
-    */
+  }
+  const down3MFclick = ()=>{
+
+    Exporter3mf().then(blob=>{
+      // const blob = new Blob(data,{ type: mimeType3mf } )
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      console.log(blob,link.href)
+      link.download = `${solidConfig.workermsg.windowConfig.func}_${solidConfig.workermsg.windowConfig.in.split(".").shift()}_${solidConfig.workermsg.windowConfig.name}_${Date.now()}.3mf`; 
+      link.click();
+      URL.revokeObjectURL(link.href); 
+    })
+    //showDownMsg="waitting down 3mf..." 
+    //solidConfig.worker.postMessage({down:"3mf"});
+      //serializer3mf(undefined,)
   }
   const downSTLclick = ()=>{
     const res = Exporter() 
@@ -110,6 +76,7 @@
     <div >
       {#if (solidConfig.showMenu & MenuType.Stl )}
       <button style="height:48:px;line-height:48px;cursor: pointer;" onclick="{downSTLclick}" >STL</button>  
+      <button style="height:48:px;line-height:48px;cursor: pointer;" onclick="{down3MFclick}" >3MF</button>  
       {/if}
       {#if (solidConfig.showMenu & MenuType.Gzip )}
       <button style="height:48:px;line-height:48px;cursor: pointer;" onclick={downCodeclick} >Gzip</button>      
@@ -125,8 +92,7 @@
        <CodeFrom {solidConfig} />
       {/if}
   
-    </div>
-    
+    </div> 
     <ShowAds {solidConfig}></ShowAds>
 </details>
 
