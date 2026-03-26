@@ -14,6 +14,7 @@ import {helpPanel,codeFile} from '$lib/website/menuPanel'
 let readOnly = false;
 //let showSave = $state(false) 
 let editorContainer:HTMLDivElement; 
+ 
 //export const codeFile:{title:string,value:string} = {title:"edit",value:"console.log('Hello, CodeMirror!')"} 
 function createEditor() {
     if (!editorContainer) return; 
@@ -68,13 +69,16 @@ function javascriptCompletions(context:CompletionContext) {
 export const initEdit =() => {
     const editorView = createEditor();
     let originalHeight = window.innerHeight;
+    
     const handleResize = () => {
         const currentHeight = window.innerHeight;
         // 如果视口高度明显变小，认为是键盘弹出
         if (currentHeight < originalHeight * 0.7) {
             editorContainer.style.height = `${currentHeight}px`;
+            editorContainer.style.paddingBottom = `20px`;
         } else {
             editorContainer.style.height = `100vh`;
+            editorContainer.style.paddingBottom = '0'
         } 
     }
     window.addEventListener('resize', handleResize);
@@ -88,6 +92,7 @@ export const initEdit =() => {
         }        
     });
     */
+
 
     return editorView
      
