@@ -38,5 +38,7 @@
   });
   
 </script>
-  <svelte:head><title>{codeFile.title}</title></svelte:head>
+  <svelte:head><title>{codeFile.title}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, height=device-height, user-scalable=yes">
+</svelte:head>
 <CodeEditor  />

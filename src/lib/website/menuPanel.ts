@@ -70,6 +70,7 @@ function createHelpPanel(view: EditorView) {
   dom.appendChild(getFileSelectList())
   dom.appendChild(createButton("save"))
   dom.appendChild(createButton("view"))
+    dom.appendChild(createButton("docs"))
   dom.className = "cm-menu-panel"
  
   dom.addEventListener("click",(e)=>{
@@ -77,6 +78,8 @@ function createHelpPanel(view: EditorView) {
         case "save":
             saveFileCode();
             return;
+        case "docs":
+            window.location.href=`https://docs.solidjscad.${window.location.host.endsWith("cn")?"cn":"com"}`
         case "view":
             window.location.href="/#"+codeFile.title.split("*")[0]
             return;

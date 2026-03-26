@@ -31,7 +31,7 @@ import { onMount } from 'svelte';
 let docUrl = $state("docs.solidjscad.com")
 // $state(undefined)
 onMount(()=>{
-    docUrl = `docs.solidjscad.${window.location.host.endsWith("cn")?"cn":"com"}`
+    docUrl = `https://docs.solidjscad.${window.location.host.endsWith("cn")?"cn":"com"}`
 })
 const handleView = new Map<string,()=>void>()
 handleView.set("camera",()=>{
@@ -85,7 +85,7 @@ handleView.set("show",()=>{
     <a style="color:white;cursor: pointer;height:48px;text-align: left;line-height: 48px;"  
      href="{getRemoteUrl(solidConfig.showAd?undefined:["https://solidjscad.com"])}more">More</a>
     <a style="color:white;cursor: pointer;height:48px;text-align: left;line-height: 48px;" 
-    href="https://{docUrl}">Docs</a>
+    href="{docUrl}">Docs</a>
 
 </div>
 {/if}
