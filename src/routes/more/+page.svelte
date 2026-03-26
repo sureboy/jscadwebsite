@@ -21,7 +21,7 @@ const getLocalDBList =async ()=>{
      crossorigin="anonymous"></script>
 </svelte:head>
 <div style="display: block; padding-left: 10px;">
-<h2><a style="color:white;" href="https://docs.solidjscad.com" target="_blank" >Docs</a></h2>
+<h2><a style="color:white;" href="https://docs.solidjscad.com"  >Documents</a></h2>
 <List list={db.list} ></List>
 {#await getLocalDBList() then localList}
 <h1>Local</h1>
