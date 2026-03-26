@@ -1,9 +1,41 @@
 import {showPanel,EditorView,keymap} from "@codemirror/view"
 import {StateField, StateEffect} from "@codemirror/state"   
 import {indentWithTab} from "@codemirror/commands"
+ import {getFileList} from "./localFile"
 export const codeFile:{title:string,value:string,isLocal?:boolean} = {title:"edit",value:"console.log('Hello, CodeMirror!')"} 
 
-
+const getFileSelectList = ()=>{
+  const select = document.createElement("select")
+  select.id="files"
+  select.add(new Option("--",""))
+  for (const [r,n] of getFileList()){
+    select.add(new Option(n,r,false,r===codeFile.title))
+  }
+  select.style.marginRight = '6px';
+  select.onchange = (e)=>{
+    //console.log(e)
+    const select = e.target as HTMLSelectElement
+    //console.log(select.value)
+    switch (select.value) {
+        case "":
+            return;
+        default:
+            //mySolidTmp.index = Number(select.value)
+            //mySolidTmp.update()
+            //currentLocalDBConfig.path = select.value 
+            //history.replaceState(null, null, '#'+select.value);
+            window.location.hash = select.value
+            //changeSolidConfig(solidConfig,showMenu)
+            //console.log(mySolidTmp)
+            window.location.reload()
+            return
+    }  
+  }
+  return select
+  
+  
+  //<select name="cars" id="cars"
+}
 const saveFileCode = ()=>{
     if (!codeFile.value ){
         window.localStorage.removeItem(codeFile.title)
@@ -23,14 +55,21 @@ const saveFileCode = ()=>{
     codeFile.value = ""
     //showSave=false
 }
+function createButton(name:string,onclick?:(e?:any)=>void){
+  const but = document.createElement("button")
+  but.id=name
+  but.textContent=name
+  but.onclick=()=>onclick
+  but.style.marginRight = '6px';
+  return but
+}
 function createHelpPanel(view: EditorView) {
   const dom = document.createElement("div")
-  dom.innerHTML = `
-  <button id="save"  >Save</button>
-  <button id="view" >View</button>
-  <button id="delete">Delete</button>
-  <span>F1: Toggle the menu panel</span>
-  `
+ 
+  dom.appendChild(createButton("delete"))
+  dom.appendChild(getFileSelectList())
+  dom.appendChild(createButton("save"))
+  dom.appendChild(createButton("view"))
   dom.className = "cm-menu-panel"
  
   dom.addEventListener("click",(e)=>{
