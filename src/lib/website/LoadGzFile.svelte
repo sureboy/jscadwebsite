@@ -114,7 +114,8 @@ export const showMenu = MenuType.MainMenu | MenuType.Camera | MenuType.Gzip | Me
             addClick.click();
             return;
         case "more":
-            window.open("/more");
+            window.location.href="/more"
+            //window.open("/more");
             return 
         default:
             //mySolidTmp.index = Number(select.value)

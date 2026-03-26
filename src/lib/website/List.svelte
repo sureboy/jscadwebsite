@@ -50,7 +50,7 @@ const getItemImg =async (item:itemType)=>{
         {#if item.update}<p>begin:{new Date(item.update).toLocaleDateString()}</p>{/if}
         {#if item.expiration}<p>end:{new Date(Number(item.expiration)*1000).toLocaleDateString()}</p>{/if}
 
-        <a href="/#{item.url}" target="_blank" >查看</a>
+        <a href="/#{item.url}"   >查看</a>
         {#if item.save}
             <button  onclick={(e)=>{
                 fetch("/admin",{
