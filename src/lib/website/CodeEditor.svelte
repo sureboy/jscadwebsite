@@ -9,7 +9,20 @@ import { javascript,snippets } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark'; 
 import {helpPanel,codeFile} from '$lib/website/menuPanel'
 //import {indentWithTab} from "@codemirror/commands"
+import completionsData from '$lib/assets/completions.json'; // 加载生成的 JSON
 
+const myCompletionSource = (context) => {
+  const word = context.matchBefore(/\w*/);
+  if (!word) return null;
+  const options = completionsData
+    .filter(item => item.label.startsWith(word.text))
+    .map(item => ({
+      label: item.label,
+      type: item.type,
+      info: item.detail
+    }));
+  return { from: word.from, to: word.to, options };
+};
  
 let readOnly = false;
 //let showSave = $state(false) 
@@ -31,6 +44,7 @@ function createEditor() {
         autocompletion({
             override:[
                 javascriptCompletions, 
+                myCompletionSource
         ]
         }), 
         readOnly ? EditorState.readOnly.of(true) : [], 
