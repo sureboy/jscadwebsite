@@ -79,7 +79,7 @@ function createHelpPanel(view: EditorView) {
             saveFileCode();
             return;
         case "docs":
-            window.location.href=`https://docs.solidjscad.${window.location.host.endsWith("cn")?"cn":"com"}`
+            window.location.href=`/docs/`
         case "view":
             window.location.href="/#"+codeFile.title.split("*")[0]
             return;

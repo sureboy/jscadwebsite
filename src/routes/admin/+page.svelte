@@ -2,7 +2,7 @@
 
 //import libdata from '/assets/data.json' assert { type: 'json' };
 import type { PageProps } from './$types';
-import List from '$lib/List.svelte'
+import List from '$lib/website/List.svelte'
 let { data }: PageProps = $props();
 
 
