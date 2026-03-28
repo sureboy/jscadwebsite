@@ -128,8 +128,8 @@ const checkInputCode =async ( )=>{
  
   <p><input type="checkbox" id="safe" name="PrivacyPolicy" >
     I have read and agree to the
-    <a target="_blank" href="https://docs.solidjscad.{window.location.host.endsWith("cn")?"cn":"com"}/UserAgreement">User Agreement and  </a> 
-    <a target="_blank" href="https://docs.solidjscad.{window.location.host.endsWith("cn")?"cn":"com"}/PrivacyPolicy">Privacy Policy</a>
+    <a target="_blank" href="/docs/UserAgreement">User Agreement and  </a> 
+    <a target="_blank" href="/docs/PrivacyPolicy">Privacy Policy</a>
     (Must be checked to upload)</p>
   {/if}
   <p><button onclick={(e)=>{
