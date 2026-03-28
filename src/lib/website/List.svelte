@@ -4,7 +4,8 @@
         expiration?:number,
         email?:string,
         title:string, 
-        save?:boolean,
+        save?:(e:any)=>void,
+        del?:(e:any)=>void,
         update?:number,
         url?:string
     }
@@ -20,9 +21,11 @@ const getItemImg =async (item:itemType)=>{
         return item.img
     }
     const img = (await imgStorage.get(item.url)) as Blob|null
-    console.log(item.url,img)
+    //console.log(item.url,img)
     if (img){
         item.img =URL.createObjectURL(img)
+    }else{
+        item.img = "/wxq.jpeg"
     }
     return item.img
 
@@ -40,6 +43,7 @@ const getItemImg =async (item:itemType)=>{
     {#await getItemImg(item) then url }
     {#if url}
      <img src={url} alt="{item.title}" width="800" height="600"/>
+
         {/if}
     {/await }
     
@@ -50,44 +54,12 @@ const getItemImg =async (item:itemType)=>{
         {#if item.update}<p>begin:{new Date(item.update).toLocaleDateString()}</p>{/if}
         {#if item.expiration}<p>end:{new Date(Number(item.expiration)*1000).toLocaleDateString()}</p>{/if}
 
-        <a href="/#{item.url}"   >查看</a>
+        <a href="{item.url.startsWith("/")?item.url:`/#${item.url}`}"   >preview</a>
         {#if item.save}
-            <button  onclick={(e)=>{
-                fetch("/admin",{
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    method:"POST",body:JSON.stringify(item)}).then(r=>{
-                    if (!r.ok)
-                        return;
-                    r.json().then(db=>{
-                        console.log(db)
-                        if (db.msg){
-                            db.save = false
-                        }
-                    })
-                })
-            }}>save</button>
-            <button onclick={e=>{
-                //console.log(e)
-                if (!window.confirm(`delete ${item.url}?`)){
-                    return;
-                }
-                fetch("/admin?k="+item.url,{
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }}).then(r=>{
-                    if (!r.ok){
-                        return;
-                    }
-                    r.json().then(db=>{
-                        console.log(db)
-                        if (db.msg){
-                            window.location.reload();
-                        }
-                    })
-                })
-            }}>del</button>
+            <button  onclick={item.save}>save</button>
+              {/if}
+        {#if item.del}
+            <button onclick={item.del}>del</button>
         {/if}
     </figcaption>
 </figure>

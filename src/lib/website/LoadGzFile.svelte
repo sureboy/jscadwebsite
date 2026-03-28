@@ -10,10 +10,29 @@ import {
     analysisGzipDB,
     currentLocalDBConfig,
     gzipCodeFromLocalStorage} from "./localdb"
-//    import { getOutputFileNames } from "typescript";
-const { solidConfig }: {  solidConfig:sConfig  } = $props(); 
-   //const myConfig = solidConfig.workermsg.windowConfig
+import { onMount } from 'svelte';  
+const { solidConfig }: {  solidConfig:sConfig  } = $props();  
 let addClick:HTMLButtonElement;
+let selectList:HTMLSelectElement;
+onMount(()=>{
+    if (window.location.hash){
+        if (window.location.hash.slice(1)==="new"){
+            setTimeout(()=>newProject())
+        }
+    }
+})
+const newProject = ( )=>{
+    gzipCodeFromLocalStorage().then(data=>{
+        if (data){
+            myStorage.put(data.path,data.db)
+        }
+    })       
+    cleanCurrentMsg() 
+    window.localStorage.clear()
+    if (solidConfig.workermsg?.windowConfig)
+        solidConfig.workermsg.windowConfig = undefined
+    addClick.click();
+}
 const analysisGzip =async ( fileName:string,data: ArrayBuffer)=>{    
     solidConfig.showMenu=0
     const p = fileName.split(".")[0] 
@@ -96,25 +115,17 @@ export const main=(opt)=>{
 export const showMenu = MenuType.MainMenu | MenuType.Camera | MenuType.Gzip | MenuType.Stl | MenuType.Png
 
 </script>
-<select name="cars" id="cars"   onchange={(e)=>{
+<select bind:this={selectList} name="cars" id="cars"    onchange={(e)=>{
     const select = e.target as HTMLSelectElement
     //console.log(select.value)
     switch (select.value) {
         case "":
             return;
         case "new":
-            gzipCodeFromLocalStorage().then(data=>{
-                if (data){
-                    myStorage.put(data.path,data.db)
-                }
-            })       
-            cleanCurrentMsg() 
-            window.localStorage.clear()
-            solidConfig.workermsg.windowConfig = undefined
-            addClick.click();
+            newProject()
             return;
         case "more":
-            window.location.href="/more"
+            window.location.href="/home"
             //window.open("/more");
             return 
         default:
@@ -131,11 +142,7 @@ export const showMenu = MenuType.MainMenu | MenuType.Camera | MenuType.Gzip | Me
 }}>
     <option value="">--</option>
     <option value="new">New project</option>
-    {#await myStorage.keys() then paths }
-        
-   
-        
-    
+    {#await myStorage.keys() then paths } 
     {#each paths as p}
         <option value={p} >{p}</option>
     {/each}
@@ -158,7 +165,7 @@ type="file" onchange={(event)=>{
     //let fileName=""
     //const myConfig = solidConfig.workermsg.windowConfig
   
-    const fileName= prompt("input file name",solidConfig.workermsg.windowConfig?"":"index")
+    const fileName= prompt("input file name",solidConfig.workermsg?.windowConfig?"":"index")
     if (!fileName){
         return
     }
@@ -169,7 +176,7 @@ type="file" onchange={(event)=>{
     if (!file_n.endsWith(".js")){
         file_n += ".js"
     }
-    if (!solidConfig.workermsg.windowConfig){
+    if (!solidConfig.workermsg?.windowConfig){
 
         const myConfig = solidConfig.workermsg.windowConfig = {
             in : fileName,

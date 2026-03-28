@@ -77,7 +77,7 @@ handleView.set("show",()=>{
     </Options> 
     {/if}
     <a style="color:white;cursor: pointer;height:48px;text-align: left;line-height: 48px;"  
-     href="{getRemoteUrl(solidConfig.showAd?undefined:["https://solidjscad.com"])}more">More</a>
+     href="{getRemoteUrl(solidConfig.showAd?undefined:["https://solidjscad.com"])}home/">Home</a>
     <a style="color:white;cursor: pointer;height:48px;text-align: left;line-height: 48px;" 
     href="/docs/" data-sveltekit-reload >Docs</a>
 

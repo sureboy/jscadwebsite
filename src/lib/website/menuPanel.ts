@@ -37,6 +37,9 @@ const getFileSelectList = ()=>{
   //<select name="cars" id="cars"
 }
 const saveFileCode = ()=>{
+    if (!codeFile.isLocal){
+      if (!window.confirm("Save to local?"))return;
+    }
     if (!codeFile.value ){
         window.localStorage.removeItem(codeFile.title)
         //showSave=false
@@ -44,9 +47,7 @@ const saveFileCode = ()=>{
         return;
     }
     console.log("save code")
-    if (!codeFile.isLocal){
-      if (!window.confirm("Save to local?"))return;
-    }
+
     window.localStorage.setItem(codeFile.title,codeFile.value)
     //const updateFileList = (window.localStorage.getItem("updateFileList") ||"").split(",")
     //const updateFileList = updateFileListKey.split(",")
@@ -55,10 +56,10 @@ const saveFileCode = ()=>{
     codeFile.value = ""
     //showSave=false
 }
-function createButton(name:string,onclick?:(e?:any)=>void){
+function createButton(id:string,name?:string,onclick?:(e?:any)=>void){
   const but = document.createElement("button")
-  but.id=name
-  but.textContent=name
+  but.id=id
+  but.textContent=name||id
   but.onclick=()=>onclick
   but.style.marginRight = '6px';
   return but
@@ -66,11 +67,12 @@ function createButton(name:string,onclick?:(e?:any)=>void){
 function createHelpPanel(view: EditorView) {
   const dom = document.createElement("div")
  
-  dom.appendChild(createButton("delete"))
+  dom.appendChild(createButton("delete","✕"))
   dom.appendChild(getFileSelectList())
-  dom.appendChild(createButton("save"))
-  dom.appendChild(createButton("view"))
-    dom.appendChild(createButton("docs"))
+  dom.appendChild(createButton("save","✓"))
+  dom.appendChild(createButton("view","▷"))
+  dom.appendChild(createButton("docs","⌸"))
+
   dom.className = "cm-menu-panel"
  
   dom.addEventListener("click",(e)=>{
@@ -80,10 +82,13 @@ function createHelpPanel(view: EditorView) {
             return;
         case "docs":
             window.location.href=`/docs/`
-        case "view":
+            return
+        case "view": 
+            saveFileCode();          
             window.location.href="/#"+codeFile.title.split("*")[0]
             return;
         case "delete":
+          if (!window.confirm("Delete document"))return
             window.localStorage.removeItem(codeFile.title)
             window.location.href="/#"+codeFile.title.split("*")[0]
             return;

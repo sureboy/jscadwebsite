@@ -4,11 +4,9 @@ import {gzipToString,srcStringToFile,
 import type {mainConfigType,sConfig} from "../function/utils"
 import {
     handleCurrentMsg,
-    cleanCurrentMsg,
-    getCurrent,
-    getCurrentCode
+    cleanCurrentMsg, 
 }  from "../function/ImportParser"
-import { runWorker,getWorkerName } from "../function/worker";
+import { runWorker } from "../function/worker";
 import {IndexedDBStorage} from "./IndexedDBStorage"
 export const myStorage = new IndexedDBStorage('solidjscad', 'gzfile');
  
@@ -32,7 +30,6 @@ export const  currentLocalDBConfig:{
             }
         },
     }
- 
 export const cleanSolidConfig = ()=>{ 
     if (!currentLocalDBConfig.path)return; 
     myStorage.del(currentLocalDBConfig.path)
@@ -86,6 +83,7 @@ const initName =async ()=>{
     if (window.location.hash){
         const p = window.location.hash.slice(1)
         //window.location.hash=""
+
         if (/\_|\./.test(p))
             clearHash()
         return p
@@ -152,6 +150,7 @@ export const loadLocalDBList  =async ( )=>{
     //solidConfig_ = solidConfig
     //currentLocalDBConfig.paths = await myStorage.keys() 
     currentLocalDBConfig.path = await initName() 
+    return currentLocalDBConfig
 }
 export const gzipCodeFromLocalStorage =async ()=>{
     if (window.localStorage.length===0){

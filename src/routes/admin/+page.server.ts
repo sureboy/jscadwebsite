@@ -12,10 +12,10 @@ export const load: PageServerLoad = async ({ params,url,platform }) => {
             newList.push(Object.assign(key.metadata||{},{
                 expiration:key.expiration||undefined,
                 url: key.name,
-                update  ,
-                save:true}))
-        }else{
-            console.log("same",key)
+                update  , 
+            }))
+        //}else{
+        //    console.log("same",key)
         }
     }  
     return {list:db.list,newList};

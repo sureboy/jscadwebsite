@@ -81,7 +81,11 @@ onMount(()=>{
     initSolidPage(solidConfig)
     //window.localStorage.getItem("")
     initMenu()
-    loadLocalDBList().then(()=>{
+    loadLocalDBList().then((p)=>{
+        if (p.path==="new"){
+            //newProject()
+            return
+        }
         changeSolidConfig(solidConfig,showMenu) 
     }) 
     window.addEventListener("storage",(e)=>{
