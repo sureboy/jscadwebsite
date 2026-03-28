@@ -54,7 +54,7 @@ const getItemImg =async (item:itemType)=>{
         {#if item.update}<p>begin:{new Date(item.update).toLocaleDateString()}</p>{/if}
         {#if item.expiration}<p>end:{new Date(Number(item.expiration)*1000).toLocaleDateString()}</p>{/if}
 
-        <a href="{item.url.startsWith("/")?item.url:`/#${item.url}`}"   >preview</a>
+        <a href="{item.url.startsWith("/")?item.url:`/#${item.url}`}"   >view</a>
         {#if item.save}
             <button  onclick={item.save}>save</button>
               {/if}

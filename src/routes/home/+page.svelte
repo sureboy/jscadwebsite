@@ -25,7 +25,7 @@ const getLocalDBList =async ()=>{
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4370679297888448"
      crossorigin="anonymous"></script>
 </svelte:head>
-<div style="display: block; padding:5px 5px 5px 5px;">
+<div style="display: block; padding:25px 5px 5px 5px;">
 <List list={[
     {
         title:"Documents",
