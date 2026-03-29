@@ -48,18 +48,16 @@ const getItemImg =async (item:itemType)=>{
     {/await }
     
    
-    <figcaption>
-        <h3>{ item.title||item.url}</h3>
+    <figcaption> 
+        <h3> <a href="{item.url.startsWith("/")?item.url:`/#${item.url}`}"   >{ item.title||item.url}</a></h3>
         {#if item.email}<p> {item.email}</p>{/if}
         {#if item.update}<p>begin:{new Date(item.update).toLocaleDateString()}</p>{/if}
-        {#if item.expiration}<p>end:{new Date(Number(item.expiration)*1000).toLocaleDateString()}</p>{/if}
-
-        <a href="{item.url.startsWith("/")?item.url:`/#${item.url}`}"   >view</a>
+        {#if item.expiration}<p>end:{new Date(Number(item.expiration)*1000).toLocaleDateString()}</p>{/if} 
         {#if item.save}
             <button  onclick={item.save}>save</button>
               {/if}
         {#if item.del}
-            <button onclick={item.del}>del</button>
+            <button onclick={item.del}>X</button>
         {/if}
     </figcaption>
 </figure>
