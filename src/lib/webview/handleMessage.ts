@@ -1,10 +1,11 @@
 import type { sConfig,menuConfigType} from '../function/utils';
 import type {messageObj} from "../function/ImportParser"
 import { runWorker, getWorkerName } from "../function/worker";
-import { addSceneSTL} from "../function/threeScene" 
+import { addSceneSTL,addScene3mf} from "../function/threeScene" 
 import {gzipToString,srcStringToFile,MenuType} from "../function/utils"
 import {delCurrentMsg,handleCurrentMsg,getCurrent,getCurrentCode}  from "../function/ImportParser"
 import {STLLoader} from "three/addons/loaders/STLLoader.js" 
+import { ThreeMFLoader } from 'three/addons/loaders/3MFLoader.js';
 import {HandleMsgToShow} from "../function/worker"  
 import {getCsgObjArray} from '../function/csgChange'
 type  handlePostMsg = (msg:any,postMessage?: (e: {name:string,db:string|ArrayBuffer,open:boolean}) => void)=>void
@@ -147,6 +148,15 @@ export  class HandleMessageClass {
         },
         name:'gzData'
     }
+    Data3mf:{name:string,fn:handlePostMsg}={
+        fn:(message:{db:ArrayBuffer},)=>{
+        //const tmf = new ThreeMFLoader()
+        //tmf.addExtension()
+        addScene3mf(this.solidConfig.el,new ThreeMFLoader().parse(message.db));
+            this.solidConfig.showMenu=MenuType.Camera // | MenuType.Stl
+        },
+        name:"3mfData"
+    }
     stlData:{name:string,fn:handlePostMsg} = {
         fn:(message:{db:ArrayBuffer},)=>{
         addSceneSTL(this.solidConfig.el,new STLLoader().parse(message.db));
@@ -162,6 +172,7 @@ export  class HandleMessageClass {
         this.getSrc,
         this.gzData,
         this.stlData,
+        this.Data3mf,
         this.bufferDB ] ;
     getMsgHandle = (type:number )=>{
         function* getTag  (Direction:{name:string,fn:handlePostMsg}[]) {

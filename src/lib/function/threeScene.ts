@@ -304,6 +304,29 @@ const materialSTL = new MeshPhongMaterial({
 	specular: 0x111111,
 	shininess: 200
 });
+export const addScene3mf = (el:HTMLCanvasElement,g:Group ) =>{
+	try{
+		if (el !== _el){
+			_el = el;
+			initRender(el);
+		}	
+	 
+		//g.
+		//g.rotation.x = -Math.PI / 2;
+		//g.rotation.y
+		const box = new Box3().setFromObject(g);
+		const center = box.getCenter(new Vector3());
+		g.position.sub(center);
+		group.copy(g)
+ 
+		onWindowResize(el);
+		//console.log("3mf end")
+		return;
+	}catch(e){
+		console.error(e)
+	}
+	
+};
 export const addSceneSTL = (el:HTMLCanvasElement,m:BufferGeometry) =>{
 	try{
 		if (el !== _el){
