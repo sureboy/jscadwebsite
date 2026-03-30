@@ -6,7 +6,7 @@ import MainMenu,{moduleInit} from "./MainMenu.svelte";
 import Camera,{toggleCamera,initView} from "./Camera.svelte"; 
 import {onWindowResize,switchView } from "../function/threeScene" 
 import { changeWorker,runWorker } from "../function/worker";  
-import {cleanCurrentMsg} from "../function/ImportParser";
+import {cleanCurrentMsg,currentMap} from "../function/ImportParser";
 import {MenuType,getRemoteUrl} from "../function/utils";
 
  
@@ -33,8 +33,10 @@ handleView.set("camera",()=>{
     onWindowResize(solidConfig.el!,solidConfig.workermsg.cameraType)
 }) 
 handleView.set("refresh",()=>{ 
-    cleanCurrentMsg()
-    runWorker(solidConfig)
+    if (currentMap.size>0){
+        cleanCurrentMsg()
+        runWorker(solidConfig)
+    }
 }) 
 handleView.set("show",()=>{ 
     onWindowResize(solidConfig.el!,solidConfig.workermsg.cameraType)
@@ -79,7 +81,7 @@ handleView.set("show",()=>{
     <a style="color:white;cursor: pointer;height:48px;text-align: left;line-height: 48px;"  
      href="{getRemoteUrl(solidConfig.showAd?undefined:["https://solidjscad.com"])}home/">Home</a>
     <a style="color:white;cursor: pointer;height:48px;text-align: left;line-height: 48px;" 
-    href="/docs/" data-sveltekit-reload >Docs</a>
+    href="{getRemoteUrl(solidConfig.showAd?undefined:["https://solidjscad.com"])}docs/" data-sveltekit-reload >Docs</a>
 
 </div>
 {/if}

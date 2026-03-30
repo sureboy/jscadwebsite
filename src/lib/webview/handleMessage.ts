@@ -5,10 +5,53 @@ import { addSceneSTL} from "../function/threeScene"
 import {gzipToString,srcStringToFile,MenuType} from "../function/utils"
 import {delCurrentMsg,handleCurrentMsg,getCurrent,getCurrentCode}  from "../function/ImportParser"
 import {STLLoader} from "three/addons/loaders/STLLoader.js" 
+import {HandleMsgToShow} from "../function/worker"  
+import {getCsgObjArray} from '../function/csgChange'
 type  handlePostMsg = (msg:any,postMessage?: (e: {name:string,db:string|ArrayBuffer,open:boolean}) => void)=>void
+const bufferDBToThreeDB = (db:ArrayBuffer)=>{
+    console.log(db)
+    const uint8Array = new Uint8Array(db);
+    const fullBuffer = new DataView(db);
+    // 读取元数据
+    const vertexCount = fullBuffer.getUint32(0, true); // true 表示小端字节序
+    const indexCount = fullBuffer.getUint32(4, true);
+
+    // 计算数据偏移
+    const vertexDataOffset = 8;
+    const vertexDataSize = vertexCount * 3 * 4; // 每个顶点 3 个 float
+    const indexDataOffset = vertexDataOffset + vertexDataSize;
+    const indexDataSize = indexCount * 4; // 每个索引 4 字节 (uint32)
+
+    if (fullBuffer.byteLength < indexDataOffset + indexDataSize) {
+      console.log(new Error('Incomplete data'));
+      return;
+    }
+
+    // 提取二进制数据
+    const vertexBuffer = uint8Array.subarray(vertexDataOffset, vertexDataOffset + vertexDataSize);
+    const indexBuffer = uint8Array.subarray(indexDataOffset, indexDataOffset + indexDataSize);
+
+    // 转换为 Float32Array 和 Uint32Array
+    const vertices = new Float32Array(vertexBuffer.buffer, vertexBuffer.byteOffset, vertexCount * 3);
+    const indices = new Uint32Array(indexBuffer.buffer, indexBuffer.byteOffset, indexCount); 
+
+    return {vertices,indices}
+}
 export  class HandleMessageClass {
     constructor(private  solidConfig:sConfig, ){
 
+    }
+    bufferDB:{name:string,fn:handlePostMsg}={
+        name:"bufferDB",
+        fn:(msg:{db:ArrayBuffer})=> {    
+            //delCurrentMsg(msg.name);
+
+        getCsgObjArray(bufferDBToThreeDB(msg.db),(e)=>{
+          console.log("t",e)
+          HandleMsgToShow(this.solidConfig,e)
+          this.solidConfig.showMenu=MenuType.Camera | MenuType.Stl
+        })
+        }
     }
     del:{name:string,fn:handlePostMsg} = {
         name:"del",
@@ -118,7 +161,8 @@ export  class HandleMessageClass {
         this.run,
         this.getSrc,
         this.gzData,
-        this.stlData ] ;
+        this.stlData,
+        this.bufferDB ] ;
     getMsgHandle = (type:number )=>{
         function* getTag  (Direction:{name:string,fn:handlePostMsg}[]) {
             for (let i = 0; i < Direction.length; i ++) {    

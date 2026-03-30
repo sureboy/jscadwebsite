@@ -16,11 +16,14 @@
     }) 
     return;  
   }
+  const getDownFileName = ()=>{
+    return `${solidConfig.workermsg.windowConfig.func}_${solidConfig.workermsg.windowConfig.in.split(".").shift()}_${solidConfig.workermsg.windowConfig.name}_${Date.now()}`
+  }
   const downPngClick = ()=>{
     //console.log("get png")
     createPng(solidConfig.el,(screenCanvas)=>{
       let aTag = document.createElement('a'); 
-      aTag.download = `${solidConfig.workermsg.windowConfig.func}_${solidConfig.workermsg.windowConfig.in.split(".").shift()}_${solidConfig.workermsg.windowConfig.name}_${Date.now()}.png`; //e.detail.name+"_screen.png";
+      aTag.download = `${getDownFileName()}.png`; //e.detail.name+"_screen.png";
       let href =screenCanvas.toDataURL()
       //console.log(href)
       //screenImgList.push(href)
@@ -37,7 +40,7 @@
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
       console.log(blob,link.href)
-      link.download = `${solidConfig.workermsg.windowConfig.func}_${solidConfig.workermsg.windowConfig.in.split(".").shift()}_${solidConfig.workermsg.windowConfig.name}_${Date.now()}.3mf`; 
+      link.download = `${getDownFileName()}.3mf`; 
       link.click();
       URL.revokeObjectURL(link.href); 
     })
@@ -51,7 +54,7 @@
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     //console.log(workermsg)
-    link.download = `${solidConfig.workermsg.windowConfig.func}_${solidConfig.workermsg.windowConfig.in.split(".").shift()}_${solidConfig.workermsg.windowConfig.name}_${Date.now()}.stl`; 
+    link.download = `${getDownFileName()}.stl`; 
     link.click();
     URL.revokeObjectURL(link.href); 
   } 
@@ -63,7 +66,7 @@
     }
     const link = document.createElement('a');
     link.href = URL.createObjectURL(compressedBlob);
-    link.download = `${solidConfig.workermsg.windowConfig.func}_${solidConfig.workermsg.windowConfig.in.split(".").shift()}_${solidConfig.workermsg.windowConfig.name}_${Date.now()}.solidjscad.gz`; 
+    link.download = `${getDownFileName()}.solidjscad.gz`; 
     link.click();
     URL.revokeObjectURL(link.href); 
   }

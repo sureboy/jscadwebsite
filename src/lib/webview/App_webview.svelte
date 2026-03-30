@@ -11,7 +11,7 @@
     solidConfig  
   } from '../webview/HandleMessagePage.svelte'; 
 
-  solidConfig.showMenu = -1
+  //solidConfig.showMenu = -1
   onMount(() => {    
     initSolidPage(solidConfig) 
     const vscode =  (window as any).vscode
