@@ -90,6 +90,7 @@ onMount(()=>{
         }
         changeSolidConfig(solidConfig,showMenu,()=>{
             showDialog=true;
+            solidConfig.workermsg.windowConfig  = undefined
         }) 
     }) 
     window.addEventListener("storage",(e)=>{

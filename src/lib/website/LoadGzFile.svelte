@@ -39,8 +39,7 @@ const analysisGzip =async ( fileName:string,data: ArrayBuffer)=>{
     console.log(fileName,p)
     let windowConfig =await analysisGzipDB(p,data,solidConfig) 
     console.log(windowConfig)
-    if (!windowConfig){
-        
+    if (!windowConfig){ 
         return
     } 
     Object.assign(solidConfig.workermsg,{windowConfig}) 
@@ -89,7 +88,7 @@ const readfile = (file:File)=>{
 <script lang="ts" module> 
 //export const fileList:string[] = $state([])
 //let show =$state(false)
-export let newPackageCode:string = `import modeling from '@jscad/modeling';
+export const newPackageCode:string = `import modeling from '@jscad/modeling';
 import  manifold from 'manifold-3d';
 const Manifold = await  manifold()
 Manifold.setup()
@@ -176,8 +175,7 @@ type="file" onchange={(event)=>{
     if (!file_n.endsWith(".js")){
         file_n += ".js"
     }
-    if (!solidConfig.workermsg?.windowConfig){
-
+    if (!solidConfig.workermsg?.windowConfig){ 
         const myConfig = solidConfig.workermsg.windowConfig = {
             in : fileName,
             name:"SolidJSCAD",

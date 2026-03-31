@@ -38,7 +38,7 @@ const getFileSelectList = ()=>{
 }
 const saveFileCode = ()=>{
     if (!codeFile.isLocal){
-      if (!window.confirm("Save to local?"))return;
+      if (!window.confirm("Save code?"))return;
     }
     if (!codeFile.value ){
         window.localStorage.removeItem(codeFile.title)
@@ -67,7 +67,7 @@ function createButton(id:string,name?:string,onclick?:(e?:any)=>void){
 function createHelpPanel(view: EditorView) {
   const dom = document.createElement("div")
  
-  dom.appendChild(createButton("delete","✕"))
+  dom.appendChild(createButton("delete","🗑️"))
   dom.appendChild(getFileSelectList())
   dom.appendChild(createButton("save","✓"))
   dom.appendChild(createButton("view","▷"))
