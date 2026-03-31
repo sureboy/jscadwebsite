@@ -133,11 +133,14 @@ const reloadDB =async (solidConfig:sConfig )=>{
     return undefined
 }
 
-export const changeSolidConfig = (solidConfig:sConfig,showMenu:number)=>{
+export const changeSolidConfig = (solidConfig:sConfig,showMenu:number,showDialog:()=>void)=>{
     reloadDB(solidConfig).then((windowConfig)=>{
         //console.log(obj)
         if (!windowConfig){
-            window.alert("not data")
+
+            showDialog()
+            //init window
+            //window.alert("not data")
             return
         }
         Object.assign(solidConfig.workermsg.windowConfig,windowConfig,{includeImport}) 

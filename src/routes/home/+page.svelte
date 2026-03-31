@@ -7,16 +7,16 @@ import {imgStorage} from '$lib/website/localImg'
 import ShowAds from '$lib/components/ShowAds.svelte'; 
 const getLocalDBList =async ()=>{
     const localList =[] as itemType[]
-    const items = db.list.map(l=>l.url) as string[]
+    //const items = db.list.map(l=>l.url) as string[]
     (await myStorage.keys()).forEach((v:string)=>{
-        if (!items.includes(v)){
+        //if (!items.includes(v)){
             localList.push({title:v,url:v,del:()=>{
                 if (!window.confirm("delete "+v))return;
                 myStorage.del(v)
                 imgStorage.del(v)
                 window.location.reload();
             }}) 
-        }
+        //}
     })
     return localList
 }

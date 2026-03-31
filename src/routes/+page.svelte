@@ -8,13 +8,15 @@ import Menu ,{menuConfig} from '$lib/components/Menu.svelte'
 import { runWorker } from "$lib/function/worker";
 import { showMenu } from "$lib/website/LoadGzFile.svelte";
 import { onMount } from 'svelte'; 
-//import aboutUs from '$lib/aboutUs.svelte'
+import Dialog from '$lib/components/Dialog.svelte'
 import {
     changeSolidConfig,
     loadLocalDBList,
     currentLocalDBConfig
 } from "$lib/website/localdb" 
 import {imgStorage,createPng} from "$lib/website/localImg"
+
+let showDialog = $state(false);
 const solidConfig:sConfig = $state({ 
     includeImport,
     showAd:true,
@@ -25,7 +27,7 @@ const solidConfig:sConfig = $state({
             //if (solidConfig.includeImport[e.path]){
                 setTimeout(()=>{
                     handleCurrentMsg({
-                    name: e.path
+                        name: e.path
                     },
                     solidConfig.postMessage
                 ).getUri =async ()=>new URL(
@@ -86,7 +88,9 @@ onMount(()=>{
             //newProject()
             return
         }
-        changeSolidConfig(solidConfig,showMenu) 
+        changeSolidConfig(solidConfig,showMenu,()=>{
+            showDialog=true;
+        }) 
     }) 
     window.addEventListener("storage",(e)=>{
         //console.log("storage",e) 
@@ -105,14 +109,25 @@ onMount(()=>{
 })
  
 </script>
-<svelte:head><title>{solidConfig.workermsg?.windowConfig?.name||"solidJSCAD"}</title></svelte:head>
+<svelte:head>
+    <title>{solidConfig.workermsg?.windowConfig?.name||"solidJSCAD"}</title>
+    
+</svelte:head>
 <ShowSolid></ShowSolid> 
  
  
 <Menu  {solidConfig}  >
     <FileMenu {solidConfig} ></FileMenu> 
 </Menu> 
-
+<Dialog bind:open={showDialog} title="温馨提示">
+    <!-- 自定义内容（带超链接） -->
+    <p>欢迎使用 SolidJScad 参数化 3D 建模平台。</p>
+    
+    <a href="/docs/UserAgreement" aria-current="page" rel="noopener noreferrer">用户协议</a>
+    <a href="/docs/PrivacyPolicy" aria-current="page"  rel="noopener noreferrer">隐私政策</a>
+    <a href="/docs/" aria-current="page"  rel="noopener noreferrer">帮助文档</a>
+    <a href="/home/" aria-current="page"  rel="noopener noreferrer">Home</a>
+</Dialog>
  
  
  
