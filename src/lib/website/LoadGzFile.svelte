@@ -3,8 +3,9 @@ import type {sConfig} from "../function/utils"
 import {handleCurrentMsg,cleanCurrentMsg}  from "../function/ImportParser"
 import { runWorker } from "../function/worker";
 import {MenuType} from "../function/utils"
-import { addSceneSTL,startSceneOBJ} from "../function/threeScene" 
+import {addScene3mf, addSceneSTL,startSceneOBJ} from "../function/threeScene" 
 import {STLLoader} from "three/addons/loaders/STLLoader.js" 
+import { ThreeMFLoader } from 'three/addons/loaders/3MFLoader.js';
 import {
     myStorage,
     analysisGzipDB,
@@ -71,10 +72,20 @@ const readfile = (file:File)=>{
                 solidConfig.workermsg.options  = undefined
                 return
             default:
-                if (!file.name.endsWith(".solidjscad.gz")){
-                    return
-                } 
-                analysisGzip(file.name,e.target.result as ArrayBuffer)
+                if (file.name.endsWith(".solidjscad.gz")){
+                    analysisGzip(file.name,e.target.result as ArrayBuffer)
+                    //return
+                }else if (file.name.endsWith(".3mf")) {
+                    solidConfig.showMenu=0
+                    
+            //this.solidConfig.showMenu=MenuType.Camera
+                    startSceneOBJ(solidConfig.el);
+                    //addSceneSTL(solidConfig.el,new STLLoader().parse(e.target.result as ArrayBuffer));
+                    addScene3mf(solidConfig.el,new ThreeMFLoader().parse(e.target.result as ArrayBuffer));
+                    solidConfig.showMenu=MenuType.Camera //| MenuType.Stl
+                    solidConfig.workermsg.options  = undefined
+                }
+                
                 //window.alert(`Not supporting file format '${file.type}'  `)
                 //console.log(file.type)
                 return
@@ -150,7 +161,7 @@ export const showMenu = MenuType.MainMenu | MenuType.Camera | MenuType.Gzip | Me
     
 </select>
 <input style="height:48:px;line-height:48px;cursor: pointer;"
-accept=".stl,.solidjscad.gz"
+accept=".stl,.3mf,.solidjscad.gz"
 type="file" onchange={(event)=>{
     const input = event.target as HTMLInputElement;
     console.log(input.files)
