@@ -61,7 +61,7 @@
         <div class="dialog-content">
             <slot>
                 <!-- 默认内容：一段文字 + 超链接 -->
-                <p>这是一个简洁弹出框，支持超链接。</p>
+                <p><a href="https://www.example.com" target="_blank" rel="noopener noreferrer"> 这是一个简洁弹出框，支持超链接。</a></p>
                 <a href="https://www.example.com" target="_blank" rel="noopener noreferrer">访问示例网站 ↗</a>
             </slot>
         </div>
@@ -107,7 +107,24 @@
         color: #2c3e44;
         line-height: 1.5;
     }
+.dialog-content p a {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: #eef2ff;
+        padding: 6px 16px;
+        border-radius: 60px;
+        text-decoration: none;
+        color: #1e4a76;
+        font-weight: 500;
+        margin-top: 0.5rem;
+        transition: background 0.2s;
+    }
 
+    .dialog-content p a:hover {
+        background: #e0e8ff;
+        text-decoration: underline;
+    }
     .dialog-content a {
         display: inline-flex;
         align-items: center;

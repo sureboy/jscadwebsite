@@ -120,14 +120,17 @@ onMount(()=>{
 <Menu  {solidConfig}  >
     <FileMenu {solidConfig} ></FileMenu> 
 </Menu> 
-<Dialog bind:open={showDialog} title="温馨提示">
+<Dialog bind:open={showDialog} title="SolidJScad">
     <!-- 自定义内容（带超链接） -->
-    <p>欢迎使用 SolidJScad 参数化 3D 建模平台。</p>
-    
+     <p><button onclick={()=>{
+        window.location.href="/#new"
+        window.location.reload()
+    }}  >从这里开始</button></p>
+    <p>参数化 3D 建模 <a href="/docs/" aria-current="page"  rel="noopener noreferrer">文档</a></p> 
+    <p><a href="/home/" aria-current="page"  rel="noopener noreferrer">Home</a></p>
     <a href="/docs/UserAgreement" aria-current="page" rel="noopener noreferrer">用户协议</a>
-    <a href="/docs/PrivacyPolicy" aria-current="page"  rel="noopener noreferrer">隐私政策</a>
-    <a href="/docs/" aria-current="page"  rel="noopener noreferrer">帮助文档</a>
-    <a href="/home/" aria-current="page"  rel="noopener noreferrer">Home</a>
+    <a href="/docs/PrivacyPolicy" aria-current="page"  rel="noopener noreferrer">隐私政策</a> 
+    
 </Dialog>
  
  
