@@ -50,7 +50,7 @@ function char(c:string ){
    
     const a = align[Math.floor(getRandom(0,3))]
     //console.log(h, a)
-    return shuffle(modeling.text.vectorText({xOffset:-h*4,height:h,align:a,input:c}))
+    return shuffle(modeling.text.vectorText({xOffset:-h*(c.length/2),height:h,align:a,input:c}))
  
 }
 export const OPTIONS = async () => {
