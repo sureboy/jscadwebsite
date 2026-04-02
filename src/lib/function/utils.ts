@@ -79,11 +79,19 @@ export const getRemoteUrl = (serverIP?: string[])=>{
     return addr
   }
 }
+export const getMinDateTime = (now:number)=>{
+  return now  - (30 * 24 * 3600 *1000 )
+}
 export const fetchGZBuffer = async (name:string)=>{
   let url = ""
   if (name.endsWith(".solidjscad.gz")){
       url = "/assets/"+name
   }else{
+    const t = parseInt(name,36)
+    const now =  Date.now()
+    if (t >now  || t< getMinDateTime(now) ){
+      return null
+    }
       url = "/db?k="+name 
   }
   console.log(url)

@@ -1,5 +1,5 @@
 import { error,json } from '@sveltejs/kit';
-
+import {getMinDateTime as getdt} from '$lib/function/utils'
 //import {put} from '$lib/function/kvdb'
 import modeling from '@jscad/modeling';
 import { API_SECRET_KEY } from '$env/static/private';
@@ -76,17 +76,16 @@ export const GET: RequestHandler =async (req) => {
     }}) 
 };
 const getMinDateTime = ()=>{
-    const now = new Date();
-    now.setMonth(now.getMonth() + 1);
-    console.log(now.toISOString() )
-    return Math.floor(now.getTime()/1000)
+  return Math.floor(getdt(Date.now())/1000);
+  //  const now = new Date(); 
+  //  return Math.floor(now.setMonth(now.getMonth() + 1)/1000)
 }
 export const POST:RequestHandler=async (e) => { 
     const code = e.url.searchParams.get("code")
     const key = e.url.searchParams.get("key") 
     if (!code 
       || !key       
-      || key != await sha256(API_SECRET_KEY+code.toLocaleLowerCase() + Date.now().toString().slice(0,8))){ 
+      || key != await sha256(API_SECRET_KEY+code.toLocaleLowerCase() + (Date.now()+15000).toString().slice(0,8))){ 
       return json(
         {msg :"err"},
         {headers:{
