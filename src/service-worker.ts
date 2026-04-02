@@ -19,17 +19,36 @@ const ASSETS = [
     ...build, // the app itself
     ...files  // everything in `static`
 ];
- 
+ self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE)
+      .then(cache => {
+        return Promise.allSettled(
+          ASSETS.map(url => cache.add(url))
+        );
+      })
+      .then(results => {
+        // 检查失败情况，决定是否继续安装
+        const failed = results.filter(r => r.status === 'rejected');
+        if (failed.length > 0) {
+          console.warn('Some resources failed to cache:', failed);
+          // 仍然可以继续激活，但需要确保应用降级可用
+        }
+      })
+  );
+});
+/*
 self.addEventListener('install', (event) => {
     // Create a new cache and add all files to it
     //console.log("install",event)
+    console.log("install",ASSETS)
     async function addFilesToCache() {
         const cache = await caches.open(CACHE);
         await cache.addAll(ASSETS);
     }
 
     event.waitUntil(addFilesToCache());
-});
+});*/
 self.addEventListener('activate', (event) => {
     // Remove previous cached data from disk
     //console.log("activate",event)
