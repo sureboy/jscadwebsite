@@ -21,7 +21,8 @@ const config = {
 			routes: {
 				include: ['/*'],
 				exclude: ['<all>']
-			}
+			},
+			strict: false
 		}) 
 		 
 	},
