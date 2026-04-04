@@ -7,8 +7,8 @@
       <p>&copy; {new Date().getFullYear()} solidJSCAD. 保留所有权利.</p>
       <div class="social-links">
         <!-- 占位社交图标，可使用文字或简单SVG -->
-    <a href="/docs/UserAgreement"   >用户协议</a>
-    <a href="/docs/PrivacyPolicy"   >隐私政策</a> 
+    <a href="/docs/UserAgreement/index.html"   >用户协议</a>
+    <a href="/docs/PrivacyPolicy/index.html"   >隐私政策</a> 
       </div>
     </div>
   </div>
