@@ -25,7 +25,7 @@ const getItemImg =async (item:itemType)=>{
     if (img){
         item.img =URL.createObjectURL(img)
     }else{
-        item.img = "/wxq.jpeg"
+        item.img = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+CiAgPHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIHg9IjEwIiB5PSIxMCIgZmlsbD0iI2Y4ZjlmYyIgc3Ryb2tlPSIjZDBkNWRjIiBzdHJva2Utd2lkdGg9IjIiIHJ4PSI4Ii8+CiAgPHBhdGggZD0iTTQwIDUwIEw1MCA2MCBMNzAgMzAiIHN0cm9rZT0iIzljYTNhZiIgc3Ryb2tlLXdpZHRoPSIzIiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8Y2lyY2xlIGN4PSI1MCIgY3k9IjcwIiByPSI4IiBmaWxsPSIjZTBlMGUwIi8+CiAgPHJlY3QgeD0iNjAiIHk9IjUwIiB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIGZpbGw9IiNlMGUwZTAiLz4KICA8cGF0aCBkPSJNNDUgODAgTDc1IDUwIiBzdHJva2U9IiNjY2MiIHN0cm9rZS13aWR0aD0iMiIvPgo8L3N2Zz4="
     }
     return item.img
 
